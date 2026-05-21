@@ -5,7 +5,7 @@ from __future__ import annotations
 import typer
 from rich.console import Console
 
-from machine_core.plugins.cli_support.utils import (
+from machine_cli.utils import (
     find_project_root,
     load_machine_config,
 )

@@ -7,12 +7,16 @@ import asyncio
 import typer
 from rich.console import Console
 
-from machine_core.plugins.cli_support.utils import (
+from machine_cli.utils import (
     find_project_root,
     load_machine_config,
     load_machine_instance,
 )
-from machine_core.plugins.deployer_support.base import DeployConfig
+
+try:
+    from machine_core.plugins.deployer_support.base import DeployConfig
+except ImportError:
+    DeployConfig = None  # type: ignore[assignment, misc]
 
 console = Console()
 

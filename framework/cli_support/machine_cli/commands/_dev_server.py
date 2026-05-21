@@ -16,7 +16,12 @@ import importlib
 module = importlib.import_module(module_path)
 machine = getattr(module, attr_name)
 
-from machine_core.plugins.server_support.app import create_app
+try:
+    from machine_core.plugins.server_support.app import create_app
+except ImportError:
+    raise ImportError(
+        "server_support plugin is required for 'machine dev'. Install it first."
+    )
 
 app = create_app(machine)
 

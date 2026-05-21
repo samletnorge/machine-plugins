@@ -9,7 +9,7 @@ import sys
 import typer
 from rich.console import Console
 
-from machine_core.plugins.cli_support.utils import (
+from machine_cli.utils import (
     find_project_root,
     load_machine_config,
 )
@@ -44,7 +44,7 @@ def studio_command(
         sys.executable,
         "-m",
         "uvicorn",
-        "machine_core.plugins.cli_support.commands._dev_server:app",
+        "machine_cli.commands._dev_server:app",
         "--host",
         host,
         "--port",

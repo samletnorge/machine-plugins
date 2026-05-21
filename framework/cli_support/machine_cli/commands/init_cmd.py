@@ -11,7 +11,7 @@ from rich.console import Console
 console = Console()
 
 env = Environment(
-    loader=PackageLoader("machine_core.plugins.cli_support", "scaffolds"),
+    loader=PackageLoader("machine_cli", "scaffolds"),
     autoescape=select_autoescape(),
     keep_trailing_newline=True,
 )
