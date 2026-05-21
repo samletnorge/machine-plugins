@@ -39,25 +39,26 @@ class StoreScreen(Widget):
             details = self.query_one("#store-details", Static)
             details.update("machine-core not installed. Cannot browse registry.")
             return
-        self._client = RegistryClient()  # Uses default GitHub raw URL
+        self._client = RegistryClient()
         await self._load_plugins()
 
     async def _load_plugins(self, query: str = "") -> None:
         """Populate list from registry."""
         list_view = self.query_one("#store-list", ListView)
+        details = self.query_one("#store-details", Static)
         list_view.clear()
 
-        if query:
-            plugins = await self._client.search_plugins(query)
-        else:
-            plugins = await self._client.list_plugins()
+        try:
+            if query:
+                plugins = await self._client.search_plugins(query)
+            else:
+                plugins = await self._client.list_plugins()
+        except Exception as e:
+            details.update(f"Failed to load registry: {e}")
+            return
 
         for plugin in plugins:
-            name = plugin.name if hasattr(plugin, "name") else plugin["name"]
-            category = (
-                plugin.tier if hasattr(plugin, "tier") else plugin.get("category", "")
-            )
-            item = ListItem(Label(f"  {name} [{category}]"), name=name)
+            item = ListItem(Label(f"  {plugin.name} [{plugin.tier}]"), name=plugin.name)
             list_view.append(item)
 
     async def on_input_changed(self, event: Input.Changed) -> None:
@@ -72,10 +73,11 @@ class StoreScreen(Widget):
         if plugin:
             details = self.query_one("#store-details", Static)
             info = (
-                f"Name: {plugin['name']}\n"
-                f"Category: {plugin.get('category')}\n"
-                f"Runtime: {plugin.get('runtime')}\n\n"
-                f"{plugin.get('description', '')}"
+                f"Name: {plugin.name}\n"
+                f"Tier: {plugin.tier}\n"
+                f"Runtime: {plugin.runtime}\n"
+                f"Version: {plugin.version}\n\n"
+                f"{plugin.description}"
             )
             details.update(info)
             self.query_one("#store-install-btn").disabled = False
@@ -86,4 +88,4 @@ class StoreScreen(Widget):
         if event.button.id == "store-install-btn" and hasattr(self, "_selected_plugin"):
             plugin = self._selected_plugin
             details = self.query_one("#store-details", Static)
-            details.update(f"Installing {plugin['name']}...")
+            details.update(f"Installing {plugin.name}...")
