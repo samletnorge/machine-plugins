@@ -13,3 +13,40 @@ Footer {
 TabbedContent {
     height: 1fr;
 }
+
+PluginsScreen, StoreScreen, ServicesScreen, ConfigScreen {
+    height: 1fr;
+    width: 1fr;
+}
+
+#plugin-list-pane, #store-list-pane {
+    width: 1fr;
+    height: 1fr;
+    border-right: solid $primary-background;
+}
+
+#plugin-detail-pane, #store-detail-pane {
+    width: 2fr;
+    height: 1fr;
+    padding: 1 2;
+}
+
+.pane-title {
+    text-style: bold;
+    padding: 0 1;
+    color: $text;
+}
+
+#store-search {
+    dock: top;
+    margin: 0 0 1 0;
+}
+
+#store-install-btn {
+    dock: bottom;
+    margin: 1 0 0 0;
+}
+
+ListView {
+    height: 1fr;
+}
