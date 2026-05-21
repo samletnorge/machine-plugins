@@ -10,7 +10,8 @@ console = Console()
 app = typer.Typer(
     name="machine",
     help="machine-core CLI — build, test, and deploy AI agents.",
-    no_args_is_help=True,
+    no_args_is_help=False,
+    invoke_without_command=True,
 )
 
 
@@ -20,8 +21,9 @@ def version_callback(value: bool):
         raise typer.Exit()
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def main(
+    ctx: typer.Context,
     version: bool = typer.Option(
         False,
         "--version",
@@ -32,18 +34,22 @@ def main(
     ),
 ):
     """machine-core CLI — build, test, and deploy AI agents."""
-    pass
+    if ctx.invoked_subcommand is None:
+        from .tui.app import MachineApp
+
+        tui = MachineApp()
+        tui.run()
 
 
 # Register commands
-from machine_core.plugins.cli_support.commands.init_cmd import init_command
-from machine_core.plugins.cli_support.commands.agent_cmd import agent_app
-from machine_core.plugins.cli_support.commands.tool_cmd import tool_app
-from machine_core.plugins.cli_support.commands.dev_cmd import dev_command
-from machine_core.plugins.cli_support.commands.build_cmd import build_command
-from machine_core.plugins.cli_support.commands.deploy_cmd import deploy_command
-from machine_core.plugins.cli_support.commands.eval_cmd import eval_app
-from machine_core.plugins.cli_support.commands.studio_cmd import studio_command
+from .commands.init_cmd import init_command
+from .commands.agent_cmd import agent_app
+from .commands.tool_cmd import tool_app
+from .commands.dev_cmd import dev_command
+from .commands.build_cmd import build_command
+from .commands.deploy_cmd import deploy_command
+from .commands.eval_cmd import eval_app
+from .commands.studio_cmd import studio_command
 
 app.command("init")(init_command)
 app.add_typer(agent_app)

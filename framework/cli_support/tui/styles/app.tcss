@@ -1,0 +1,15 @@
+Screen {
+    background: $surface;
+}
+
+Header {
+    dock: top;
+}
+
+Footer {
+    dock: bottom;
+}
+
+TabbedContent {
+    height: 1fr;
+}
