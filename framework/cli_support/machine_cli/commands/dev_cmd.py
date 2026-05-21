@@ -51,9 +51,12 @@ def dev_command(
         host,
         "--port",
         str(port),
-        "--reload-dir",
-        str(root / "src"),
     ]
+
+    # Only add --reload-dir if src/ exists
+    src_dir = root / "src"
+    if src_dir.is_dir():
+        cmd.extend(["--reload-dir", str(src_dir)])
 
     full_env = {**os.environ, **env_vars}
     subprocess.run(cmd, cwd=str(root), env=full_env)
