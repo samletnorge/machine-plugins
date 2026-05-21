@@ -7,15 +7,10 @@ from textual.containers import Horizontal, Vertical
 from textual.widgets import Static, ListView, ListItem, Label, Input, Button
 from textual.widget import Widget
 
-from pathlib import Path
-
 try:
     from machine_core.plugin.registry import RegistryClient
 except ImportError:
     RegistryClient = None  # type: ignore[assignment, misc]
-
-
-DEFAULT_REGISTRY_DIR = Path.home() / ".config" / "machine-core" / "registry"
 
 
 class StoreScreen(Widget):
@@ -44,7 +39,7 @@ class StoreScreen(Widget):
             details = self.query_one("#store-details", Static)
             details.update("machine-core not installed. Cannot browse registry.")
             return
-        self._client = RegistryClient(DEFAULT_REGISTRY_DIR)
+        self._client = RegistryClient()  # Uses default GitHub raw URL
         await self._load_plugins()
 
     async def _load_plugins(self, query: str = "") -> None:
