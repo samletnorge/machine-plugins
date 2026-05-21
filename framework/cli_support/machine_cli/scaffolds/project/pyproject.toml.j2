@@ -5,10 +5,14 @@ description = "A machine-core AI agent project"
 requires-python = ">=3.12"
 dependencies = [
     "machine-core @ git+ssh://git@github.com/samletnorge/machine-core.git",
+    "machine-core-server-support @ git+ssh://git@github.com/samletnorge/machine-plugins.git#subdirectory=framework/server_support",
+    "machine-core-agent-support @ git+ssh://git@github.com/samletnorge/machine-plugins.git#subdirectory=framework/agent_support",
+    "machine-core-tool-support @ git+ssh://git@github.com/samletnorge/machine-plugins.git#subdirectory=framework/tool_support",
 ]
 
 [tool.machine-core]
 entry = "src.main:machine"
+plugins = ["agent_support", "tool_support", "server_support"]
 
 [tool.hatch.metadata]
 allow-direct-references = true

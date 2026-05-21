@@ -1,7 +1,8 @@
 """Main entry point for {{ project_name }}."""
-from machine_core import Machine
+from machine_core import Machine, MachineConfig
 
-machine = Machine(name="{{ project_name }}")
+config = MachineConfig.from_pyproject()
+machine = Machine(config=config)
 
 # Register your agents, tools, and workflows here:
 # from .agents.example import example_agent
