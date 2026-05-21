@@ -29,11 +29,41 @@ class PluginsScreen(Widget):
                 resp = await client.get(f"{self.app.server_url}/health")
                 data = resp.json()
                 list_view = self.query_one("#plugin-list", ListView)
-                for category, info in data.get("categories", {}).items():
-                    for item_name in info.get("items", []):
-                        list_view.append(
-                            ListItem(Label(f"  {item_name}"), name=item_name)
+                categories = data.get("categories", {})
+
+                for category, count in categories.items():
+                    # Add category header
+                    list_view.append(
+                        ListItem(
+                            Label(f"[{category}] ({count} items)"),
+                            name=f"_cat_{category}",
                         )
+                    )
+                    # Fetch actual items for this category
+                    if count > 0:
+                        try:
+                            items_resp = await client.get(
+                                f"{self.app.server_url}/api/{category}"
+                            )
+                            items = items_resp.json()
+                            for item in items:
+                                item_name = (
+                                    item
+                                    if isinstance(item, str)
+                                    else item.get("name", str(item))
+                                )
+                                list_view.append(
+                                    ListItem(Label(f"  {item_name}"), name=item_name)
+                                )
+                        except Exception:
+                            pass
+
+                if not categories:
+                    details = self.query_one("#plugin-details", Static)
+                    details.update(
+                        "No categories registered.\nPlugins are loaded but no items registered yet."
+                    )
+
         except httpx.ConnectError:
             details = self.query_one("#plugin-details", Static)
             details.update("Server not running. Start with: machine dev")
@@ -42,4 +72,8 @@ class PluginsScreen(Widget):
         """Show plugin details when selected."""
         name = event.item.name
         details = self.query_one("#plugin-details", Static)
-        details.update(f"Name: {name}\nStatus: Loaded")
+        if name and name.startswith("_cat_"):
+            category = name[5:]
+            details.update(f"Category: {category}\nType: Plugin-defined category")
+        else:
+            details.update(f"Name: {name}\nStatus: Loaded")

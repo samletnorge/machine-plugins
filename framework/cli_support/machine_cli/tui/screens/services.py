@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
+
 from textual.app import ComposeResult
 from textual.containers import Vertical
 from textual.widgets import Static, Button, Label, Log
@@ -12,6 +15,8 @@ import httpx
 
 class ServicesScreen(Widget):
     """Shows server/studio status with start/stop controls."""
+
+    _server_process: subprocess.Popen | None = None
 
     def compose(self) -> ComposeResult:
         with Vertical():
@@ -45,3 +50,53 @@ class ServicesScreen(Widget):
             status.update("Server: [red]stopped[/red]")
             self.query_one("#stop-server-btn").disabled = True
             self.query_one("#start-dev-btn").disabled = False
+
+    async def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Handle button presses."""
+        log = self.query_one("#service-logs", Log)
+
+        if event.button.id == "start-dev-btn":
+            log.write_line("Starting dev server...")
+            try:
+                self._server_process = subprocess.Popen(
+                    [
+                        sys.executable,
+                        "-m",
+                        "uvicorn",
+                        "machine_cli.commands._dev_server:app",
+                        "--host",
+                        "127.0.0.1",
+                        "--port",
+                        "8000",
+                    ],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                )
+                log.write_line(f"Server started (PID: {self._server_process.pid})")
+                # Wait briefly then check status
+                import asyncio
+
+                await asyncio.sleep(1.5)
+                await self._check_status()
+            except Exception as e:
+                log.write_line(f"Failed to start: {e}")
+
+        elif event.button.id == "stop-server-btn":
+            log.write_line("Stopping server...")
+            if self._server_process and self._server_process.poll() is None:
+                self._server_process.terminate()
+                self._server_process.wait(timeout=5)
+                self._server_process = None
+                log.write_line("Server stopped.")
+            else:
+                # Try to kill by port
+                try:
+                    subprocess.run(
+                        ["fuser", "-k", "8000/tcp"],
+                        capture_output=True,
+                    )
+                    log.write_line("Server stopped (killed by port).")
+                except Exception:
+                    log.write_line("Could not stop server.")
+            await self._check_status()
