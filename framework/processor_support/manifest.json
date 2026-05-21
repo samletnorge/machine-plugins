@@ -1,0 +1,14 @@
+{
+  "name": "processor-support",
+  "version": "0.1.0",
+  "description": "Middleware processor pipeline for agents — PII detection, moderation, token limiting, cost guard, caching, and more.",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "hooks:define", "processor:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.processor_support:ProcessorSupportPlugin"
+  }
+}

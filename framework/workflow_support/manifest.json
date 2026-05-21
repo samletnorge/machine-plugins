@@ -1,0 +1,14 @@
+{
+  "name": "workflow-support",
+  "version": "0.9.0",
+  "description": "Defines the 'workflow' and 'execution-engine' categories with step primitives, DAG builder, and execution engines",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "hooks:define", "events:emit", "workflow:register", "execution-engine:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.workflow_support:WorkflowSupportPlugin"
+  }
+}

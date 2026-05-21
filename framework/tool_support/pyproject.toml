@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-tool-support"
+version = "0.5.0"
+description = "Defines the tool category for registering callable tools"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

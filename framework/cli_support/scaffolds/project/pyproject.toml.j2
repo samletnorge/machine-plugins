@@ -1,0 +1,15 @@
+[project]
+name = "{{ project_name }}"
+version = "0.1.0"
+description = "A machine-core AI agent project"
+requires-python = ">=3.12"
+dependencies = [
+    "machine-core>=0.5.0",
+]
+
+[tool.machine-core]
+entry = "src.main:machine"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

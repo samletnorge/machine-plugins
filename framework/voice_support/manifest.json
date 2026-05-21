@@ -1,0 +1,14 @@
+{
+  "name": "voice-support",
+  "version": "0.1.0",
+  "description": "Voice abstraction layer with TTS, STT, and realtime voice providers",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.voice_support:VoiceSupportPlugin"
+  }
+}

@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-vectorstore-support"
+version = "0.5.0"
+description = "Defines the vector_store category for machine-core"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

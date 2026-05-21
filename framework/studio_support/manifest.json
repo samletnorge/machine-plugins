@@ -1,0 +1,14 @@
+{
+  "name": "studio-support",
+  "version": "0.1.0",
+  "description": "Visual studio/playground for testing agents, tools, and workflows",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": [],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.studio_support:StudioSupportPlugin"
+  }
+}

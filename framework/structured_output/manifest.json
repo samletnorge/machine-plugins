@@ -1,0 +1,14 @@
+{
+  "name": "structured-output",
+  "version": "0.5.0",
+  "description": "Defines the 'structured_output' category for LLM-to-JSON validated generation",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "hooks:define", "events:emit", "structured_output:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.structured_output:StructuredOutputPlugin"
+  }
+}

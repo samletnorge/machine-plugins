@@ -1,0 +1,14 @@
+{
+  "name": "memory-support",
+  "version": "0.10.0",
+  "description": "Defines the 'memory' and 'storage-backend' categories with thread-based conversation memory, working memory, observational memory, and windowing strategies",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "hooks:define", "events:emit", "memory:register", "storage-backend:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.memory_support:MemorySupportPlugin"
+  }
+}

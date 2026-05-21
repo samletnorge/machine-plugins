@@ -1,0 +1,14 @@
+{
+  "name": "agent-support",
+  "version": "0.5.0",
+  "description": "Defines the 'agent' category with AgentDefinition, handoff protocol, and agent lifecycle hooks",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "hooks:define", "events:emit", "agent:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.agent_support:AgentSupportPlugin"
+  }
+}

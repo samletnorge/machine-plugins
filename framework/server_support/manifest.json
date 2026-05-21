@@ -1,0 +1,14 @@
+{
+  "name": "server-support",
+  "version": "0.11.0",
+  "description": "Auto-generates FastAPI HTTP endpoints from Machine registry for agents, tools, workflows, and memory",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "hooks:define"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.server_support:ServerSupportPlugin"
+  }
+}

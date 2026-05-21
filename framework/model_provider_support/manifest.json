@@ -1,0 +1,14 @@
+{
+  "name": "model-provider-support",
+  "version": "0.5.0",
+  "description": "Defines the 'model_provider' category for any model type (LLM, TTS, STT, image, etc.)",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "hooks:define", "events:emit", "model_provider:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.model_provider_support:ModelProviderSupportPlugin"
+  }
+}

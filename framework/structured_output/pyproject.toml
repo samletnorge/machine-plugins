@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-structured-output"
+version = "0.5.0"
+description = "Defines the structured_output category for typed outputs"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-memory-support"
+version = "0.10.0"
+description = "Defines the memory and storage-backend categories for machine-core"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

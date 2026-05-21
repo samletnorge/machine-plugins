@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-processor-support"
+version = "0.5.0"
+description = "Defines the processor category for data processors"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

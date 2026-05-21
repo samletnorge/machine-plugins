@@ -1,0 +1,14 @@
+{
+  "name": "storage-support",
+  "version": "0.1.0",
+  "description": "Storage backends: local filesystem and S3-compatible storage",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["storage-backend:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.storage_support:StorageSupportPlugin"
+  }
+}

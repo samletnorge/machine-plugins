@@ -1,0 +1,14 @@
+{
+  "name": "embeddings",
+  "version": "0.5.0",
+  "description": "Defines the 'embedding' category for text-to-vector providers",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "hooks:define", "events:emit", "embedding:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.embeddings:EmbeddingsPlugin"
+  }
+}

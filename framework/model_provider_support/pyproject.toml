@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-model-provider-support"
+version = "0.5.0"
+description = "Defines the model_provider category for any model type"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
