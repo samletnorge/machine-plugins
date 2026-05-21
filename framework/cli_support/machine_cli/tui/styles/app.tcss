@@ -18,13 +18,19 @@ TabPane {
     height: 1fr;
 }
 
+/* All screens fill their tab pane */
 PluginsScreen, StoreScreen, ServicesScreen, ConfigScreen {
     height: 1fr;
     width: 1fr;
 }
 
-/* All direct Horizontal/Vertical containers inside screens must fill */
+/* Layout containers inside screens */
 PluginsScreen > Horizontal,
+ConfigScreen > Horizontal {
+    height: 1fr;
+    width: 1fr;
+}
+
 StoreScreen > Vertical {
     height: 1fr;
     width: 1fr;
@@ -40,51 +46,74 @@ ServicesScreen > Vertical {
     width: 1fr;
 }
 
-ConfigScreen > Horizontal {
-    height: 1fr;
-    width: 1fr;
-}
-
-#config-list-pane {
+/* List/detail panes */
+#plugin-list-pane, #store-list-pane, #config-list-pane {
     width: 1fr;
     height: 1fr;
     border-right: solid $primary-background;
 }
 
-#config-edit-pane {
+#plugin-detail-pane, #store-detail-pane, #config-edit-pane {
     width: 2fr;
     height: 1fr;
     padding: 1 2;
 }
 
-#plugin-list-pane, #store-list-pane {
-    width: 1fr;
-    height: 1fr;
-    border-right: solid $primary-background;
-}
-
-#plugin-detail-pane, #store-detail-pane {
-    width: 2fr;
-    height: 1fr;
-    padding: 1 2;
-}
-
+/* Pane titles */
 .pane-title {
     text-style: bold;
     padding: 0 1;
     color: $text;
+    height: 1;
 }
 
+/* Search input */
 #store-search {
     dock: top;
     height: 3;
 }
 
+/* Install button docked to bottom of detail pane */
 #store-install-btn {
+    dock: bottom;
+    height: 3;
+    margin-top: 1;
+}
+
+/* Refresh buttons at bottom of list panes */
+#refresh-plugins-btn, #refresh-config-btn {
     dock: bottom;
     height: 3;
 }
 
+/* Service buttons row */
+#service-buttons {
+    height: 3;
+    width: 100%;
+    padding: 0 1;
+}
+
+#service-buttons Button {
+    margin-right: 1;
+}
+
+/* Log widget */
+#service-logs {
+    height: 1fr;
+    border: solid $primary-background;
+    margin-top: 1;
+}
+
+/* ListView fills available space */
 ListView {
     height: 1fr;
+}
+
+/* ListItem hover */
+ListItem:hover {
+    background: $boost;
+}
+
+ListItem.-highlight {
+    background: $accent;
 }
