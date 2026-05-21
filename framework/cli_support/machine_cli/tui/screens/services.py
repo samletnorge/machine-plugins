@@ -226,11 +226,25 @@ class ServicesScreen(Widget):
     async def _tail_log_file(self, log: Log) -> None:
         """Tail SERVER_LOG_FILE, streaming new lines to the Log widget."""
         try:
-            if not SERVER_LOG_FILE.exists():
-                log.write_line("[dim]No server log file yet.[/dim]")
-                return
+            # Wait for log file to appear (server may have just started)
+            for _ in range(20):  # up to 6 seconds
+                if SERVER_LOG_FILE.exists() and SERVER_LOG_FILE.stat().st_size > 0:
+                    break
+                await asyncio.sleep(0.3)
 
-            # Read existing content first (last 50 lines)
+            if not SERVER_LOG_FILE.exists() or SERVER_LOG_FILE.stat().st_size == 0:
+                log.write_line(
+                    "[dim]No server logs available yet. "
+                    "Logs will appear after the server is (re)started with the current version.[/dim]"
+                )
+                # Still keep polling for the file to appear
+                while True:
+                    await asyncio.sleep(1.0)
+                    if SERVER_LOG_FILE.exists() and SERVER_LOG_FILE.stat().st_size > 0:
+                        break
+                # Fall through to read it
+
+            # Read existing content (last 50 lines)
             lines = SERVER_LOG_FILE.read_text().splitlines()
             for line in lines[-50:]:
                 log.write_line(line)
