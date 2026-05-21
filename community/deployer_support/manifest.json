@@ -1,0 +1,14 @@
+{
+  "name": "deployer-support",
+  "version": "0.1.0",
+  "description": "Deployment target category and built-in deployers (Docker, Dokploy, Vercel, Cloudflare)",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.deployer_support:DeployerSupportPlugin"
+  }
+}

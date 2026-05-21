@@ -1,0 +1,8 @@
+[project]
+name = "machine-plugin-embeddings-sentence-transformers"
+version = "0.1.0"
+description = "SentenceTransformers embedding provider for machine-core"
+requires-python = ">=3.11"
+dependencies = [
+    "sentence-transformers>=3.0",
+]

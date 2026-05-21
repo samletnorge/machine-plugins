@@ -1,0 +1,19 @@
+[project]
+name = "machine-core-observability-support"
+version = "0.5.0"
+description = "Defines the observability category for tracing and monitoring"
+requires-python = ">=3.12"
+dependencies = [
+    "opentelemetry-api>=1.25.0",
+    "opentelemetry-sdk>=1.25.0",
+]
+
+[project.optional-dependencies]
+otlp = ["opentelemetry-exporter-otlp-proto-http>=1.25.0"]
+langfuse = ["langfuse>=2.0.0"]
+langsmith = ["langsmith>=0.1.0"]
+sentry = ["sentry-sdk[opentelemetry]>=2.0.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

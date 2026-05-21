@@ -1,0 +1,47 @@
+{
+  "name": "provider-azure-openai",
+  "version": "0.1.0",
+  "description": "Azure OpenAI LLM provider via pydantic-ai",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["model_provider:register"],
+  "dependencies": ["pydantic-ai>=0.0.1", "openai>=1.0"],
+  "config_schema": {
+    "endpoint": {
+      "type": "string",
+      "required": true,
+      "env": "AZURE_OPENAI_ENDPOINT",
+      "description": "Azure OpenAI endpoint URL"
+    },
+    "api_key": {
+      "type": "string",
+      "secret": true,
+      "env": "AZURE_OPENAI_API_KEY",
+      "description": "Azure OpenAI API key (not needed if use_token_auth=true)"
+    },
+    "deployment": {
+      "type": "string",
+      "default": "gpt-4o",
+      "env": "AZURE_OPENAI_DEPLOYMENT",
+      "description": "Model deployment name"
+    },
+    "api_version": {
+      "type": "string",
+      "default": "2024-12-01-preview",
+      "env": "AZURE_OPENAI_API_VERSION",
+      "description": "Azure API version"
+    },
+    "use_token_auth": {
+      "type": "boolean",
+      "default": false,
+      "env": "AZURE_USE_TOKEN_AUTH",
+      "description": "Use Azure token-based auth instead of API key"
+    }
+  },
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.provider_azure_openai:AzureOpenAIProviderPlugin"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "provider-github-copilot",
+  "version": "0.1.0",
+  "description": "GitHub Copilot LLM provider via OAuth device flow + pydantic-ai",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["model_provider:register"],
+  "dependencies": ["pydantic-ai>=0.0.1", "httpx>=0.28"],
+  "config_schema": {
+    "access_token": {
+      "type": "string",
+      "secret": true,
+      "env": "GITHUB_COPILOT_TOKEN",
+      "description": "GitHub OAuth access token (or acquired via device flow)"
+    },
+    "model": {
+      "type": "string",
+      "default": "gpt-4o",
+      "description": "Model to use via Copilot API"
+    }
+  },
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.provider_github_copilot:CopilotProviderPlugin"
+  }
+}

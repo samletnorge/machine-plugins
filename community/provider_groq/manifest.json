@@ -1,0 +1,30 @@
+{
+  "name": "provider-groq",
+  "version": "0.1.0",
+  "description": "Groq LLM provider via pydantic-ai",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["model_provider:register"],
+  "dependencies": ["pydantic-ai>=0.0.1"],
+  "config_schema": {
+    "api_key": {
+      "type": "string",
+      "secret": true,
+      "required": true,
+      "env": "GROQ_API_KEY",
+      "description": "Groq API key"
+    },
+    "model": {
+      "type": "string",
+      "default": "llama-3.3-70b-versatile",
+      "env": "GROQ_MODEL",
+      "description": "Default model to use"
+    }
+  },
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.provider_groq:GroqProviderPlugin"
+  }
+}

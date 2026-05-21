@@ -1,0 +1,20 @@
+{
+  "name": "embeddings_sentence_transformers",
+  "version": "0.1.0",
+  "description": "SentenceTransformers embedding provider for machine-core",
+  "category": "embedding",
+  "transport": {
+    "type": "in-process"
+  },
+  "dependencies": ["embeddings"],
+  "config_schema": {
+    "type": "object",
+    "properties": {
+      "model": {
+        "type": "string",
+        "default": "all-MiniLM-L6-v2",
+        "description": "SentenceTransformers model name"
+      }
+    }
+  }
+}

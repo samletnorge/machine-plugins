@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-provider-ollama"
+version = "0.1.0"
+description = "Ollama LLM provider for machine-core"
+requires-python = ">=3.12"
+dependencies = ["httpx>=0.28"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

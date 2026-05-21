@@ -1,0 +1,30 @@
+{
+  "name": "provider-grok",
+  "version": "0.1.0",
+  "description": "Grok (xAI) LLM provider via pydantic-ai",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["model_provider:register"],
+  "dependencies": ["pydantic-ai>=0.0.1"],
+  "config_schema": {
+    "api_key": {
+      "type": "string",
+      "secret": true,
+      "required": true,
+      "env": "GROK_API_KEY",
+      "description": "xAI/Grok API key"
+    },
+    "model": {
+      "type": "string",
+      "default": "grok-3",
+      "env": "GROK_MODEL",
+      "description": "Default model to use"
+    }
+  },
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.provider_grok:GrokProviderPlugin"
+  }
+}

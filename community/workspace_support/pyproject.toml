@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-workspace-support"
+version = "0.5.0"
+description = "Defines the workspace category for workspace management"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

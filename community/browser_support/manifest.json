@@ -1,0 +1,14 @@
+{
+  "name": "browser-support",
+  "version": "0.1.0",
+  "description": "Browser automation with Playwright and AI-driven element selection (Stagehand)",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.browser_support:BrowserSupportPlugin"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "provider-ollama",
+  "version": "0.1.0",
+  "description": "Ollama LLM provider — pure httpx reference implementation",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["model_provider:register"],
+  "dependencies": ["httpx>=0.28"],
+  "config_schema": {
+    "base_url": {
+      "type": "string",
+      "default": "http://localhost:11434",
+      "env": "OLLAMA_HOST",
+      "description": "Ollama server URL"
+    },
+    "model": {
+      "type": "string",
+      "default": "llama3.2",
+      "env": "OLLAMA_MODEL",
+      "description": "Default model to use"
+    }
+  },
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.provider_ollama:OllamaProviderPlugin"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "provider-vertex-claude",
+  "version": "0.1.0",
+  "description": "Vertex AI Claude LLM provider via pydantic-ai",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["model_provider:register"],
+  "dependencies": ["pydantic-ai>=0.0.1", "anthropic>=0.40"],
+  "config_schema": {
+    "project": {
+      "type": "string",
+      "required": true,
+      "env": "GCP_PROJECT",
+      "description": "Google Cloud project ID"
+    },
+    "location": {
+      "type": "string",
+      "default": "us-east5",
+      "env": "GCP_LOCATION",
+      "description": "Vertex AI region"
+    },
+    "model": {
+      "type": "string",
+      "default": "claude-sonnet-4-20250514",
+      "env": "VERTEX_CLAUDE_MODEL",
+      "description": "Claude model to use"
+    }
+  },
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.provider_vertex_claude:VertexClaudeProviderPlugin"
+  }
+}

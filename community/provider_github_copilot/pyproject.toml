@@ -1,0 +1,13 @@
+[project]
+name = "machine-core-provider-github-copilot"
+version = "0.1.0"
+description = "GitHub Copilot LLM provider for machine-core"
+requires-python = ">=3.12"
+dependencies = ["pydantic-ai>=0.0.1", "httpx>=0.28"]
+
+[project.scripts]
+machine-core-copilot-login = "machine_core.plugins.provider_github_copilot.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

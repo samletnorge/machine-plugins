@@ -1,0 +1,9 @@
+[project]
+name = "machine-core-agent-runtime-pydantic"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["pydantic-ai>=1.0.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

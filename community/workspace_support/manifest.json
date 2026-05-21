@@ -1,0 +1,14 @@
+{
+  "name": "workspace-support",
+  "version": "0.1.0",
+  "description": "Agent workspace with sandboxed execution, filesystem abstraction, and skills system",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.workspace_support:WorkspaceSupportPlugin"
+  }
+}

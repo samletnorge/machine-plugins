@@ -1,0 +1,36 @@
+{
+  "name": "rag-support",
+  "version": "0.1.0",
+  "description": "RAG pipeline: chunking, metadata extraction, reranking, GraphRAG, and pipeline orchestration",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "chunker:register", "reranker:register", "metadata_extractor:register", "rag_pipeline:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.rag_support:RagSupportPlugin"
+  },
+  "config_schema": {
+    "semantic_chunker": {
+      "type": "json",
+      "description": "Config for semantic chunker: {provider, model, similarity_threshold}",
+      "required": false
+    },
+    "reranker_llm": {
+      "type": "json",
+      "description": "Config for LLM reranker: {provider, model}",
+      "required": false
+    },
+    "reranker_cross_encoder": {
+      "type": "json",
+      "description": "Config for cross-encoder reranker: {model}",
+      "required": false
+    },
+    "extractor_llm": {
+      "type": "json",
+      "description": "Config for metadata extractors (title, summary, keywords, questions): {provider, model}",
+      "required": false
+    }
+  }
+}

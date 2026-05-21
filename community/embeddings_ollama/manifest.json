@@ -1,0 +1,15 @@
+{
+  "name": "embeddings-ollama",
+  "version": "0.1.0",
+  "description": "Ollama embedding provider via OpenAI-compatible API",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["embedding:register"],
+  "dependencies": ["httpx>=0.28"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.embeddings_ollama:OllamaEmbeddingPlugin"
+  }
+}

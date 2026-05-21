@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-pubsub-support"
+version = "0.1.0"
+description = "PubSub category: in-memory event pub/sub"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,13 @@
+[project]
+name = "machine-core-browser-support"
+version = "0.5.0"
+description = "Defines the browser category for browser automation"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+playwright = ["playwright>=1.40.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-tool-openapi"
+version = "0.1.0"
+description = "OpenAPI spec to tool generator for machine-core"
+requires-python = ">=3.12"
+dependencies = ["httpx>=0.28"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

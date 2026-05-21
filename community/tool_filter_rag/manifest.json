@@ -1,0 +1,15 @@
+{
+  "name": "tool-filter-rag",
+  "version": "0.1.0",
+  "description": "Semantic tool filtering via embeddings + vector store",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["tool:register"],
+  "dependencies": [],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.tool_filter_rag:ToolFilterRAGPlugin"
+  }
+}

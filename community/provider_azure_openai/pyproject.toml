@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-provider-azure-openai"
+version = "0.1.0"
+description = "Azure OpenAI LLM provider for machine-core"
+requires-python = ">=3.12"
+dependencies = ["pydantic-ai>=0.0.1", "openai>=1.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

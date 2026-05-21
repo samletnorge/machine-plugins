@@ -1,0 +1,15 @@
+{
+  "name": "agent-runtime-pydantic",
+  "version": "0.1.0",
+  "description": "Pydantic-AI based agent runtime with tool-calling loop",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["agent:register"],
+  "dependencies": ["pydantic-ai>=1.0.0"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "machine_core.plugins.agent_runtime_pydantic:AgentRuntimePydanticPlugin"
+  }
+}

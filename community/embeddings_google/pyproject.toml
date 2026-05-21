@@ -1,0 +1,10 @@
+[project]
+name = "machine-core-embeddings-google"
+version = "0.1.0"
+description = "Google GenAI embedding provider"
+requires-python = ">=3.12"
+dependencies = ["google-genai>=1.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
