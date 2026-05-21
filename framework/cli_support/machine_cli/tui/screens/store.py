@@ -45,33 +45,35 @@ class StoreScreen(Widget):
             details.update("machine-core not installed. Cannot browse registry.")
             return
         self._client = RegistryClient(DEFAULT_REGISTRY_DIR)
-        self._load_plugins()
+        await self._load_plugins()
 
-    def _load_plugins(self, query: str = "") -> None:
+    async def _load_plugins(self, query: str = "") -> None:
         """Populate list from registry."""
         list_view = self.query_one("#store-list", ListView)
         list_view.clear()
 
         if query:
-            plugins = self._client.search(query)
+            plugins = await self._client.search_plugins(query)
         else:
-            plugins = self._client.list_plugins()
+            plugins = await self._client.list_plugins()
 
         for plugin in plugins:
-            name = plugin["name"]
-            category = plugin.get("category", "")
+            name = plugin.name if hasattr(plugin, "name") else plugin["name"]
+            category = (
+                plugin.tier if hasattr(plugin, "tier") else plugin.get("category", "")
+            )
             item = ListItem(Label(f"  {name} [{category}]"), name=name)
             list_view.append(item)
 
     async def on_input_changed(self, event: Input.Changed) -> None:
         """Filter list on search input."""
         if event.input.id == "store-search":
-            self._load_plugins(event.value)
+            await self._load_plugins(event.value)
 
     async def on_list_view_selected(self, event: ListView.Selected) -> None:
         """Show plugin details."""
         name = event.item.name
-        plugin = self._client.get_plugin(name)
+        plugin = await self._client.get_plugin(name)
         if plugin:
             details = self.query_one("#store-details", Static)
             info = (
