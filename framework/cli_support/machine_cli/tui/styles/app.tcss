@@ -14,9 +14,47 @@ TabbedContent {
     height: 1fr;
 }
 
+TabPane {
+    height: 1fr;
+}
+
 PluginsScreen, StoreScreen, ServicesScreen, ConfigScreen {
     height: 1fr;
     width: 1fr;
+}
+
+/* All direct Horizontal/Vertical containers inside screens must fill */
+PluginsScreen > Horizontal,
+StoreScreen > Vertical {
+    height: 1fr;
+    width: 1fr;
+}
+
+StoreScreen > Vertical > Horizontal {
+    height: 1fr;
+    width: 1fr;
+}
+
+ServicesScreen > Vertical {
+    height: 1fr;
+    width: 1fr;
+}
+
+ConfigScreen > Horizontal {
+    height: 1fr;
+    width: 1fr;
+}
+
+#config-list-pane {
+    width: 1fr;
+    height: 1fr;
+    border-right: solid $primary-background;
+}
+
+#config-edit-pane {
+    width: 2fr;
+    height: 1fr;
+    padding: 1 2;
 }
 
 #plugin-list-pane, #store-list-pane {
@@ -39,12 +77,12 @@ PluginsScreen, StoreScreen, ServicesScreen, ConfigScreen {
 
 #store-search {
     dock: top;
-    margin: 0 0 1 0;
+    height: 3;
 }
 
 #store-install-btn {
     dock: bottom;
-    margin: 1 0 0 0;
+    height: 3;
 }
 
 ListView {
