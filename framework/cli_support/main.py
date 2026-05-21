@@ -50,6 +50,7 @@ from .commands.build_cmd import build_command
 from .commands.deploy_cmd import deploy_command
 from .commands.eval_cmd import eval_app
 from .commands.studio_cmd import studio_command
+from .commands.plugin_cmd import plugin_app
 
 app.command("init")(init_command)
 app.add_typer(agent_app)
@@ -59,3 +60,4 @@ app.command("build")(build_command)
 app.command("deploy")(deploy_command)
 app.add_typer(eval_app)
 app.command("studio")(studio_command)
+app.add_typer(plugin_app, name="plugin")
