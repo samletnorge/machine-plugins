@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.memory_support:MemorySupportPlugin"
+    "entry_point": "machine_memory:MemorySupportPlugin"
   }
 }

@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.tool_support:ToolSupportPlugin"
+    "entry_point": "machine_tool:ToolSupportPlugin"
   }
 }

@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.model_provider_support:ModelProviderSupportPlugin"
+    "entry_point": "machine_model_provider:ModelProviderSupportPlugin"
   }
 }

@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import typer
-from pathlib import Path
 
 try:
     from machine_core.plugin.registry import RegistryClient
@@ -13,9 +14,6 @@ except ImportError:
     PluginInstaller = None  # type: ignore[assignment, misc]
 
 plugin_app = typer.Typer(help="Manage plugins")
-
-DEFAULT_REGISTRY_DIR = Path.home() / ".config" / "machine-core" / "registry"
-DEFAULT_INSTALL_DIR = Path.home() / ".config" / "machine-core" / "installed"
 
 
 def _require_machine_core():
@@ -27,59 +25,36 @@ def _require_machine_core():
 @plugin_app.command("list")
 def list_plugins():
     """List installed plugins."""
-    if not DEFAULT_INSTALL_DIR.exists():
+    _require_machine_core()
+    installer = PluginInstaller()
+    installed = installer.installed_plugins()
+    if not installed:
         typer.echo("No plugins installed.")
         return
-    for p in sorted(DEFAULT_INSTALL_DIR.iterdir()):
-        if p.is_dir() and not p.name.startswith("_"):
-            typer.echo(f"  {p.name}")
+    for name in sorted(installed):
+        typer.echo(f"  {name}")
 
 
 @plugin_app.command("install")
 def install_plugin(
-    name: str = typer.Argument(..., help="Plugin name from registry"),
-    interactive: bool = typer.Option(
-        False, "-i", "--interactive", help="Launch config wizard"
+    name: str = typer.Argument(
+        ..., help="Plugin name from registry (e.g. agent_support)"
     ),
+    force: bool = typer.Option(False, "-f", "--force", help="Force reinstall"),
 ):
     """Install a plugin from the registry."""
     _require_machine_core()
 
-    client = RegistryClient(DEFAULT_REGISTRY_DIR)
-    plugin = client.get_plugin(name)
-
-    if plugin is None:
-        typer.echo(
-            f"Plugin '{name}' not found in registry. Run `machine registry update` first?"
-        )
-        raise typer.Exit(1)
-
-    installer = PluginInstaller(
-        registry_dir=DEFAULT_REGISTRY_DIR, install_dir=DEFAULT_INSTALL_DIR
-    )
-
-    location = plugin["location"]
-    runtime = plugin.get("runtime", "python")
-
-    if location.startswith("manifests/"):
-        manifest = client.resolve_manifest(name)
-        if manifest is None:
-            typer.echo(f"Could not resolve manifest for '{name}'")
+    async def _install():
+        installer = PluginInstaller()
+        try:
+            path = await installer.install(name, force=force)
+            typer.echo(f"Installed {name} → {path}")
+        except ValueError as e:
+            typer.echo(f"Error: {e}")
             raise typer.Exit(1)
-        result = installer.install_from_manifest(manifest)
-    else:
-        result = installer.install(name, location=location, runtime=runtime)
 
-    if result.success:
-        typer.echo(f"Installed {name} → {result.install_path}")
-        if interactive:
-            from ..tui.app import MachineApp
-
-            app = MachineApp()
-            app.run()
-    else:
-        typer.echo(f"Failed to install {name}: {result.error}")
-        raise typer.Exit(1)
+    asyncio.run(_install())
 
 
 @plugin_app.command("remove")
@@ -87,14 +62,12 @@ def remove_plugin(name: str = typer.Argument(..., help="Plugin name to remove"))
     """Remove an installed plugin."""
     _require_machine_core()
 
-    installer = PluginInstaller(
-        registry_dir=DEFAULT_REGISTRY_DIR, install_dir=DEFAULT_INSTALL_DIR
-    )
-    result = installer.uninstall(name)
-    if result.success:
+    async def _remove():
+        installer = PluginInstaller()
+        await installer.uninstall(name)
         typer.echo(f"Removed {name}")
-    else:
-        typer.echo(f"Failed to remove {name}: {result.error}")
+
+    asyncio.run(_remove())
 
 
 @plugin_app.command("search")
@@ -102,12 +75,13 @@ def search_plugins(query: str = typer.Argument(..., help="Search term")):
     """Search the plugin registry."""
     _require_machine_core()
 
-    client = RegistryClient(DEFAULT_REGISTRY_DIR)
-    results = client.search(query)
-    if not results:
-        typer.echo("No plugins found.")
-        return
-    for p in results:
-        typer.echo(
-            f"  {p['name']:30s} [{p.get('category', '')}] — {p.get('description', '')}"
-        )
+    async def _search():
+        client = RegistryClient()
+        results = await client.search_plugins(query)
+        if not results:
+            typer.echo("No plugins found.")
+            return
+        for p in results:
+            typer.echo(f"  {p.name:30s} [{p.tier}] — {p.description}")
+
+    asyncio.run(_search())

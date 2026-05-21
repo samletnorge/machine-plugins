@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.voice_support:VoiceSupportPlugin"
+    "entry_point": "machine_voice:VoiceSupportPlugin"
   }
 }

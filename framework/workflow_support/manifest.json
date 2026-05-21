@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.workflow_support:WorkflowSupportPlugin"
+    "entry_point": "machine_workflow:WorkflowSupportPlugin"
   }
 }

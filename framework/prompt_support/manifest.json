@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.prompt_support:PromptSupportPlugin"
+    "entry_point": "machine_prompt:PromptSupportPlugin"
   }
 }

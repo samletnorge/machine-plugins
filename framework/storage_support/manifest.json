@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.storage_support:StorageSupportPlugin"
+    "entry_point": "machine_storage:StorageSupportPlugin"
   }
 }
