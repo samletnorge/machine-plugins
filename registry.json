@@ -1,0 +1,415 @@
+{
+  "version": "1.0.0",
+  "plugins": {
+    "agent_support": {
+      "version": "0.5.0",
+      "description": "Defines the 'agent' category with AgentDefinition, handoff protocol, and agent lifecycle hooks",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/agent_support"
+      }
+    },
+    "auth_support": {
+      "version": "0.1.0",
+      "description": "Authentication and authorization: JWT, API Key providers with RBAC",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/auth_support"
+      }
+    },
+    "cli_support": {
+      "version": "0.1.0",
+      "description": "machine CLI \u2014 scaffold, dev, build, deploy, and studio commands",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/cli_support"
+      }
+    },
+    "embeddings": {
+      "version": "0.5.0",
+      "description": "Defines the 'embedding' category for text-to-vector providers",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/embeddings"
+      }
+    },
+    "memory_support": {
+      "version": "0.10.0",
+      "description": "Defines the 'memory' and 'storage-backend' categories with thread-based conversation memory, working memory, observational memory, and windowing strategies",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/memory_support"
+      }
+    },
+    "model_provider_support": {
+      "version": "0.5.0",
+      "description": "Defines the 'model_provider' category for any model type (LLM, TTS, STT, image, etc.)",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/model_provider_support"
+      }
+    },
+    "processor_support": {
+      "version": "0.1.0",
+      "description": "Middleware processor pipeline for agents \u2014 PII detection, moderation, token limiting, cost guard, caching, and more.",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/processor_support"
+      }
+    },
+    "prompt_support": {
+      "version": "0.5.0",
+      "description": "Defines the 'prompt' category with versioned templates, rendering, and composition",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/prompt_support"
+      }
+    },
+    "server_support": {
+      "version": "0.11.0",
+      "description": "Auto-generates FastAPI HTTP endpoints from Machine registry for agents, tools, workflows, and memory",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/server_support"
+      }
+    },
+    "storage_support": {
+      "version": "0.1.0",
+      "description": "Storage backends: local filesystem and S3-compatible storage",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/storage_support"
+      }
+    },
+    "structured_output": {
+      "version": "0.5.0",
+      "description": "Defines the 'structured_output' category for LLM-to-JSON validated generation",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/structured_output"
+      }
+    },
+    "studio_support": {
+      "version": "0.1.0",
+      "description": "Visual studio/playground for testing agents, tools, and workflows",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/studio_support"
+      }
+    },
+    "tool_support": {
+      "version": "0.5.0",
+      "description": "Defines the 'tool' category with ToolDefinition schema and @tool decorator",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/tool_support"
+      }
+    },
+    "vectorstore_support": {
+      "version": "0.5.0",
+      "description": "Defines the vector_store category for vector databases",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/vectorstore_support"
+      }
+    },
+    "voice_support": {
+      "version": "0.1.0",
+      "description": "Voice abstraction layer with TTS, STT, and realtime voice providers",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/voice_support"
+      }
+    },
+    "workflow_support": {
+      "version": "0.9.0",
+      "description": "Defines the 'workflow' and 'execution-engine' categories with step primitives, DAG builder, and execution engines",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/workflow_support"
+      }
+    },
+    "agent_runtime_basic": {
+      "version": "0.1.0",
+      "description": "Basic agent runtime with custom loop, no pydantic-ai dependency",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/agent_runtime_basic"
+      }
+    },
+    "agent_runtime_pydantic": {
+      "version": "0.1.0",
+      "description": "Pydantic-AI based agent runtime with tool-calling loop",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/agent_runtime_pydantic"
+      }
+    },
+    "browser_support": {
+      "version": "0.1.0",
+      "description": "Browser automation with Playwright and AI-driven element selection (Stagehand)",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/browser_support"
+      }
+    },
+    "channel_support": {
+      "version": "0.1.0",
+      "description": "Channel integrations: in-memory and WebSocket channels",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/channel_support"
+      }
+    },
+    "deployer_support": {
+      "version": "0.1.0",
+      "description": "Deployment target category and built-in deployers (Docker, Dokploy, Vercel, Cloudflare)",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/deployer_support"
+      }
+    },
+    "embeddings_azure": {
+      "version": "0.1.0",
+      "description": "Azure OpenAI embedding provider",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/embeddings_azure"
+      }
+    },
+    "embeddings_google": {
+      "version": "0.1.0",
+      "description": "Google GenAI embedding provider",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/embeddings_google"
+      }
+    },
+    "embeddings_ollama": {
+      "version": "0.1.0",
+      "description": "Ollama embedding provider via OpenAI-compatible API",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/embeddings_ollama"
+      }
+    },
+    "embeddings_sentence_transformers": {
+      "version": "0.1.0",
+      "description": "SentenceTransformers embedding provider for machine-core",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/embeddings_sentence_transformers"
+      }
+    },
+    "observability_support": {
+      "version": "0.1.0",
+      "description": "OpenTelemetry-based tracing, cost tracking, and multiple exporter backends",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/observability_support"
+      }
+    },
+    "provider_azure_openai": {
+      "version": "0.1.0",
+      "description": "Azure OpenAI LLM provider via pydantic-ai",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/provider_azure_openai"
+      }
+    },
+    "provider_github_copilot": {
+      "version": "0.1.0",
+      "description": "GitHub Copilot LLM provider via OAuth device flow + pydantic-ai",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/provider_github_copilot"
+      }
+    },
+    "provider_google_gemini": {
+      "version": "0.1.0",
+      "description": "Google Gemini LLM provider via pydantic-ai",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/provider_google_gemini"
+      }
+    },
+    "provider_grok": {
+      "version": "0.1.0",
+      "description": "Grok (xAI) LLM provider via pydantic-ai",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/provider_grok"
+      }
+    },
+    "provider_groq": {
+      "version": "0.1.0",
+      "description": "Groq LLM provider via pydantic-ai",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/provider_groq"
+      }
+    },
+    "provider_ollama": {
+      "version": "0.1.0",
+      "description": "Ollama LLM provider \u2014 pure httpx reference implementation",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/provider_ollama"
+      }
+    },
+    "provider_vertex_claude": {
+      "version": "0.1.0",
+      "description": "Vertex AI Claude LLM provider via pydantic-ai",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/provider_vertex_claude"
+      }
+    },
+    "provider_vertex_gemini": {
+      "version": "0.1.0",
+      "description": "Vertex AI Gemini LLM provider via pydantic-ai",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/provider_vertex_gemini"
+      }
+    },
+    "pubsub_support": {
+      "version": "0.1.0",
+      "description": "PubSub event system: in-memory implementation",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/pubsub_support"
+      }
+    },
+    "rag_support": {
+      "version": "0.1.0",
+      "description": "RAG pipeline: chunking, metadata extraction, reranking, GraphRAG, and pipeline orchestration",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/rag_support"
+      }
+    },
+    "tool_filter_rag": {
+      "version": "0.1.0",
+      "description": "Semantic tool filtering via embeddings + vector store",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/tool_filter_rag"
+      }
+    },
+    "tool_openapi": {
+      "version": "0.1.0",
+      "description": "Generate tools from OpenAPI specs",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/tool_openapi"
+      }
+    },
+    "workspace_support": {
+      "version": "0.1.0",
+      "description": "Agent workspace with sandboxed execution, filesystem abstraction, and skills system",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/workspace_support"
+      }
+    },
+    "eval_support": {
+      "version": "0.1.0",
+      "description": "Evaluation framework plugin for machine-core",
+      "tier": "external",
+      "runtime": "python",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/samletnorge/machine-plugin-eval-support.git"
+      }
+    },
+    "vectorstore_lancedb": {
+      "version": "0.1.0",
+      "description": "LanceDB vector store plugin for machine-core",
+      "tier": "external",
+      "runtime": "python",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/samletnorge/machine-plugin-vectorstore-lancedb.git"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "eval_support",
+  "version": "0.1.0",
+  "description": "Evaluation framework plugin for machine-core",
+  "category": "eval",
+  "runtime": "python",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/samletnorge/machine-plugin-eval-support.git"
+  }
+}

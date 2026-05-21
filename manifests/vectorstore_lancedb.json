@@ -1,0 +1,11 @@
+{
+  "name": "vectorstore_lancedb",
+  "version": "0.1.0",
+  "description": "LanceDB vector store plugin for machine-core",
+  "category": "vectorstore",
+  "runtime": "python",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/samletnorge/machine-plugin-vectorstore-lancedb.git"
+  }
+}
