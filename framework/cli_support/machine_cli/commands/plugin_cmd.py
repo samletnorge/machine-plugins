@@ -38,20 +38,37 @@ def list_plugins():
 @plugin_app.command("install")
 def install_plugin(
     name: str = typer.Argument(
-        ..., help="Plugin name from registry (e.g. agent_support)"
+        None, help="Plugin name from registry (e.g. agent_support)"
     ),
     force: bool = typer.Option(False, "-f", "--force", help="Force reinstall"),
+    all_framework: bool = typer.Option(
+        False, "--all-framework", help="Install all framework plugins"
+    ),
 ):
     """Install a plugin from the registry."""
     _require_machine_core()
 
     async def _install():
         installer = PluginInstaller()
-        try:
-            path = await installer.install(name, force=force)
-            typer.echo(f"Installed {name} → {path}")
-        except ValueError as e:
-            typer.echo(f"Error: {e}")
+        if all_framework:
+            client = RegistryClient()
+            plugins = await client.list_plugins(tier="framework")
+            for p in plugins:
+                try:
+                    path = await installer.install(p.name, force=force)
+                    typer.echo(f"  ✓ {p.name} → {path}")
+                except Exception as e:
+                    typer.echo(f"  ✗ {p.name}: {e}")
+            typer.echo(f"\nInstalled {len(plugins)} framework plugins.")
+        elif name:
+            try:
+                path = await installer.install(name, force=force)
+                typer.echo(f"Installed {name} → {path}")
+            except ValueError as e:
+                typer.echo(f"Error: {e}")
+                raise typer.Exit(1)
+        else:
+            typer.echo("Error: provide a plugin name or use --all-framework")
             raise typer.Exit(1)
 
     asyncio.run(_install())
