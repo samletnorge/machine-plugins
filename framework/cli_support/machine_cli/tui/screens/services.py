@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import subprocess
 import sys
 
@@ -13,12 +14,15 @@ from textual.widget import Widget
 
 import httpx
 
+from machine_cli._server_launcher import SERVER_LOG_FILE
+
 
 class ServicesScreen(Widget):
     """Shows server/studio status with start/stop controls."""
 
     _server_process: subprocess.Popen | None = None
     _log_task: asyncio.Task | None = None
+    _tail_task: asyncio.Task | None = None
 
     def compose(self) -> ComposeResult:
         with Vertical():
@@ -58,12 +62,19 @@ class ServicesScreen(Widget):
                 )
                 stop_btn.disabled = False
                 start_btn.disabled = True
+
+                # If server is running but we didn't start it, tail the log file
+                if self._server_process is None and self._tail_task is None:
+                    self._start_log_tail()
+
         except (httpx.ConnectError, httpx.ReadTimeout):
             status.update(
                 f"Server: [red]● stopped[/red]\nExpected at: {self.app.server_url}"
             )
             stop_btn.disabled = True
             start_btn.disabled = False
+            # Stop tailing if server went down
+            self._stop_log_tail()
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle button presses."""
@@ -80,7 +91,13 @@ class ServicesScreen(Widget):
         """Start the dev server as a subprocess."""
         log.write_line("Starting dev server...")
 
+        # Stop any existing tail task
+        self._stop_log_tail()
+
         try:
+            SERVER_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+            log_fh = open(SERVER_LOG_FILE, "w")
+
             self._server_process = subprocess.Popen(
                 [
                     sys.executable,
@@ -94,14 +111,13 @@ class ServicesScreen(Widget):
                     "--log-level",
                     "info",
                 ],
-                stdout=subprocess.PIPE,
+                stdout=log_fh,
                 stderr=subprocess.STDOUT,
-                text=True,
             )
             log.write_line(f"Server process started (PID: {self._server_process.pid})")
 
-            # Start background log reader
-            self._log_task = asyncio.create_task(self._read_logs(log))
+            # Start tailing the log file
+            self._start_log_tail()
 
             # Wait for server to become healthy
             for _ in range(10):
@@ -132,10 +148,11 @@ class ServicesScreen(Widget):
         """Stop the server."""
         log.write_line("Stopping server...")
 
-        # Cancel log reader
+        # Cancel log tasks
         if self._log_task and not self._log_task.done():
             self._log_task.cancel()
             self._log_task = None
+        self._stop_log_tail()
 
         if self._server_process and self._server_process.poll() is None:
             self._server_process.terminate()
@@ -189,5 +206,41 @@ class ServicesScreen(Widget):
                     log.write_line(line.rstrip())
                 else:
                     break
+        except (asyncio.CancelledError, OSError):
+            pass
+
+    def _start_log_tail(self) -> None:
+        """Start tailing the server log file."""
+        log = self.query_one("#service-logs", Log)
+        self._tail_task = asyncio.create_task(self._tail_log_file(log))
+
+    def _stop_log_tail(self) -> None:
+        """Stop the log file tail task."""
+        if self._tail_task and not self._tail_task.done():
+            self._tail_task.cancel()
+            self._tail_task = None
+
+    async def _tail_log_file(self, log: Log) -> None:
+        """Tail SERVER_LOG_FILE, streaming new lines to the Log widget."""
+        try:
+            if not SERVER_LOG_FILE.exists():
+                log.write_line("[dim]No server log file yet.[/dim]")
+                return
+
+            # Read existing content first (last 50 lines)
+            lines = SERVER_LOG_FILE.read_text().splitlines()
+            for line in lines[-50:]:
+                log.write_line(line)
+
+            # Then follow new lines
+            with open(SERVER_LOG_FILE, "r") as f:
+                # Seek to end
+                f.seek(0, os.SEEK_END)
+                while True:
+                    line = f.readline()
+                    if line:
+                        log.write_line(line.rstrip())
+                    else:
+                        await asyncio.sleep(0.3)
         except (asyncio.CancelledError, OSError):
             pass
