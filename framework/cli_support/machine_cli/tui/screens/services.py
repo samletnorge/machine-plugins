@@ -14,7 +14,10 @@ from textual.widget import Widget
 
 import httpx
 
-from machine_cli._server_launcher import SERVER_LOG_FILE
+# Shared log file path — must match _server_launcher.py
+SERVER_LOG_FILE = (
+    __import__("pathlib").Path.home() / ".config" / "machine-core" / "server.log"
+)
 
 
 class ServicesScreen(Widget):
