@@ -125,7 +125,7 @@ class PluginsScreen(Widget):
                         }
                     )
 
-        # Populate the list
+        # Populate the list with section headers
         if not plugins_found:
             if server_online:
                 details.update(
@@ -141,46 +141,89 @@ class PluginsScreen(Widget):
                 )
             return
 
-        status_icon = {"running": "●", "loaded": "  •", "installed": "○"}
-        status_color = {"running": "green", "loaded": "cyan", "installed": "yellow"}
+        # Split into active (running/loaded) vs available (installed but not active)
+        active = [p for p in plugins_found if p["status"] in ("running", "loaded")]
+        available = [p for p in plugins_found if p["status"] == "installed"]
 
-        for p in plugins_found:
-            icon = status_icon.get(p["status"], "?")
-            color = status_color.get(p["status"], "white")
-            display = f"[{color}]{icon}[/{color}] {p['name']}"
-            list_view.append(ListItem(Label(display), name=p["name"]))
+        # Section: Active in this project
+        if active:
+            list_view.append(
+                ListItem(
+                    Label("[bold green]━━ Active in this project ━━[/bold green]"),
+                    name="_header_active",
+                )
+            )
+            for p in active:
+                if p["status"] == "running":
+                    display = f"  [green]●[/green] {p['name']} [dim]({p.get('items', 0)} items)[/dim]"
+                else:
+                    display = f"    [cyan]•[/cyan] {p['name']}"
+                list_view.append(ListItem(Label(display), name=p["name"]))
+
+        # Section: Available on this machine
+        if available:
+            list_view.append(
+                ListItem(
+                    Label("[bold yellow]━━ Available on this machine ━━[/bold yellow]"),
+                    name="_header_available",
+                )
+            )
+            for p in available:
+                version = (
+                    f" [dim]v{p.get('version', '?')}[/dim]" if "version" in p else ""
+                )
+                source_tag = f" [dim]({p['source']})[/dim]"
+                display = f"  [yellow]○[/yellow] {p['name']}{version}{source_tag}"
+                list_view.append(ListItem(Label(display), name=p["name"]))
 
         # Store for detail lookup
         self._plugins = {p["name"]: p for p in plugins_found}
 
-        # Summary at top
+        # Summary in details pane
         server_status = (
             "[green]online[/green]" if server_online else "[red]offline[/red]"
         )
         details.update(
             f"Server: {server_status}\n"
-            f"Plugins: {len(plugins_found)} found\n\n"
-            f"● running  ○ installed (not loaded)\n"
-            f"Select a plugin to see details."
+            f"Active: {len(active)} plugins loaded in this project\n"
+            f"Available: {len(available)} installed but not active\n\n"
+            f"To activate a plugin, add it to\n"
+            f"[tool.machine-core].plugins in pyproject.toml\n"
+            f"then restart: machine dev"
         )
 
     async def on_list_view_selected(self, event: ListView.Selected) -> None:
         """Show plugin details when selected."""
         name = event.item.name
         details = self.query_one("#plugin-details", Static)
+
+        # Ignore section headers
+        if name and name.startswith("_header_"):
+            return
+
         if hasattr(self, "_plugins") and name in self._plugins:
             p = self._plugins[name]
-            lines = [f"Name: {name}"]
-            lines.append(f"Source: {p['source']}")
-            lines.append(f"Status: {p['status']}")
+            lines = [f"[bold]{name}[/bold]", ""]
+
+            if p["status"] in ("running", "loaded"):
+                lines.append("Status: [green]Active in this project[/green]")
+                if "items" in p:
+                    lines.append(f"Registered items: {p['items']}")
+                if "category" in p:
+                    lines.append(f"Category: {p['category']}")
+            else:
+                lines.append("Status: [yellow]Installed but not active[/yellow]")
+                lines.append("")
+                lines.append("To activate, add to pyproject.toml:")
+                lines.append(f'  plugins = ["...', '{name}", ...]')
+
             if "version" in p:
-                lines.append(f"Version: {p['version']}")
+                lines.append(f"\nVersion: {p['version']}")
+            if "source" in p:
+                lines.append(f"Source: {p['source']}")
             if "path" in p:
                 lines.append(f"Path: {p['path']}")
-            if "items" in p:
-                lines.append(f"Items registered: {p['items']}")
-            if "category" in p:
-                lines.append(f"Category: {p['category']}")
+
             details.update("\n".join(lines))
         else:
             details.update(f"Name: {name}\nStatus: unknown")
