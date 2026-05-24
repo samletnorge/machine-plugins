@@ -12,7 +12,17 @@ dependencies = [
 
 [tool.machine-core]
 entry = "src.main:machine"
-plugins = ["machine_agent", "machine_tool", "machine_server"]
+plugins = [    
+    "agent_support",
+    "tool_support",
+    "server_support",
+    "eval_support",
+    "tool_openapi",
+    "tool_filter_rag",
+    "rag_support",
+    "provider_ollama",
+    "model_provider_support",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
