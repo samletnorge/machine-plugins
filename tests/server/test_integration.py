@@ -75,7 +75,7 @@ class TestFullRoundTrip:
         assert resp.status_code == 204
 
     def test_dynamic_client_round_trip(self, test_client):
-        from machine_core.plugins.server_support.client import MachineClient
+        from server_support.client import MachineClient
 
         client = MachineClient(base_url="http://testserver", http_client=test_client)
 

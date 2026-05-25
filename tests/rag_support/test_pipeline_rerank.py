@@ -1,11 +1,11 @@
 """Tests for RAG pipeline with reranker integration."""
 
 import pytest
-from machine_core.plugins.rag_support.pipeline import RAGPipeline
-from machine_core.plugins.rag_support.models import IngestDocument, RankedResult
-from machine_core.plugins.rag_support.chunking.recursive import RecursiveChunker
-from machine_core.plugins.rag_support.rerankers.llm import LLMReranker
-from machine_core.plugins.vectorstore_support.schemas import SearchResult, UpsertRequest
+from rag_support.pipeline import RAGPipeline
+from rag_support.models import IngestDocument, RankedResult
+from rag_support.chunking.recursive import RecursiveChunker
+from rag_support.rerankers.llm import LLMReranker
+from vectorstore_support.schemas import SearchResult, UpsertRequest
 
 
 class MockEmbedder:

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from machine_core.plugins.embeddings.schemas import EmbeddingRequest, EmbeddingResult
-from machine_core.plugins.tool_support.schemas import ToolDefinition
-from machine_core.plugins.vectorstore_support.schemas import (
+from embeddings.schemas import EmbeddingRequest, EmbeddingResult
+from tool_support.schemas import ToolDefinition
+from vectorstore_support.schemas import (
     SearchRequest,
     SearchResult,
     UpsertRequest,

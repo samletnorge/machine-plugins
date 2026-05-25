@@ -9,11 +9,11 @@ from typing import Any
 
 from loguru import logger
 
-from machine_core.plugins.rag_support.chunking.base import Chunker
-from machine_core.plugins.rag_support.extractors.base import MetadataExtractor
-from machine_core.plugins.rag_support.models import IngestDocument, RankedResult
-from machine_core.plugins.rag_support.rerankers.base import BaseReranker
-from machine_core.plugins.vectorstore_support.schemas import (
+from rag_support.chunking.base import Chunker
+from rag_support.extractors.base import MetadataExtractor
+from rag_support.models import IngestDocument, RankedResult
+from rag_support.rerankers.base import BaseReranker
+from vectorstore_support.schemas import (
     SearchRequest,
     SearchResult,
     UpsertRequest,

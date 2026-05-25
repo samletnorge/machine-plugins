@@ -1,7 +1,7 @@
 """Tests for the EvalSupportPlugin registration."""
 
 import pytest
-from machine_core.plugins.eval_support import EvalSupportPlugin
+from eval_support import EvalSupportPlugin
 
 
 def test_plugin_instantiation():

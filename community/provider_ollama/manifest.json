@@ -24,6 +24,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.provider_ollama:OllamaProviderPlugin"
+    "entry_point": "provider_ollama:OllamaProviderPlugin"
   }
 }

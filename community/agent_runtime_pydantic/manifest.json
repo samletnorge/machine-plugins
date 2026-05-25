@@ -10,6 +10,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.agent_runtime_pydantic:AgentRuntimePydanticPlugin"
+    "entry_point": "agent_runtime_pydantic:AgentRuntimePydanticPlugin"
   }
 }

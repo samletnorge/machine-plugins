@@ -5,7 +5,7 @@ import time
 from unittest.mock import AsyncMock, patch, MagicMock
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from machine_core.plugins.server_support.gateway import (
+from server_support.gateway import (
     create_gateway_router,
     GatewayConfig,
     RequestCache,

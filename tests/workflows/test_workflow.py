@@ -1,8 +1,8 @@
 import pytest
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.step import step, StepContext
-from machine_core.plugins.workflow_support.workflow import Workflow, NodeType
+from workflow_support.step import step, StepContext
+from workflow_support.workflow import Workflow, NodeType
 
 
 class In(BaseModel):

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json as json_lib
-from machine_core.plugins.rag_support.chunking.base import Chunker
-from machine_core.plugins.rag_support.models import Chunk
+from rag_support.chunking.base import Chunker
+from rag_support.models import Chunk
 
 
 class JSONChunker(Chunker):

@@ -1,7 +1,7 @@
 """Tests for the dynamic OpenAPI-based client SDK."""
 
 import pytest
-from machine_core.plugins.server_support.client import MachineClient
+from server_support.client import MachineClient
 
 
 def test_client_discovers_namespaces(test_client):

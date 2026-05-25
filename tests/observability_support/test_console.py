@@ -2,7 +2,7 @@
 
 import pytest
 from io import StringIO
-from machine_core.plugins.observability_support.exporters.console import (
+from observability_support.exporters.console import (
     ConsoleSpanExporter,
 )
 from opentelemetry.sdk.trace import TracerProvider

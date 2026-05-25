@@ -1,13 +1,13 @@
 """Tests for prompt-support builtin plugin."""
 
 import pytest
-from machine_core.plugins.prompt_support.schemas import (
+from prompt_support.schemas import (
     PromptTemplate,
     PromptBlock,
     PromptVariable,
     RenderedPrompt,
 )
-from machine_core.plugins.prompt_support.registry import PromptRegistry
+from prompt_support.registry import PromptRegistry
 
 
 def test_prompt_variable():
@@ -135,7 +135,7 @@ async def test_plugin_setup_registers_category():
         ],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.prompt_support:PromptSupportPlugin",
+            entry_point="prompt_support:PromptSupportPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)

@@ -6,7 +6,7 @@ from typing import Any
 
 import httpx
 
-from machine_core.plugins.deployer_support.base import (
+from deployer_support.base import (
     Deployer,
     DeployConfig,
     DeployResult,

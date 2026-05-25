@@ -3,18 +3,18 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 
-from machine_core.plugins.agent_support.schemas import (
+from agent_support.schemas import (
     AgentDefinition,
     AgentRunner,
     AgentRunResult,
 )
-from machine_core.plugins.tool_support.schemas import ToolDefinition
-from machine_core.plugins.model_provider_support.schemas import ModelResponse
+from tool_support.schemas import ToolDefinition
+from model_provider_support.schemas import ModelResponse
 
 
 def test_implements_agent_runner():
     """BasicAgentRunner satisfies the AgentRunner protocol."""
-    from machine_core.plugins.agent_runtime_basic.runtime import BasicAgentRunner
+    from agent_runtime_basic.runtime import BasicAgentRunner
 
     runner = BasicAgentRunner.__new__(BasicAgentRunner)
     assert isinstance(runner, AgentRunner)
@@ -23,7 +23,7 @@ def test_implements_agent_runner():
 @pytest.mark.asyncio
 async def test_run_no_tools_returns_text():
     """Without tool calls in response, agent returns text directly."""
-    from machine_core.plugins.agent_runtime_basic.runtime import BasicAgentRunner
+    from agent_runtime_basic.runtime import BasicAgentRunner
 
     mock_provider = AsyncMock()
     mock_provider.generate = AsyncMock(
@@ -57,7 +57,7 @@ async def test_run_no_tools_returns_text():
 @pytest.mark.asyncio
 async def test_run_with_tool_calls():
     """Agent executes tool calls and feeds results back."""
-    from machine_core.plugins.agent_runtime_basic.runtime import BasicAgentRunner
+    from agent_runtime_basic.runtime import BasicAgentRunner
 
     resp1 = ModelResponse(
         provider="test",
@@ -109,7 +109,7 @@ async def test_run_with_tool_calls():
 
 def test_tools_to_openai_schema():
     """tools_to_openai_schema converts ToolDefinitions correctly."""
-    from machine_core.plugins.agent_runtime_basic.messages import tools_to_openai_schema
+    from agent_runtime_basic.messages import tools_to_openai_schema
 
     tools = [
         ToolDefinition(
@@ -128,7 +128,7 @@ def test_tools_to_openai_schema():
 @pytest.mark.asyncio
 async def test_max_steps_reached():
     """Agent stops after max_steps with appropriate message."""
-    from machine_core.plugins.agent_runtime_basic.runtime import BasicAgentRunner
+    from agent_runtime_basic.runtime import BasicAgentRunner
 
     # Always return tool calls — force hitting max_steps
     mock_provider = AsyncMock()

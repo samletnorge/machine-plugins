@@ -1,9 +1,9 @@
 """Tests for recursive character text splitter."""
 
 import pytest
-from machine_core.plugins.rag_support.chunking.recursive import RecursiveChunker
-from machine_core.plugins.rag_support.chunking.base import Chunker
-from machine_core.plugins.rag_support.models import Chunk
+from rag_support.chunking.recursive import RecursiveChunker
+from rag_support.chunking.base import Chunker
+from rag_support.models import Chunk
 
 
 def test_is_chunker_subclass():

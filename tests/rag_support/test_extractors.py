@@ -1,11 +1,11 @@
 """Tests for metadata extractors."""
 
 import pytest
-from machine_core.plugins.rag_support.extractors.base import MetadataExtractor
-from machine_core.plugins.rag_support.extractors.title import TitleExtractor
-from machine_core.plugins.rag_support.extractors.summary import SummaryExtractor
-from machine_core.plugins.rag_support.extractors.keywords import KeywordsExtractor
-from machine_core.plugins.rag_support.extractors.questions import QuestionsExtractor
+from rag_support.extractors.base import MetadataExtractor
+from rag_support.extractors.title import TitleExtractor
+from rag_support.extractors.summary import SummaryExtractor
+from rag_support.extractors.keywords import KeywordsExtractor
+from rag_support.extractors.questions import QuestionsExtractor
 
 
 class MockLLM:

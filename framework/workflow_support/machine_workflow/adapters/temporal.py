@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from machine_core.plugins.workflow_support.adapters.base import ExternalEngineAdapter
-from machine_core.plugins.workflow_support.workflow import Workflow, NodeType
+from workflow_support.adapters.base import ExternalEngineAdapter
+from workflow_support.workflow import Workflow, NodeType
 
 
 class TemporalAdapter(ExternalEngineAdapter):

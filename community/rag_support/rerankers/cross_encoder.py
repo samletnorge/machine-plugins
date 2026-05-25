@@ -3,9 +3,9 @@
 from __future__ import annotations
 import asyncio
 from typing import Any
-from machine_core.plugins.vectorstore_support.schemas import SearchResult
-from machine_core.plugins.rag_support.models import RankedResult
-from machine_core.plugins.rag_support.rerankers.base import BaseReranker
+from vectorstore_support.schemas import SearchResult
+from rag_support.models import RankedResult
+from rag_support.rerankers.base import BaseReranker
 
 
 class CrossEncoderReranker(BaseReranker):

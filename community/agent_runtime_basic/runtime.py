@@ -9,16 +9,16 @@ from typing import Any, Callable
 
 from loguru import logger
 
-from machine_core.plugins.agent_support.schemas import (
+from agent_support.schemas import (
     AgentDefinition,
     AgentRunResult,
     AgentStep,
 )
-from machine_core.plugins.model_provider_support.schemas import (
+from model_provider_support.schemas import (
     ModelRequest,
     ModelResponse,
 )
-from machine_core.plugins.tool_support.schemas import ToolDefinition
+from tool_support.schemas import ToolDefinition
 
 from .messages import (
     build_system_message,

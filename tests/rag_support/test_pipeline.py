@@ -1,10 +1,10 @@
 """Tests for the RAG pipeline."""
 
 import pytest
-from machine_core.plugins.rag_support.pipeline import RAGPipeline
-from machine_core.plugins.rag_support.models import IngestDocument
-from machine_core.plugins.rag_support.chunking.recursive import RecursiveChunker
-from machine_core.plugins.vectorstore_support.schemas import SearchResult, UpsertRequest
+from rag_support.pipeline import RAGPipeline
+from rag_support.models import IngestDocument
+from rag_support.chunking.recursive import RecursiveChunker
+from vectorstore_support.schemas import SearchResult, UpsertRequest
 
 
 class MockEmbedder:

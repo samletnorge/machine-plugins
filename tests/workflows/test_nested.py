@@ -3,11 +3,11 @@
 import pytest
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.step import step, StepContext, Step
-from machine_core.plugins.workflow_support.workflow import Workflow
-from machine_core.plugins.workflow_support.engine import DefaultExecutionEngine
-from machine_core.plugins.workflow_support.nested import workflow_as_step
-from machine_core.plugins.workflow_support.run import RunStatus
+from workflow_support.step import step, StepContext, Step
+from workflow_support.workflow import Workflow
+from workflow_support.engine import DefaultExecutionEngine
+from workflow_support.nested import workflow_as_step
+from workflow_support.run import RunStatus
 
 
 class Val(BaseModel):

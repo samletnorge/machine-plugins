@@ -3,10 +3,10 @@
 import pytest
 import sys
 from unittest.mock import patch, MagicMock
-from machine_core.plugins.observability_support.exporters.jaeger import (
+from observability_support.exporters.jaeger import (
     build_jaeger_exporter,
 )
-from machine_core.plugins.observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig
 
 
 @pytest.fixture(autouse=True)

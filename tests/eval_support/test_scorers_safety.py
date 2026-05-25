@@ -2,8 +2,8 @@
 
 import pytest
 from unittest.mock import AsyncMock, patch
-from machine_core.plugins.eval_support.scorers.toxicity import ToxicityScorer
-from machine_core.plugins.eval_support.scorers.bias import BiasScorer
+from eval_support.scorers.toxicity import ToxicityScorer
+from eval_support.scorers.bias import BiasScorer
 
 
 def test_toxicity_scorer_name():

@@ -1,7 +1,7 @@
 """Tests for audio utilities."""
 
 import pytest
-from machine_core.plugins.voice_support.utils import (
+from voice_support.utils import (
     create_wav_header,
     pcm_to_wav,
     chunk_audio,

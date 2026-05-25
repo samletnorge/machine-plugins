@@ -10,10 +10,10 @@ from __future__ import annotations
 import re
 from typing import Optional, TYPE_CHECKING
 
-from machine_core.plugins.memory_support.thread import Message, MessageRole, Fact
+from memory_support.thread import Message, MessageRole, Fact
 
 if TYPE_CHECKING:
-    from machine_core.plugins.memory_support.storage import BaseStorage
+    from memory_support.storage import BaseStorage
 
 
 class FactExtractor:

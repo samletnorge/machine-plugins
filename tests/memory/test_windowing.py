@@ -2,12 +2,12 @@
 
 import pytest
 
-from machine_core.plugins.memory_support.windowing import (
+from memory_support.windowing import (
     LastNWindow,
     TokenLimitedWindow,
     SummarizedWindow,
 )
-from machine_core.plugins.memory_support.thread import Message, MessageRole
+from memory_support.thread import Message, MessageRole
 
 
 def _msg(role: MessageRole, content: str) -> Message:

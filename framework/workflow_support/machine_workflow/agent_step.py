@@ -6,7 +6,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.step import Step, StepContext
+from workflow_support.step import Step, StepContext
 
 
 def agent_as_step(

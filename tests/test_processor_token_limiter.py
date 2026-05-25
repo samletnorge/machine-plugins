@@ -1,8 +1,8 @@
 """Tests for token limiter processor."""
 
 import pytest
-from machine_core.plugins.processor_support.base import ProcessorData, TripWire
-from machine_core.plugins.processor_support.builtin.token_limiter import (
+from processor_support.base import ProcessorData, TripWire
+from processor_support.builtin.token_limiter import (
     TokenLimiterProcessor,
 )
 

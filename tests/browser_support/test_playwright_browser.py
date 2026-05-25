@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 
 @pytest.mark.asyncio
 async def test_playwright_navigate(mock_pw_browser, mock_page):
-    from machine_core.plugins.browser_support.playwright_browser import (
+    from browser_support.playwright_browser import (
         PlaywrightBrowser,
     )
 
@@ -26,7 +26,7 @@ async def test_playwright_navigate(mock_pw_browser, mock_page):
 
 @pytest.mark.asyncio
 async def test_playwright_click(mock_pw_browser, mock_page):
-    from machine_core.plugins.browser_support.playwright_browser import (
+    from browser_support.playwright_browser import (
         PlaywrightBrowser,
     )
 
@@ -42,7 +42,7 @@ async def test_playwright_click(mock_pw_browser, mock_page):
 
 @pytest.mark.asyncio
 async def test_playwright_fill(mock_pw_browser, mock_page):
-    from machine_core.plugins.browser_support.playwright_browser import (
+    from browser_support.playwright_browser import (
         PlaywrightBrowser,
     )
 
@@ -58,7 +58,7 @@ async def test_playwright_fill(mock_pw_browser, mock_page):
 
 @pytest.mark.asyncio
 async def test_playwright_screenshot(mock_pw_browser, mock_page):
-    from machine_core.plugins.browser_support.playwright_browser import (
+    from browser_support.playwright_browser import (
         PlaywrightBrowser,
     )
 
@@ -75,7 +75,7 @@ async def test_playwright_screenshot(mock_pw_browser, mock_page):
 
 @pytest.mark.asyncio
 async def test_playwright_get_text(mock_pw_browser, mock_page):
-    from machine_core.plugins.browser_support.playwright_browser import (
+    from browser_support.playwright_browser import (
         PlaywrightBrowser,
     )
 
@@ -91,7 +91,7 @@ async def test_playwright_get_text(mock_pw_browser, mock_page):
 
 @pytest.mark.asyncio
 async def test_playwright_evaluate(mock_pw_browser, mock_page):
-    from machine_core.plugins.browser_support.playwright_browser import (
+    from browser_support.playwright_browser import (
         PlaywrightBrowser,
     )
 
@@ -107,7 +107,7 @@ async def test_playwright_evaluate(mock_pw_browser, mock_page):
 
 @pytest.mark.asyncio
 async def test_playwright_navigate_error(mock_pw_browser, mock_page):
-    from machine_core.plugins.browser_support.playwright_browser import (
+    from browser_support.playwright_browser import (
         PlaywrightBrowser,
     )
 
@@ -124,7 +124,7 @@ async def test_playwright_navigate_error(mock_pw_browser, mock_page):
 
 @pytest.mark.asyncio
 async def test_playwright_close(mock_pw_browser, mock_page):
-    from machine_core.plugins.browser_support.playwright_browser import (
+    from browser_support.playwright_browser import (
         PlaywrightBrowser,
     )
 

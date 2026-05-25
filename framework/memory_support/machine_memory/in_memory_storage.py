@@ -6,7 +6,7 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Optional
 
-from machine_core.plugins.memory_support.thread import Thread, Message, Fact
+from memory_support.thread import Thread, Message, Fact
 from .storage import BaseStorage
 
 

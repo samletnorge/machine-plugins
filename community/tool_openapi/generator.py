@@ -7,7 +7,7 @@ from typing import Any
 
 import httpx
 
-from machine_core.plugins.tool_support.schemas import ToolDefinition
+from tool_support.schemas import ToolDefinition
 
 
 def generate_tools(

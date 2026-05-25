@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from machine_core.plugins.memory_support.thread import Message, MessageRole
+from memory_support.thread import Message, MessageRole
 
 
 class WindowStrategy(ABC):

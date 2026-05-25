@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from machine_core.plugins.embeddings.schemas import EmbeddingRequest
+from embeddings.schemas import EmbeddingRequest
 
 
 class EmbedderAdapter:
@@ -41,7 +41,7 @@ class LLMAdapter:
         self._model = model
 
     async def generate(self, prompt: str) -> str:
-        from machine_core.plugins.model_provider_support.schemas import ModelRequest
+        from model_provider_support.schemas import ModelRequest
 
         request = ModelRequest(
             provider=self._provider.__class__.__name__,

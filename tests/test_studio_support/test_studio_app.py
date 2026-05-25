@@ -1,8 +1,8 @@
 """Task 9 — Studio app creation and index route tests."""
 
 import json
-from machine_core.plugins.studio_support import StudioSupportPlugin
-from machine_core.plugins.studio_support.app import create_studio_app
+from studio_support import StudioSupportPlugin
+from studio_support.app import create_studio_app
 
 
 def test_plugin_class_exists():
@@ -17,7 +17,7 @@ def test_manifest_loads():
     from pathlib import Path
 
     # Find the manifest relative to the installed package
-    import machine_core.plugins.studio_support as pkg
+    import studio_support as pkg
 
     manifest_path = Path(pkg.__file__).parent / "manifest.json"
     manifest = json.loads(manifest_path.read_text())

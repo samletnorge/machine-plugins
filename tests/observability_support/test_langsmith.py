@@ -3,11 +3,11 @@
 import pytest
 import sys
 from unittest.mock import patch, MagicMock
-from machine_core.plugins.observability_support.exporters.langsmith import (
+from observability_support.exporters.langsmith import (
     build_langsmith_exporter,
     LangSmithSpanExporter,
 )
-from machine_core.plugins.observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig
 from opentelemetry.sdk.trace.export import SpanExportResult
 
 

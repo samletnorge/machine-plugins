@@ -1,6 +1,6 @@
 """Voice support plugin — defines voice_provider category and houses all voice providers."""
 
-from machine_core.plugins.voice_support.base import (
+from voice_support.base import (
     VoiceProvider,
     SpeakOptions,
     ListenOptions,

@@ -2,13 +2,13 @@
 
 import pytest
 from unittest.mock import MagicMock, patch
-from machine_core.plugins.voice_support.base import SpeakOptions, ListenOptions
+from voice_support.base import SpeakOptions, ListenOptions
 
 
 class TestAzureVoiceProvider:
     def test_import(self):
-        with patch("machine_core.plugins.voice_support.providers.azure.speechsdk"):
-            from machine_core.plugins.voice_support.providers.azure import (
+        with patch("voice_support.providers.azure.speechsdk"):
+            from voice_support.providers.azure import (
                 AzureVoiceProvider,
             )
 
@@ -18,9 +18,9 @@ class TestAzureVoiceProvider:
     @pytest.mark.asyncio
     async def test_speak_returns_chunks(self):
         with patch(
-            "machine_core.plugins.voice_support.providers.azure.speechsdk"
+            "voice_support.providers.azure.speechsdk"
         ) as mock_sdk:
-            from machine_core.plugins.voice_support.providers.azure import (
+            from voice_support.providers.azure import (
                 AzureVoiceProvider,
             )
 
@@ -43,9 +43,9 @@ class TestAzureVoiceProvider:
     @pytest.mark.asyncio
     async def test_listen_returns_text(self):
         with patch(
-            "machine_core.plugins.voice_support.providers.azure.speechsdk"
+            "voice_support.providers.azure.speechsdk"
         ) as mock_sdk:
-            from machine_core.plugins.voice_support.providers.azure import (
+            from voice_support.providers.azure import (
                 AzureVoiceProvider,
             )
 
@@ -69,8 +69,8 @@ class TestAzureVoiceProvider:
 
     @pytest.mark.asyncio
     async def test_connect_raises(self):
-        with patch("machine_core.plugins.voice_support.providers.azure.speechsdk"):
-            from machine_core.plugins.voice_support.providers.azure import (
+        with patch("voice_support.providers.azure.speechsdk"):
+            from voice_support.providers.azure import (
                 AzureVoiceProvider,
             )
 

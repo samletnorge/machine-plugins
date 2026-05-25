@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from machine_core.plugins.vectorstore_support.schemas import SearchResult
-from machine_core.plugins.rag_support.models import RankedResult
+from vectorstore_support.schemas import SearchResult
+from rag_support.models import RankedResult
 
 
 class BaseReranker(ABC):

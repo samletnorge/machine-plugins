@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.observability_support:ObservabilitySupportPlugin"
+    "entry_point": "observability_support:ObservabilitySupportPlugin"
   }
 }

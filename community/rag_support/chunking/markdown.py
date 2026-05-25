@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import re
-from machine_core.plugins.rag_support.chunking.base import Chunker
-from machine_core.plugins.rag_support.models import Chunk
+from rag_support.chunking.base import Chunker
+from rag_support.models import Chunk
 
 _HEADER_RE = re.compile(r"^(#{1,6})\s+(.+)$", re.MULTILINE)
 

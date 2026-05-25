@@ -217,7 +217,7 @@ def mock_machine():
 @pytest.fixture
 def test_client(mock_machine):
     from fastapi.testclient import TestClient
-    from machine_core.plugins.server_support.app import create_app
+    from server_support.app import create_app
 
     app = create_app(mock_machine)
     return TestClient(app)

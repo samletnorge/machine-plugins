@@ -1,15 +1,15 @@
 """Tests for all chunking strategies."""
 
 import pytest
-from machine_core.plugins.rag_support.chunking.base import Chunker
-from machine_core.plugins.rag_support.models import Chunk
-from machine_core.plugins.rag_support.chunking.sentence import SentenceChunker
-from machine_core.plugins.rag_support.chunking.token import TokenChunker
-from machine_core.plugins.rag_support.chunking.markdown import MarkdownChunker
-from machine_core.plugins.rag_support.chunking.html import HTMLChunker
-from machine_core.plugins.rag_support.chunking.json_chunker import JSONChunker
-from machine_core.plugins.rag_support.chunking.code import CodeChunker
-from machine_core.plugins.rag_support.chunking.semantic import SemanticChunker
+from rag_support.chunking.base import Chunker
+from rag_support.models import Chunk
+from rag_support.chunking.sentence import SentenceChunker
+from rag_support.chunking.token import TokenChunker
+from rag_support.chunking.markdown import MarkdownChunker
+from rag_support.chunking.html import HTMLChunker
+from rag_support.chunking.json_chunker import JSONChunker
+from rag_support.chunking.code import CodeChunker
+from rag_support.chunking.semantic import SemanticChunker
 
 
 # --- SentenceChunker ---

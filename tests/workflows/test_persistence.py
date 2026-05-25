@@ -5,8 +5,8 @@ import pytest
 from pathlib import Path
 from datetime import datetime, timezone
 
-from machine_core.plugins.workflow_support.run import WorkflowRun, RunStatus, StepResult
-from machine_core.plugins.workflow_support.persistence import JsonRunStore
+from workflow_support.run import WorkflowRun, RunStatus, StepResult
+from workflow_support.persistence import JsonRunStore
 
 
 class TestJsonRunStore:

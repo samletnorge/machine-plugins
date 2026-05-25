@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from machine_core.plugins.rag_support.models import Chunk
+from rag_support.models import Chunk
 
 
 class Chunker(ABC):

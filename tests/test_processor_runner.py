@@ -1,13 +1,13 @@
 """Tests for ProcessorRunner — sequential processor chain."""
 
 import pytest
-from machine_core.plugins.processor_support.base import (
+from processor_support.base import (
     Processor,
     ProcessorData,
     TripWire,
     ProcessorResult,
 )
-from machine_core.plugins.processor_support.runner import ProcessorRunner
+from processor_support.runner import ProcessorRunner
 
 
 class UpperProcessor(Processor):

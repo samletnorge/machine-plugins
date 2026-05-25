@@ -1,7 +1,7 @@
 """Tests for Deployer ABC and models."""
 
 import pytest
-from machine_core.plugins.deployer_support.base import (
+from deployer_support.base import (
     Deployer,
     DeployConfig,
     DeployResult,

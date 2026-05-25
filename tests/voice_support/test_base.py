@@ -2,7 +2,7 @@
 
 import pytest
 from pydantic import ValidationError
-from machine_core.plugins.voice_support.base import (
+from voice_support.base import (
     VoiceProvider,
     SpeakOptions,
     ListenOptions,

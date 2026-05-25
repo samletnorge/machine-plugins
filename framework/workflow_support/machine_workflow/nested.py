@@ -6,9 +6,9 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.engine import DefaultExecutionEngine
-from machine_core.plugins.workflow_support.step import Step, StepContext
-from machine_core.plugins.workflow_support.workflow import Workflow
+from workflow_support.engine import DefaultExecutionEngine
+from workflow_support.step import Step, StepContext
+from workflow_support.workflow import Workflow
 
 
 def workflow_as_step(

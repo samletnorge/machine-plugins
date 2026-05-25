@@ -6,8 +6,8 @@ Each level is attempted when the previous produces chunks still too large.
 
 from __future__ import annotations
 
-from machine_core.plugins.rag_support.chunking.base import Chunker
-from machine_core.plugins.rag_support.models import Chunk
+from rag_support.chunking.base import Chunker
+from rag_support.models import Chunk
 
 _DEFAULT_SEPARATORS = ["\n\n", "\n", ". ", " ", ""]
 

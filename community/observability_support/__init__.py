@@ -5,14 +5,14 @@ from __future__ import annotations
 import functools
 from typing import Any, TYPE_CHECKING
 
-from machine_core.plugins.observability_support.config import (
+from observability_support.config import (
     ObservabilityConfig,
     SpanConfig,
 )
-from machine_core.plugins.observability_support.tracer import MachineTracer
-from machine_core.plugins.observability_support.decorator import traced
-from machine_core.plugins.observability_support.cost import CostTracker, ModelPricing
-from machine_core.plugins.observability_support.spans import SpanKind, SpanAttributes
+from observability_support.tracer import MachineTracer
+from observability_support.decorator import traced
+from observability_support.cost import CostTracker, ModelPricing
+from observability_support.spans import SpanKind, SpanAttributes
 
 if TYPE_CHECKING:
     from machine_core.plugin.context import PluginContext

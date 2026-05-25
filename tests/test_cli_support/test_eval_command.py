@@ -3,7 +3,7 @@
 import pytest
 import json
 from typer.testing import CliRunner
-from machine_core.plugins.cli_support.main import app
+from cli_support.main import app
 
 runner = CliRunner()
 

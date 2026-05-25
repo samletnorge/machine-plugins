@@ -15,7 +15,7 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel, Field
 
-from machine_core.plugins.vectorstore_support.schemas import SearchResult
+from vectorstore_support.schemas import SearchResult
 
 
 class GraphNode(BaseModel):

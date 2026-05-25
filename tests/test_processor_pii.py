@@ -1,8 +1,8 @@
 """Tests for PII detection processor."""
 
 import pytest
-from machine_core.plugins.processor_support.base import ProcessorData, TripWire
-from machine_core.plugins.processor_support.builtin.pii import PIIProcessor
+from processor_support.base import ProcessorData, TripWire
+from processor_support.builtin.pii import PIIProcessor
 
 
 @pytest.mark.asyncio

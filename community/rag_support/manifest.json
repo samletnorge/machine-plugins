@@ -9,7 +9,7 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.rag_support:RagSupportPlugin"
+    "entry_point": "rag_support:RagSupportPlugin"
   },
   "config_schema": {
     "semantic_chunker": {

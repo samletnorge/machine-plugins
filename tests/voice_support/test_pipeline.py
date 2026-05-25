@@ -2,8 +2,8 @@
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock
-from machine_core.plugins.voice_support.pipeline import VoiceAgentPipeline
-from machine_core.plugins.voice_support.base import (
+from voice_support.pipeline import VoiceAgentPipeline
+from voice_support.base import (
     VoiceProvider,
     SpeakOptions,
     ListenOptions,

@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, timezone
 
-from machine_core.plugins.workflow_support.run import WorkflowRun, RunStatus, StepResult
+from workflow_support.run import WorkflowRun, RunStatus, StepResult
 
 
 class TestRunStatus:

@@ -3,7 +3,7 @@
 import os
 import shutil
 import pytest
-from machine_core.plugins.storage_support import (
+from storage_support import (
     StorageSupportPlugin,
     LocalStorageBackend,
     S3StorageBackend,

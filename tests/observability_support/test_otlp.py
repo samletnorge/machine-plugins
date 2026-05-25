@@ -3,10 +3,10 @@
 import pytest
 import sys
 from unittest.mock import patch, MagicMock
-from machine_core.plugins.observability_support.exporters.otlp import (
+from observability_support.exporters.otlp import (
     build_otlp_exporter,
 )
-from machine_core.plugins.observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig
 
 
 @pytest.fixture(autouse=True)

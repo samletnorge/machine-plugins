@@ -3,7 +3,7 @@
 Auto-discovers endpoints from /openapi.json and builds namespaces dynamically.
 
 Usage:
-    from machine_core.plugins.server_support.client import MachineClient
+    from server_support.client import MachineClient
 
     client = MachineClient(base_url="http://localhost:8000")
 

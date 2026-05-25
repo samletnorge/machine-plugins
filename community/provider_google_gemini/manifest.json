@@ -25,6 +25,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.provider_google_gemini:GoogleGeminiProviderPlugin"
+    "entry_point": "provider_google_gemini:GoogleGeminiProviderPlugin"
   }
 }

@@ -4,8 +4,8 @@ import pytest
 from unittest.mock import AsyncMock
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.agent_step import agent_as_step
-from machine_core.plugins.workflow_support.step import Step, StepContext
+from workflow_support.agent_step import agent_as_step
+from workflow_support.step import Step, StepContext
 
 
 class AgentInput(BaseModel):

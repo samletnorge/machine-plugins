@@ -4,10 +4,10 @@ import pytest
 
 from machine_core import Machine
 from machine_core.plugin.manifest import PluginManifest, TransportConfig
-from machine_core.plugins.memory_support.manager import MemoryManager
-from machine_core.plugins.memory_support.in_memory_storage import InMemoryStorage
-from machine_core.plugins.memory_support.windowing import LastNWindow
-from machine_core.plugins.memory_support.observational import facts_to_system_prompt
+from memory_support.manager import MemoryManager
+from memory_support.in_memory_storage import InMemoryStorage
+from memory_support.windowing import LastNWindow
+from memory_support.observational import facts_to_system_prompt
 
 
 @pytest.mark.asyncio
@@ -26,7 +26,7 @@ async def test_plugin_loads_and_registers_categories():
         ],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.memory_support:MemorySupportPlugin",
+            entry_point="memory_support:MemorySupportPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)
@@ -46,7 +46,7 @@ async def test_plugin_hookspecs_registered():
         capabilities=["categories:define", "hooks:define"],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.memory_support:MemorySupportPlugin",
+            entry_point="memory_support:MemorySupportPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)
@@ -120,7 +120,7 @@ async def test_full_memory_lifecycle():
 @pytest.mark.asyncio
 async def test_memory_tools_lifecycle():
     """End-to-end: use tool functions with manager."""
-    from machine_core.plugins.memory_support.tools import (
+    from memory_support.tools import (
         remember,
         recall,
         forget,

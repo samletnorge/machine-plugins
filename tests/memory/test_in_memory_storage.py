@@ -2,7 +2,7 @@
 
 import pytest
 
-from machine_core.plugins.memory_support.thread import (
+from memory_support.thread import (
     Fact,
     Message,
     MessageRole,

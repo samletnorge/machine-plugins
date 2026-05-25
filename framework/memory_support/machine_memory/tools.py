@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from machine_core.plugins.memory_support.manager import MemoryManager
+    from memory_support.manager import MemoryManager
 
 
 async def remember(

@@ -2,14 +2,14 @@
 
 import pytest
 
-from machine_core.plugins.memory_support.tools import (
+from memory_support.tools import (
     remember,
     recall,
     forget,
     list_memories,
 )
-from machine_core.plugins.memory_support.manager import MemoryManager
-from machine_core.plugins.memory_support.in_memory_storage import InMemoryStorage
+from memory_support.manager import MemoryManager
+from memory_support.in_memory_storage import InMemoryStorage
 
 
 @pytest.fixture

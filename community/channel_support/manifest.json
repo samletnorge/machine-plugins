@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.channel_support:ChannelSupportPlugin"
+    "entry_point": "channel_support:ChannelSupportPlugin"
   }
 }

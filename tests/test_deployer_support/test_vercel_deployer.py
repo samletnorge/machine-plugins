@@ -2,8 +2,8 @@
 
 import pytest
 import json
-from machine_core.plugins.deployer_support.vercel import VercelDeployer
-from machine_core.plugins.deployer_support.base import DeployConfig, DeployStatus
+from deployer_support.vercel import VercelDeployer
+from deployer_support.base import DeployConfig, DeployStatus
 
 
 @pytest.fixture

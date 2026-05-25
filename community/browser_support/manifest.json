@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.browser_support:BrowserSupportPlugin"
+    "entry_point": "browser_support:BrowserSupportPlugin"
   }
 }

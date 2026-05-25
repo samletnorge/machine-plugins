@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from machine_core.plugins.voice_support.base import (
+from voice_support.base import (
     SpeakOptions,
     ListenOptions,
     ConnectOptions,
@@ -12,12 +12,12 @@ from machine_core.plugins.voice_support.base import (
 
 class TestOpenAIVoiceProvider:
     def test_import(self):
-        from machine_core.plugins.voice_support.providers.openai_voice import (
+        from voice_support.providers.openai_voice import (
             OpenAIVoiceProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.openai_voice.AsyncOpenAI",
+            "voice_support.providers.openai_voice.AsyncOpenAI",
             MagicMock(),
         ):
             provider = OpenAIVoiceProvider(api_key="test-key")
@@ -25,7 +25,7 @@ class TestOpenAIVoiceProvider:
 
     @pytest.mark.asyncio
     async def test_speak_streams_audio(self):
-        from machine_core.plugins.voice_support.providers.openai_voice import (
+        from voice_support.providers.openai_voice import (
             OpenAIVoiceProvider,
         )
 
@@ -36,7 +36,7 @@ class TestOpenAIVoiceProvider:
         mock_client.audio.speech.create = AsyncMock(return_value=mock_response)
 
         with patch(
-            "machine_core.plugins.voice_support.providers.openai_voice.AsyncOpenAI",
+            "voice_support.providers.openai_voice.AsyncOpenAI",
             return_value=mock_client,
         ):
             provider = OpenAIVoiceProvider(api_key="test-key")
@@ -47,7 +47,7 @@ class TestOpenAIVoiceProvider:
 
     @pytest.mark.asyncio
     async def test_speak_with_voice_option(self):
-        from machine_core.plugins.voice_support.providers.openai_voice import (
+        from voice_support.providers.openai_voice import (
             OpenAIVoiceProvider,
         )
 
@@ -58,7 +58,7 @@ class TestOpenAIVoiceProvider:
         mock_client.audio.speech.create = AsyncMock(return_value=mock_response)
 
         with patch(
-            "machine_core.plugins.voice_support.providers.openai_voice.AsyncOpenAI",
+            "voice_support.providers.openai_voice.AsyncOpenAI",
             return_value=mock_client,
         ):
             provider = OpenAIVoiceProvider(api_key="test-key")
@@ -71,7 +71,7 @@ class TestOpenAIVoiceProvider:
 
     @pytest.mark.asyncio
     async def test_listen_returns_text(self):
-        from machine_core.plugins.voice_support.providers.openai_voice import (
+        from voice_support.providers.openai_voice import (
             OpenAIVoiceProvider,
         )
 
@@ -84,7 +84,7 @@ class TestOpenAIVoiceProvider:
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.openai_voice.AsyncOpenAI",
+            "voice_support.providers.openai_voice.AsyncOpenAI",
             return_value=mock_client,
         ):
             provider = OpenAIVoiceProvider(api_key="test-key")
@@ -97,7 +97,7 @@ class TestOpenAIVoiceProvider:
 
     @pytest.mark.asyncio
     async def test_listen_with_language(self):
-        from machine_core.plugins.voice_support.providers.openai_voice import (
+        from voice_support.providers.openai_voice import (
             OpenAIVoiceProvider,
         )
 
@@ -110,7 +110,7 @@ class TestOpenAIVoiceProvider:
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.openai_voice.AsyncOpenAI",
+            "voice_support.providers.openai_voice.AsyncOpenAI",
             return_value=mock_client,
         ):
             provider = OpenAIVoiceProvider(api_key="test-key")
@@ -124,7 +124,7 @@ class TestOpenAIVoiceProvider:
 
     @pytest.mark.asyncio
     async def test_connect_returns_session(self):
-        from machine_core.plugins.voice_support.providers.openai_voice import (
+        from voice_support.providers.openai_voice import (
             OpenAIVoiceProvider,
         )
 
@@ -134,11 +134,11 @@ class TestOpenAIVoiceProvider:
         mock_ws.close = AsyncMock()
 
         with patch(
-            "machine_core.plugins.voice_support.providers.openai_voice.AsyncOpenAI",
+            "voice_support.providers.openai_voice.AsyncOpenAI",
             MagicMock(),
         ):
             with patch(
-                "machine_core.plugins.voice_support.providers.openai_voice.websockets"
+                "voice_support.providers.openai_voice.websockets"
             ) as mock_websockets:
                 mock_websockets.connect = AsyncMock(return_value=mock_ws)
                 provider = OpenAIVoiceProvider(api_key="test-key")

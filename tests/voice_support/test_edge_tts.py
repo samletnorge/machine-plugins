@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from machine_core.plugins.voice_support.base import (
+from voice_support.base import (
     SpeakOptions,
     ListenOptions,
     AudioFormat,
@@ -11,24 +11,24 @@ from machine_core.plugins.voice_support.base import (
 
 class TestEdgeTTSProvider:
     def test_import(self):
-        from machine_core.plugins.voice_support.providers.edge_tts import (
+        from voice_support.providers.edge_tts import (
             EdgeTTSProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.edge_tts.edge_tts",
+            "voice_support.providers.edge_tts.edge_tts",
             MagicMock(),
         ):
             provider = EdgeTTSProvider()
             assert provider is not None
 
     def test_default_voice(self):
-        from machine_core.plugins.voice_support.providers.edge_tts import (
+        from voice_support.providers.edge_tts import (
             EdgeTTSProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.edge_tts.edge_tts",
+            "voice_support.providers.edge_tts.edge_tts",
             MagicMock(),
         ):
             provider = EdgeTTSProvider(voice="en-US-AriaNeural")
@@ -36,7 +36,7 @@ class TestEdgeTTSProvider:
 
     @pytest.mark.asyncio
     async def test_speak_returns_async_iterator(self):
-        from machine_core.plugins.voice_support.providers.edge_tts import (
+        from voice_support.providers.edge_tts import (
             EdgeTTSProvider,
         )
 
@@ -51,7 +51,7 @@ class TestEdgeTTSProvider:
         mock_edge.Communicate = mock_communicate
 
         with patch(
-            "machine_core.plugins.voice_support.providers.edge_tts.edge_tts", mock_edge
+            "voice_support.providers.edge_tts.edge_tts", mock_edge
         ):
             provider = EdgeTTSProvider()
             chunks = []
@@ -62,7 +62,7 @@ class TestEdgeTTSProvider:
 
     @pytest.mark.asyncio
     async def test_speak_with_options(self):
-        from machine_core.plugins.voice_support.providers.edge_tts import (
+        from voice_support.providers.edge_tts import (
             EdgeTTSProvider,
         )
 
@@ -76,7 +76,7 @@ class TestEdgeTTSProvider:
         mock_edge.Communicate = mock_communicate
 
         with patch(
-            "machine_core.plugins.voice_support.providers.edge_tts.edge_tts", mock_edge
+            "voice_support.providers.edge_tts.edge_tts", mock_edge
         ):
             provider = EdgeTTSProvider()
             opts = SpeakOptions(voice="nb-NO-FinnNeural", speed=1.2)
@@ -87,12 +87,12 @@ class TestEdgeTTSProvider:
 
     @pytest.mark.asyncio
     async def test_listen_raises(self):
-        from machine_core.plugins.voice_support.providers.edge_tts import (
+        from voice_support.providers.edge_tts import (
             EdgeTTSProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.edge_tts.edge_tts",
+            "voice_support.providers.edge_tts.edge_tts",
             MagicMock(),
         ):
             provider = EdgeTTSProvider()
@@ -101,12 +101,12 @@ class TestEdgeTTSProvider:
 
     @pytest.mark.asyncio
     async def test_connect_raises(self):
-        from machine_core.plugins.voice_support.providers.edge_tts import (
+        from voice_support.providers.edge_tts import (
             EdgeTTSProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.edge_tts.edge_tts",
+            "voice_support.providers.edge_tts.edge_tts",
             MagicMock(),
         ):
             provider = EdgeTTSProvider()

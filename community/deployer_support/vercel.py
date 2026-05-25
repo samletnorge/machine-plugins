@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from machine_core.plugins.deployer_support.base import (
+from deployer_support.base import (
     Deployer,
     DeployConfig,
     DeployResult,
@@ -35,7 +35,7 @@ class VercelDeployer(Deployer):
 
         module_path, _, attr_name = entry.rpartition(":")
         handler_content = f'''"""Vercel serverless handler for machine-core."""
-from machine_core.plugins.server_support.app import create_app
+from server_support.app import create_app
 from {module_path} import {attr_name}
 
 app = create_app({attr_name})

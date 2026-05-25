@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from machine_core.plugins.model_provider_support.schemas import (
+from model_provider_support.schemas import (
     ModelRequest,
     ModelResponse,
 )
@@ -12,7 +12,7 @@ from machine_core.plugins.model_provider_support.schemas import (
 class TestGrokProvider:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.provider_grok.provider import GrokLLMProvider
+        from provider_grok.provider import GrokLLMProvider
 
         return GrokLLMProvider(api_key="test-key", model="grok-3")
 
@@ -35,7 +35,7 @@ class TestGrokProvider:
 class TestGroqProvider:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.provider_groq.provider import GroqLLMProvider
+        from provider_groq.provider import GroqLLMProvider
 
         return GroqLLMProvider(api_key="test-key", model="llama-3.3-70b-versatile")
 
@@ -59,7 +59,7 @@ class TestGroqProvider:
 class TestGoogleGeminiProvider:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.provider_google_gemini.provider import (
+        from provider_google_gemini.provider import (
             GoogleGeminiLLMProvider,
         )
 
@@ -85,7 +85,7 @@ class TestGoogleGeminiProvider:
 class TestVertexGeminiProvider:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.provider_vertex_gemini.provider import (
+        from provider_vertex_gemini.provider import (
             VertexGeminiLLMProvider,
         )
 
@@ -113,7 +113,7 @@ class TestVertexGeminiProvider:
 class TestVertexClaudeProvider:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.provider_vertex_claude.provider import (
+        from provider_vertex_claude.provider import (
             VertexClaudeLLMProvider,
         )
 

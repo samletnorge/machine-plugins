@@ -1,7 +1,7 @@
 """Tests for channel_support plugin."""
 
 import pytest
-from machine_core.plugins.channel_support import (
+from channel_support import (
     ChannelSupportPlugin,
     InMemoryChannel,
     WebSocketChannel,

@@ -8,8 +8,8 @@ from typing import Sequence
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
-from machine_core.plugins.observability_support.config import ObservabilityConfig
-from machine_core.plugins.observability_support.spans import SpanAttributes
+from observability_support.config import ObservabilityConfig
+from observability_support.spans import SpanAttributes
 
 
 def build_langsmith_exporter(config: ObservabilityConfig) -> SpanExporter:

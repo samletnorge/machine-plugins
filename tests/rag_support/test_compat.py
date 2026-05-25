@@ -1,12 +1,12 @@
 """Verify RAG plugin is compatible with existing vectorstore_support schemas."""
 
 import pytest
-from machine_core.plugins.vectorstore_support.schemas import (
+from vectorstore_support.schemas import (
     SearchResult,
     UpsertRequest,
     SearchRequest,
 )
-from machine_core.plugins.rag_support.models import RankedResult
+from rag_support.models import RankedResult
 
 
 def test_search_result_used_by_reranker():

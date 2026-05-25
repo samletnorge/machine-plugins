@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import APIRouter, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from machine_core.plugins.studio_support.dependencies import get_machine
+from studio_support.dependencies import get_machine
 
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))

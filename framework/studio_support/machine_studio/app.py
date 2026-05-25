@@ -9,7 +9,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from machine_core.plugins.studio_support.dependencies import set_machine, get_machine
+from studio_support.dependencies import set_machine, get_machine
 
 STUDIO_DIR = Path(__file__).parent
 TEMPLATES_DIR = STUDIO_DIR / "templates"
@@ -57,7 +57,7 @@ def create_studio_app(machine: Any) -> FastAPI:
             },
         )
 
-    from machine_core.plugins.studio_support.routes import chat, tools as tool_routes
+    from studio_support.routes import chat, tools as tool_routes
 
     app.include_router(chat.router)
     app.include_router(tool_routes.router)

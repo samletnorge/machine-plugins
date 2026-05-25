@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from machine_core.plugins.embeddings.schemas import EmbeddingRequest, EmbeddingResult
+from embeddings.schemas import EmbeddingRequest, EmbeddingResult
 
 
 # ---------------------------------------------------------------------------
@@ -18,7 +18,7 @@ from machine_core.plugins.embeddings.schemas import EmbeddingRequest, EmbeddingR
 class TestOllamaEmbeddingProvider:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.embeddings_ollama.provider import (
+        from embeddings_ollama.provider import (
             OllamaEmbeddingProvider,
         )
 
@@ -75,7 +75,7 @@ class TestOllamaEmbeddingProvider:
 class TestAzureEmbeddingProvider:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.embeddings_azure.provider import (
+        from embeddings_azure.provider import (
             AzureEmbeddingProvider,
         )
 
@@ -123,7 +123,7 @@ class TestGoogleEmbeddingProvider:
             mock_client = MagicMock()
             MockGenAI.return_value = mock_client
 
-            from machine_core.plugins.embeddings_google.provider import (
+            from embeddings_google.provider import (
                 GoogleEmbeddingProvider,
             )
 

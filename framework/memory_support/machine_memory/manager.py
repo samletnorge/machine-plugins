@@ -8,19 +8,19 @@ from __future__ import annotations
 
 from typing import Optional, Any
 
-from machine_core.plugins.memory_support.thread import (
+from memory_support.thread import (
     Thread,
     Message,
     MessageRole,
     Fact,
 )
-from machine_core.plugins.memory_support.working import WorkingMemory
-from machine_core.plugins.memory_support.observational import (
+from memory_support.working import WorkingMemory
+from memory_support.observational import (
     FactExtractor,
     ObservationalMemory,
 )
-from machine_core.plugins.memory_support.windowing import WindowStrategy, LastNWindow
-from machine_core.plugins.memory_support.storage import BaseStorage
+from memory_support.windowing import WindowStrategy, LastNWindow
+from memory_support.storage import BaseStorage
 
 
 class MemoryManager:

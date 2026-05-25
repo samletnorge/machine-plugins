@@ -2,7 +2,7 @@
 
 import pytest
 from pydantic import ValidationError as PydanticValidationError
-from machine_core.plugins.model_provider_support.schemas import (
+from model_provider_support.schemas import (
     ModelProviderConfig,
     ModelRequest,
     ModelResponse,
@@ -67,7 +67,7 @@ async def test_plugin_setup_registers_category():
         ],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.model_provider_support:ModelProviderSupportPlugin",
+            entry_point="model_provider_support:ModelProviderSupportPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)
@@ -91,7 +91,7 @@ async def test_plugin_hookspecs_registered():
         ],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.model_provider_support:ModelProviderSupportPlugin",
+            entry_point="model_provider_support:ModelProviderSupportPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)

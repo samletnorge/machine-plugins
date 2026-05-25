@@ -11,7 +11,7 @@ from typing import Optional, TYPE_CHECKING
 from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
-    from machine_core.plugins.memory_support.storage import BaseStorage
+    from memory_support.storage import BaseStorage
 
 
 class WorkingMemoryData(BaseModel):

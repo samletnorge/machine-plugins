@@ -3,17 +3,17 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from machine_core.plugins.agent_support.schemas import (
+from agent_support.schemas import (
     AgentDefinition,
     AgentRunner,
     AgentRunResult,
 )
-from machine_core.plugins.tool_support.schemas import ToolDefinition
+from tool_support.schemas import ToolDefinition
 
 
 def test_implements_agent_runner():
     """PydanticAgentRunner satisfies the AgentRunner protocol."""
-    from machine_core.plugins.agent_runtime_pydantic.runtime import PydanticAgentRunner
+    from agent_runtime_pydantic.runtime import PydanticAgentRunner
 
     runner = PydanticAgentRunner.__new__(PydanticAgentRunner)
     assert isinstance(runner, AgentRunner)
@@ -22,7 +22,7 @@ def test_implements_agent_runner():
 @pytest.mark.asyncio
 async def test_run_calls_model_resolver():
     """Runner resolves model from definition.model_ref."""
-    from machine_core.plugins.agent_runtime_pydantic.runtime import PydanticAgentRunner
+    from agent_runtime_pydantic.runtime import PydanticAgentRunner
 
     mock_model = MagicMock()
     resolver = MagicMock(return_value=mock_model)
@@ -40,7 +40,7 @@ async def test_run_calls_model_resolver():
     mock_result.all_messages = MagicMock(return_value=[])
 
     with patch(
-        "machine_core.plugins.agent_runtime_pydantic.runtime.Agent"
+        "agent_runtime_pydantic.runtime.Agent"
     ) as MockAgent:
         mock_agent_instance = AsyncMock()
         mock_agent_instance.run = AsyncMock(return_value=mock_result)
@@ -56,7 +56,7 @@ async def test_run_calls_model_resolver():
 
 def test_tool_definition_to_pydantic():
     """Converter creates pydantic-ai Tool from ToolDefinition."""
-    from machine_core.plugins.agent_runtime_pydantic.converters import (
+    from agent_runtime_pydantic.converters import (
         tool_definition_to_pydantic,
     )
 
@@ -73,7 +73,7 @@ def test_tool_definition_to_pydantic():
 
 def test_pydantic_result_to_agent_run_result():
     """Converter creates AgentRunResult from pydantic-ai result."""
-    from machine_core.plugins.agent_runtime_pydantic.converters import (
+    from agent_runtime_pydantic.converters import (
         pydantic_result_to_agent_run_result,
     )
 

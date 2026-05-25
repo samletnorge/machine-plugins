@@ -10,6 +10,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.embeddings_google:GoogleEmbeddingPlugin"
+    "entry_point": "embeddings_google:GoogleEmbeddingPlugin"
   }
 }

@@ -1,7 +1,7 @@
 """Tests for auth_support plugin."""
 
 import pytest
-from machine_core.plugins.auth_support import (
+from auth_support import (
     AuthSupportPlugin,
     JWTAuthProvider,
     APIKeyAuthProvider,

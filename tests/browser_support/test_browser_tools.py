@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import AsyncMock
-from machine_core.plugins.browser_support.tools import (
+from browser_support.tools import (
     create_browser_tools,
     BrowseInput,
     ClickInput,
@@ -11,7 +11,7 @@ from machine_core.plugins.browser_support.tools import (
     GetTextInput,
     EvalInput,
 )
-from machine_core.plugins.browser_support.base import (
+from browser_support.base import (
     BrowserResult,
     NavigateResult,
     ScreenshotResult,

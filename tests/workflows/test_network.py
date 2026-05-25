@@ -5,7 +5,7 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.network import (
+from workflow_support.network import (
     AgentNetwork,
     DelegationConfig,
     NetworkAgent,

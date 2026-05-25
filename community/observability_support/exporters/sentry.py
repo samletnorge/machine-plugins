@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from opentelemetry.sdk.trace.export import SpanExporter
 
-from machine_core.plugins.observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig
 
 
 def build_sentry_exporter(config: ObservabilityConfig) -> SpanExporter:

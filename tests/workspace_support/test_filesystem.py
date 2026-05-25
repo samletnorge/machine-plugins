@@ -3,7 +3,7 @@
 import os
 import tempfile
 import pytest
-from machine_core.plugins.workspace_support.filesystem import (
+from workspace_support.filesystem import (
     FileSystem,
     LocalFileSystem,
     FileInfo,

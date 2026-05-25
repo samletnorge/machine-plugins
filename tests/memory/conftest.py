@@ -1,5 +1,5 @@
 import pytest
-from machine_core.plugins.memory_support.in_memory_storage import InMemoryStorage
+from memory_support.in_memory_storage import InMemoryStorage
 
 
 @pytest.fixture

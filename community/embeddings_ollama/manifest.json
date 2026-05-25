@@ -10,6 +10,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.embeddings_ollama:OllamaEmbeddingPlugin"
+    "entry_point": "embeddings_ollama:OllamaEmbeddingPlugin"
   }
 }

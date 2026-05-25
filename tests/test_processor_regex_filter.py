@@ -1,8 +1,8 @@
 """Tests for configurable regex filter processor."""
 
 import pytest
-from machine_core.plugins.processor_support.base import ProcessorData, TripWire
-from machine_core.plugins.processor_support.builtin.regex_filter import (
+from processor_support.base import ProcessorData, TripWire
+from processor_support.builtin.regex_filter import (
     RegexFilterProcessor,
 )
 

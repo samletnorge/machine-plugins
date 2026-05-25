@@ -2,8 +2,8 @@
 
 import pytest
 import time
-from machine_core.plugins.processor_support.base import ProcessorData
-from machine_core.plugins.processor_support.builtin.cache import CacheProcessor
+from processor_support.base import ProcessorData
+from processor_support.builtin.cache import CacheProcessor
 
 
 @pytest.mark.asyncio

@@ -6,7 +6,7 @@ import time
 
 from google import genai
 
-from machine_core.plugins.embeddings.schemas import EmbeddingRequest, EmbeddingResult
+from embeddings.schemas import EmbeddingRequest, EmbeddingResult
 
 
 class GoogleEmbeddingProvider:

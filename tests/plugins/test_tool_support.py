@@ -3,8 +3,8 @@
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
-from machine_core.plugins.tool_support.schemas import ToolDefinition, ToolResult
-from machine_core.plugins.tool_support.decorator import tool
+from tool_support.schemas import ToolDefinition, ToolResult
+from tool_support.decorator import tool
 
 
 # --- Schema tests ---
@@ -96,7 +96,7 @@ async def test_plugin_setup_registers_category():
         ],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.tool_support:ToolSupportPlugin",
+            entry_point="tool_support:ToolSupportPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)
@@ -122,7 +122,7 @@ async def test_plugin_hookspecs_registered():
         ],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.tool_support:ToolSupportPlugin",
+            entry_point="tool_support:ToolSupportPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)

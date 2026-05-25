@@ -6,7 +6,7 @@ import enum
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from machine_core.plugins.workflow_support.step import Step
+from workflow_support.step import Step
 
 
 class NodeType(str, enum.Enum):

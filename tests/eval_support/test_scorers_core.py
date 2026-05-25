@@ -2,9 +2,9 @@
 
 import pytest
 from unittest.mock import AsyncMock, patch
-from machine_core.plugins.eval_support.scorers.relevancy import RelevancyScorer
-from machine_core.plugins.eval_support.scorers.faithfulness import FaithfulnessScorer
-from machine_core.plugins.eval_support.scorers.hallucination import HallucinationScorer
+from eval_support.scorers.relevancy import RelevancyScorer
+from eval_support.scorers.faithfulness import FaithfulnessScorer
+from eval_support.scorers.hallucination import HallucinationScorer
 
 
 def test_relevancy_scorer_name():

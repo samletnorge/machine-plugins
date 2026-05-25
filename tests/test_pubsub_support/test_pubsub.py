@@ -1,7 +1,7 @@
 """Tests for pubsub_support plugin."""
 
 import pytest
-from machine_core.plugins.pubsub_support import (
+from pubsub_support import (
     PubSubSupportPlugin,
     InMemoryPubSub,
     Topic,

@@ -2,8 +2,8 @@
 
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
-from machine_core.plugins.deployer_support.dokploy import DokployDeployer
-from machine_core.plugins.deployer_support.base import DeployConfig, DeployStatus
+from deployer_support.dokploy import DokployDeployer
+from deployer_support.base import DeployConfig, DeployStatus
 
 
 @pytest.fixture
@@ -35,7 +35,7 @@ def test_dokploy_deployer_name(dokploy_deployer):
 async def test_dokploy_deploy_calls_api(dokploy_deployer, deploy_config):
     """DokployDeployer calls Dokploy API to trigger deployment."""
     with patch(
-        "machine_core.plugins.deployer_support.dokploy.httpx.AsyncClient"
+        "deployer_support.dokploy.httpx.AsyncClient"
     ) as mock_client_cls:
         mock_client = AsyncMock()
         mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
@@ -52,7 +52,7 @@ async def test_dokploy_deploy_calls_api(dokploy_deployer, deploy_config):
 async def test_dokploy_deploy_sets_env_vars(dokploy_deployer, deploy_config):
     """DokployDeployer saves environment variables before deploying."""
     with patch(
-        "machine_core.plugins.deployer_support.dokploy.httpx.AsyncClient"
+        "deployer_support.dokploy.httpx.AsyncClient"
     ) as mock_client_cls:
         mock_client = AsyncMock()
         mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)

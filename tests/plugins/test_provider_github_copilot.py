@@ -4,7 +4,7 @@ import time
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from machine_core.plugins.model_provider_support.schemas import (
+from model_provider_support.schemas import (
     ModelRequest,
     ModelResponse,
 )
@@ -12,7 +12,7 @@ from machine_core.plugins.model_provider_support.schemas import (
 
 class TestCopilotAuth:
     async def test_copilot_token_exchange(self):
-        from machine_core.plugins.provider_github_copilot.auth import CopilotAuth
+        from provider_github_copilot.auth import CopilotAuth
 
         auth = CopilotAuth(access_token="gho_test_oauth_token")
 
@@ -36,7 +36,7 @@ class TestCopilotAuth:
         assert not auth.is_expired
 
     async def test_token_cached_when_valid(self):
-        from machine_core.plugins.provider_github_copilot.auth import CopilotAuth
+        from provider_github_copilot.auth import CopilotAuth
 
         auth = CopilotAuth(access_token="gho_test")
         auth._copilot_token = "cached-token"
@@ -45,7 +45,7 @@ class TestCopilotAuth:
         assert not auth.is_expired
 
     async def test_token_expired_with_buffer(self):
-        from machine_core.plugins.provider_github_copilot.auth import CopilotAuth
+        from provider_github_copilot.auth import CopilotAuth
 
         auth = CopilotAuth(access_token="gho_test")
         auth._copilot_token = "old-token"
@@ -55,13 +55,13 @@ class TestCopilotAuth:
         assert auth.is_expired
 
     async def test_base_url(self):
-        from machine_core.plugins.provider_github_copilot.auth import CopilotAuth
+        from provider_github_copilot.auth import CopilotAuth
 
         auth = CopilotAuth(access_token="gho_test")
         assert auth.base_url == "https://api.githubcopilot.com"
 
     async def test_device_flow_login(self):
-        from machine_core.plugins.provider_github_copilot.auth import device_flow_login
+        from provider_github_copilot.auth import device_flow_login
 
         mock_device_resp = MagicMock()
         mock_device_resp.json.return_value = {
@@ -80,10 +80,10 @@ class TestCopilotAuth:
             patch("httpx.AsyncClient") as MockClient,
             patch("webbrowser.open_new_tab"),
             patch(
-                "machine_core.plugins.provider_github_copilot.auth.CONFIG_DIR"
+                "provider_github_copilot.auth.CONFIG_DIR"
             ) as mock_dir,
             patch(
-                "machine_core.plugins.provider_github_copilot.auth.TOKEN_FILE"
+                "provider_github_copilot.auth.TOKEN_FILE"
             ) as mock_file,
         ):
             client = AsyncMock()
@@ -97,7 +97,7 @@ class TestCopilotAuth:
         assert token == "gho_new_token"
 
     def test_copilot_headers_have_required_fields(self):
-        from machine_core.plugins.provider_github_copilot.auth import copilot_headers
+        from provider_github_copilot.auth import copilot_headers
 
         headers = copilot_headers()
         assert "copilot-integration-id" in headers
@@ -106,7 +106,7 @@ class TestCopilotAuth:
         assert "x-github-api-version" in headers
 
     def test_github_headers_have_required_fields(self):
-        from machine_core.plugins.provider_github_copilot.auth import github_headers
+        from provider_github_copilot.auth import github_headers
 
         headers = github_headers()
         assert "editor-version" in headers
@@ -117,7 +117,7 @@ class TestCopilotAuth:
 class TestCopilotProvider:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.provider_github_copilot.provider import (
+        from provider_github_copilot.provider import (
             CopilotLLMProvider,
         )
 
@@ -146,8 +146,8 @@ class TestCopilotProvider:
 
 def test_get_pydantic_model():
     """Copilot provider exposes its pydantic-ai model."""
-    from machine_core.plugins.provider_github_copilot.provider import CopilotLLMProvider
-    from machine_core.plugins.provider_github_copilot.auth import CopilotAuth
+    from provider_github_copilot.provider import CopilotLLMProvider
+    from provider_github_copilot.auth import CopilotAuth
 
     mock_auth = MagicMock(spec=CopilotAuth)
     mock_auth.auth_flow = MagicMock(return_value=iter([]))

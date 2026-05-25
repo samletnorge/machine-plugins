@@ -1,13 +1,13 @@
 """Tests for ExperimentRunner."""
 
 import pytest
-from machine_core.plugins.eval_support.experiment import (
+from eval_support.experiment import (
     ExperimentRunner,
     ExperimentResult,
     SampleResult,
 )
-from machine_core.plugins.eval_support.dataset import Dataset, EvalSample
-from machine_core.plugins.eval_support.scorer import Scorer, EvalScore
+from eval_support.dataset import Dataset, EvalSample
+from eval_support.scorer import Scorer, EvalScore
 
 
 class ConstantScorer(Scorer):

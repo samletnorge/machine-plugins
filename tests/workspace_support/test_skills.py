@@ -3,7 +3,7 @@
 import os
 import tempfile
 import pytest
-from machine_core.plugins.workspace_support.skills import (
+from workspace_support.skills import (
     SkillMetadata,
     SkillsManager,
 )

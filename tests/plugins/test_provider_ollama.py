@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, patch, MagicMock
 
 from machine_core import Machine
 from machine_core.plugin.manifest import PluginManifest
-from machine_core.plugins.model_provider_support.schemas import (
+from model_provider_support.schemas import (
     ModelProviderConfig,
     ModelRequest,
     ModelResponse,
@@ -42,7 +42,7 @@ async def test_ollama_manifest_has_dependencies():
 class TestOllamaProviderGenerate:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.provider_ollama.provider import OllamaLLMProvider
+        from provider_ollama.provider import OllamaLLMProvider
 
         return OllamaLLMProvider(
             base_url="http://localhost:11434",
@@ -134,7 +134,7 @@ class TestOllamaProviderGenerate:
 class TestOllamaProviderStream:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.provider_ollama.provider import OllamaLLMProvider
+        from provider_ollama.provider import OllamaLLMProvider
 
         return OllamaLLMProvider(base_url="http://localhost:11434", model="llama3.2")
 
@@ -176,7 +176,7 @@ class TestOllamaProviderStream:
 class TestOllamaProviderPydanticModel:
     def test_get_pydantic_model(self):
         """Ollama provider exposes a pydantic-ai model."""
-        from machine_core.plugins.provider_ollama.provider import OllamaLLMProvider
+        from provider_ollama.provider import OllamaLLMProvider
 
         provider = OllamaLLMProvider(
             base_url="http://localhost:9012", model="gemma4:latest"
@@ -188,7 +188,7 @@ class TestOllamaProviderPydanticModel:
 
 class TestOllamaProviderProtocol:
     def test_implements_provider_protocol(self):
-        from machine_core.plugins.provider_ollama.provider import OllamaLLMProvider
+        from provider_ollama.provider import OllamaLLMProvider
         from machine_core.types import Provider
 
         provider = OllamaLLMProvider(

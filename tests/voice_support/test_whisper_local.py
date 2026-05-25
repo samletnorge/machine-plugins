@@ -2,17 +2,17 @@
 
 import pytest
 from unittest.mock import MagicMock, patch
-from machine_core.plugins.voice_support.base import ListenOptions
+from voice_support.base import ListenOptions
 
 
 class TestWhisperLocalProvider:
     def test_import(self):
-        from machine_core.plugins.voice_support.providers.whisper_local import (
+        from voice_support.providers.whisper_local import (
             WhisperLocalProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.whisper_local.whisper"
+            "voice_support.providers.whisper_local.whisper"
         ) as mock_whisper:
             mock_whisper.load_model.return_value = MagicMock()
             provider = WhisperLocalProvider(model_size="base")
@@ -20,7 +20,7 @@ class TestWhisperLocalProvider:
 
     @pytest.mark.asyncio
     async def test_listen_returns_text(self):
-        from machine_core.plugins.voice_support.providers.whisper_local import (
+        from voice_support.providers.whisper_local import (
             WhisperLocalProvider,
         )
 
@@ -28,7 +28,7 @@ class TestWhisperLocalProvider:
         mock_model.transcribe.return_value = {"text": "Hello world"}
 
         with patch(
-            "machine_core.plugins.voice_support.providers.whisper_local.whisper"
+            "voice_support.providers.whisper_local.whisper"
         ) as mock_whisper:
             mock_whisper.load_model.return_value = mock_model
             provider = WhisperLocalProvider(model_size="base")
@@ -41,7 +41,7 @@ class TestWhisperLocalProvider:
 
     @pytest.mark.asyncio
     async def test_listen_with_language(self):
-        from machine_core.plugins.voice_support.providers.whisper_local import (
+        from voice_support.providers.whisper_local import (
             WhisperLocalProvider,
         )
 
@@ -49,7 +49,7 @@ class TestWhisperLocalProvider:
         mock_model.transcribe.return_value = {"text": "Hei verden"}
 
         with patch(
-            "machine_core.plugins.voice_support.providers.whisper_local.whisper"
+            "voice_support.providers.whisper_local.whisper"
         ) as mock_whisper:
             mock_whisper.load_model.return_value = mock_model
             provider = WhisperLocalProvider()
@@ -65,12 +65,12 @@ class TestWhisperLocalProvider:
 
     @pytest.mark.asyncio
     async def test_speak_raises(self):
-        from machine_core.plugins.voice_support.providers.whisper_local import (
+        from voice_support.providers.whisper_local import (
             WhisperLocalProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.whisper_local.whisper"
+            "voice_support.providers.whisper_local.whisper"
         ) as mock_whisper:
             mock_whisper.load_model.return_value = MagicMock()
             provider = WhisperLocalProvider()
@@ -79,12 +79,12 @@ class TestWhisperLocalProvider:
 
     @pytest.mark.asyncio
     async def test_connect_raises(self):
-        from machine_core.plugins.voice_support.providers.whisper_local import (
+        from voice_support.providers.whisper_local import (
             WhisperLocalProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.whisper_local.whisper"
+            "voice_support.providers.whisper_local.whisper"
         ) as mock_whisper:
             mock_whisper.load_model.return_value = MagicMock()
             provider = WhisperLocalProvider()

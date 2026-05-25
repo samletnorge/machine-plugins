@@ -2,18 +2,18 @@
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from machine_core.plugins.voice_support.base import SpeakOptions, ListenOptions
+from voice_support.base import SpeakOptions, ListenOptions
 
 
 class TestGoogleCloudVoiceProvider:
     def test_import(self):
         with patch(
-            "machine_core.plugins.voice_support.providers.google_cloud.texttospeech"
+            "voice_support.providers.google_cloud.texttospeech"
         ):
             with patch(
-                "machine_core.plugins.voice_support.providers.google_cloud.speech"
+                "voice_support.providers.google_cloud.speech"
             ):
-                from machine_core.plugins.voice_support.providers.google_cloud import (
+                from voice_support.providers.google_cloud import (
                     GoogleCloudVoiceProvider,
                 )
 
@@ -23,12 +23,12 @@ class TestGoogleCloudVoiceProvider:
     @pytest.mark.asyncio
     async def test_speak_returns_chunks(self):
         with patch(
-            "machine_core.plugins.voice_support.providers.google_cloud.texttospeech"
+            "voice_support.providers.google_cloud.texttospeech"
         ) as mock_tts:
             with patch(
-                "machine_core.plugins.voice_support.providers.google_cloud.speech"
+                "voice_support.providers.google_cloud.speech"
             ):
-                from machine_core.plugins.voice_support.providers.google_cloud import (
+                from voice_support.providers.google_cloud import (
                     GoogleCloudVoiceProvider,
                 )
 
@@ -45,12 +45,12 @@ class TestGoogleCloudVoiceProvider:
     @pytest.mark.asyncio
     async def test_listen_returns_text(self):
         with patch(
-            "machine_core.plugins.voice_support.providers.google_cloud.texttospeech"
+            "voice_support.providers.google_cloud.texttospeech"
         ):
             with patch(
-                "machine_core.plugins.voice_support.providers.google_cloud.speech"
+                "voice_support.providers.google_cloud.speech"
             ) as mock_stt:
-                from machine_core.plugins.voice_support.providers.google_cloud import (
+                from voice_support.providers.google_cloud import (
                     GoogleCloudVoiceProvider,
                 )
 
@@ -71,12 +71,12 @@ class TestGoogleCloudVoiceProvider:
     @pytest.mark.asyncio
     async def test_connect_raises(self):
         with patch(
-            "machine_core.plugins.voice_support.providers.google_cloud.texttospeech"
+            "voice_support.providers.google_cloud.texttospeech"
         ):
             with patch(
-                "machine_core.plugins.voice_support.providers.google_cloud.speech"
+                "voice_support.providers.google_cloud.speech"
             ):
-                from machine_core.plugins.voice_support.providers.google_cloud import (
+                from voice_support.providers.google_cloud import (
                     GoogleCloudVoiceProvider,
                 )
 

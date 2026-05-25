@@ -14,7 +14,7 @@ from cli_support.utils import (
 )
 
 try:
-    from machine_core.plugins.deployer_support.base import DeployConfig
+    from deployer_support.base import DeployConfig
 except ImportError:
     DeployConfig = None  # type: ignore[assignment, misc]
 
@@ -65,7 +65,7 @@ def deploy_command(
 
     if deployer is None:
         # Fallback: import deployer directly
-        from machine_core.plugins.deployer_support import _get_builtin_deployer
+        from deployer_support import _get_builtin_deployer
 
         deployer = _get_builtin_deployer(target)
 

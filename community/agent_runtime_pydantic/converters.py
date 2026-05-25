@@ -7,8 +7,8 @@ from typing import Any
 
 from pydantic_ai import Tool as PydanticTool
 
-from machine_core.plugins.agent_support.schemas import AgentRunResult, AgentStep
-from machine_core.plugins.tool_support.schemas import ToolDefinition
+from agent_support.schemas import AgentRunResult, AgentStep
+from tool_support.schemas import ToolDefinition
 
 
 def tool_definition_to_pydantic(td: ToolDefinition) -> PydanticTool:

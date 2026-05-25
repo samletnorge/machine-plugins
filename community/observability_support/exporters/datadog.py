@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from opentelemetry.sdk.trace.export import SpanExporter
 
-from machine_core.plugins.observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig
 
 # Datadog Agent accepts OTLP on port 4318 by default
 _DEFAULT_DD_ENDPOINT = "http://localhost:4318/v1/traces"

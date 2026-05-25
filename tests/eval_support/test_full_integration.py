@@ -2,10 +2,10 @@
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock
-from machine_core.plugins.eval_support import EvalSupportPlugin
-from machine_core.plugins.eval_support.scorer import EvalScore, Scorer
-from machine_core.plugins.eval_support.dataset import Dataset, EvalSample
-from machine_core.plugins.eval_support.experiment import (
+from eval_support import EvalSupportPlugin
+from eval_support.scorer import EvalScore, Scorer
+from eval_support.dataset import Dataset, EvalSample
+from eval_support.experiment import (
     ExperimentRunner,
     ExperimentResult,
 )
@@ -52,14 +52,14 @@ async def test_plugin_registers_all_scorers():
 
 
 def test_all_types_importable():
-    from machine_core.plugins.eval_support.scorer import EvalScore, Scorer
-    from machine_core.plugins.eval_support.llm_judge import LLMJudgeScorer
-    from machine_core.plugins.eval_support.dataset import Dataset, EvalSample
-    from machine_core.plugins.eval_support.experiment import (
+    from eval_support.scorer import EvalScore, Scorer
+    from eval_support.llm_judge import LLMJudgeScorer
+    from eval_support.dataset import Dataset, EvalSample
+    from eval_support.experiment import (
         ExperimentRunner,
         ExperimentResult,
         SampleResult,
     )
-    from machine_core.plugins.eval_support.scorers import parse_json_score
+    from eval_support.scorers import parse_json_score
 
     assert issubclass(LLMJudgeScorer, Scorer)

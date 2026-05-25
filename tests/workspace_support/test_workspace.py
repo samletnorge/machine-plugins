@@ -3,13 +3,13 @@
 import os
 import tempfile
 import pytest
-from machine_core.plugins.workspace_support.workspace import (
+from workspace_support.workspace import (
     AgentWorkspace,
     WorkspaceConfig,
 )
-from machine_core.plugins.workspace_support.filesystem import LocalFileSystem
-from machine_core.plugins.workspace_support.sandbox import LocalSandbox
-from machine_core.plugins.workspace_support.skills import SkillsManager
+from workspace_support.filesystem import LocalFileSystem
+from workspace_support.sandbox import LocalSandbox
+from workspace_support.skills import SkillsManager
 
 
 SAMPLE_SKILL = """\

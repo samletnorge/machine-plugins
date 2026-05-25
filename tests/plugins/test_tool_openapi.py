@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from machine_core.plugins.tool_support.schemas import ToolDefinition
+from tool_support.schemas import ToolDefinition
 
 PETSTORE_SPEC = {
     "openapi": "3.0.0",
@@ -44,7 +44,7 @@ PETSTORE_SPEC = {
 
 class TestOpenAPIGenerator:
     def test_generate_tools_from_spec(self):
-        from machine_core.plugins.tool_openapi.generator import generate_tools
+        from tool_openapi.generator import generate_tools
 
         tools = generate_tools(PETSTORE_SPEC, base_url="https://petstore.example.com")
         assert len(tools) == 2
@@ -52,7 +52,7 @@ class TestOpenAPIGenerator:
         assert "listPets" in names
 
     def test_tool_has_parameters_schema(self):
-        from machine_core.plugins.tool_openapi.generator import generate_tools
+        from tool_openapi.generator import generate_tools
 
         tools = generate_tools(PETSTORE_SPEC, base_url="https://petstore.example.com")
         list_tool = next(t for t in tools if "list" in t.name.lower())
@@ -60,14 +60,14 @@ class TestOpenAPIGenerator:
         assert "properties" in list_tool.parameters
 
     def test_tool_has_handler(self):
-        from machine_core.plugins.tool_openapi.generator import generate_tools
+        from tool_openapi.generator import generate_tools
 
         tools = generate_tools(PETSTORE_SPEC, base_url="https://petstore.example.com")
         for tool in tools:
             assert callable(tool.handler)
 
     def test_tool_metadata(self):
-        from machine_core.plugins.tool_openapi.generator import generate_tools
+        from tool_openapi.generator import generate_tools
 
         tools = generate_tools(PETSTORE_SPEC, base_url="https://petstore.example.com")
         list_tool = next(t for t in tools if "list" in t.name.lower())
@@ -76,7 +76,7 @@ class TestOpenAPIGenerator:
         assert list_tool.metadata["method"] == "get"
 
     def test_schema_simplification(self):
-        from machine_core.plugins.tool_openapi.generator import simplify_schema
+        from tool_openapi.generator import simplify_schema
 
         schema = {
             "type": "object",
@@ -95,7 +95,7 @@ class TestOpenAPIGenerator:
         assert "name" in simplified["properties"]["pet"]["properties"]
 
     def test_simplify_schema_strips_extra_fields(self):
-        from machine_core.plugins.tool_openapi.generator import simplify_schema
+        from tool_openapi.generator import simplify_schema
 
         schema = {
             "type": "string",
@@ -110,7 +110,7 @@ class TestOpenAPIGenerator:
         assert simplified["type"] == "string"
 
     def test_simplify_schema_max_depth(self):
-        from machine_core.plugins.tool_openapi.generator import simplify_schema
+        from tool_openapi.generator import simplify_schema
 
         schema = {"$ref": "#/components/schemas/A"}
         components = {"schemas": {"A": {"$ref": "#/components/schemas/A"}}}
@@ -119,7 +119,7 @@ class TestOpenAPIGenerator:
 
     @pytest.mark.asyncio
     async def test_tool_handler_makes_http_call(self):
-        from machine_core.plugins.tool_openapi.generator import generate_tools
+        from tool_openapi.generator import generate_tools
 
         tools = generate_tools(PETSTORE_SPEC, base_url="https://petstore.example.com")
         list_tool = next(t for t in tools if "list" in t.name.lower())
@@ -129,7 +129,7 @@ class TestOpenAPIGenerator:
         mock_resp.raise_for_status = MagicMock()
 
         with patch(
-            "machine_core.plugins.tool_openapi.generator.httpx.AsyncClient"
+            "tool_openapi.generator.httpx.AsyncClient"
         ) as MockClient:
             client = AsyncMock()
             client.request.return_value = mock_resp
@@ -143,7 +143,7 @@ class TestOpenAPIGenerator:
         client.request.assert_called_once()
 
     def test_server_url_fallback(self):
-        from machine_core.plugins.tool_openapi.generator import generate_tools
+        from tool_openapi.generator import generate_tools
 
         spec = {**PETSTORE_SPEC, "servers": [{"url": "https://custom.api.com"}]}
         tools = generate_tools(spec)
@@ -151,7 +151,7 @@ class TestOpenAPIGenerator:
         assert len(tools) == 2
 
     def test_empty_spec(self):
-        from machine_core.plugins.tool_openapi.generator import generate_tools
+        from tool_openapi.generator import generate_tools
 
         tools = generate_tools({"openapi": "3.0.0", "paths": {}})
         assert tools == []

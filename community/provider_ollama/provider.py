@@ -12,7 +12,7 @@ from typing import Any, AsyncIterator
 
 import httpx
 
-from machine_core.plugins.model_provider_support.schemas import (
+from model_provider_support.schemas import (
     ModelRequest,
     ModelResponse,
 )

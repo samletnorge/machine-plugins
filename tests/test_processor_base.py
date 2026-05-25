@@ -1,7 +1,7 @@
 """Tests for processor base types."""
 
 import pytest
-from machine_core.plugins.processor_support.base import (
+from processor_support.base import (
     ProcessorData,
     TripWire,
     Processor,

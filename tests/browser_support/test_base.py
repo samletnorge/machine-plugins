@@ -1,7 +1,7 @@
 """Tests for BaseBrowser ABC and result types."""
 
 import pytest
-from machine_core.plugins.browser_support.base import (
+from browser_support.base import (
     BaseBrowser,
     BrowserResult,
     NavigateResult,

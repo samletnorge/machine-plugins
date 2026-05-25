@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from machine_core.plugins.vectorstore_support.schemas import (
+from vectorstore_support.schemas import (
     SearchRequest,
     SearchResult,
     UpsertRequest,
@@ -16,7 +16,7 @@ class TestLanceDBStore:
     @pytest.fixture
     def store(self, tmp_path):
         lancedb = pytest.importorskip("lancedb")  # noqa: F841
-        from machine_core.plugins.vectorstore_lancedb.store import LanceDBVectorStore
+        from vectorstore_lancedb.store import LanceDBVectorStore
 
         return LanceDBVectorStore(db_path=str(tmp_path / "test_db"))
 
@@ -29,7 +29,7 @@ class TestLanceDBStore:
             table="docs",
         )
         await store.upsert([request])
-        from machine_core.plugins.vectorstore_lancedb.store import _table_names
+        from vectorstore_lancedb.store import _table_names
 
         assert "docs" in _table_names(store._db)
 
@@ -80,7 +80,7 @@ class TestLanceDBStore:
     async def test_invoke_upsert(self, store):
         records = [UpsertRequest(id="doc-1", vector=[0.1, 0.2, 0.3], table="t")]
         await store.invoke(records)
-        from machine_core.plugins.vectorstore_lancedb.store import _table_names
+        from vectorstore_lancedb.store import _table_names
 
         assert "t" in _table_names(store._db)
 

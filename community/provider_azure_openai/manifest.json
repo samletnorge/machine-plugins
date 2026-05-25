@@ -42,6 +42,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.provider_azure_openai:AzureOpenAIProviderPlugin"
+    "entry_point": "provider_azure_openai:AzureOpenAIProviderPlugin"
   }
 }

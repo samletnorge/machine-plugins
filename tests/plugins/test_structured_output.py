@@ -2,7 +2,7 @@
 
 import pytest
 from pydantic import BaseModel
-from machine_core.plugins.structured_output.schemas import (
+from structured_output.schemas import (
     GenerateObjectRequest,
     GenerateObjectResponse,
 )
@@ -76,7 +76,7 @@ async def test_plugin_setup_registers_category():
         ],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.structured_output:StructuredOutputPlugin",
+            entry_point="structured_output:StructuredOutputPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)

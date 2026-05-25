@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 dependencies = ["pydantic-ai>=0.0.1", "httpx>=0.28"]
 
 [project.scripts]
-machine-core-copilot-login = "machine_core.plugins.provider_github_copilot.cli:main"
+machine-core-copilot-login = "provider_github_copilot.cli:main"
 
 [build-system]
 requires = ["hatchling"]

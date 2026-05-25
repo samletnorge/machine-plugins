@@ -9,9 +9,9 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.run import RunStatus, StepResult, WorkflowRun
-from machine_core.plugins.workflow_support.step import StepContext
-from machine_core.plugins.workflow_support.workflow import (
+from workflow_support.run import RunStatus, StepResult, WorkflowRun
+from workflow_support.step import StepContext
+from workflow_support.workflow import (
     NodeType,
     Workflow,
     WorkflowNode,

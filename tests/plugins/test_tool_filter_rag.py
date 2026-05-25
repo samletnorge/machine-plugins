@@ -3,9 +3,9 @@
 import pytest
 from unittest.mock import AsyncMock
 
-from machine_core.plugins.tool_support.schemas import ToolDefinition
-from machine_core.plugins.embeddings.schemas import EmbeddingResult
-from machine_core.plugins.vectorstore_support.schemas import SearchResult
+from tool_support.schemas import ToolDefinition
+from embeddings.schemas import EmbeddingResult
+from vectorstore_support.schemas import SearchResult
 
 
 class TestToolFilterRAG:
@@ -30,7 +30,7 @@ class TestToolFilterRAG:
 
     @pytest.fixture
     def filter_manager(self, mock_embedder, mock_store):
-        from machine_core.plugins.tool_filter_rag.filter import ToolFilterManager
+        from tool_filter_rag.filter import ToolFilterManager
 
         return ToolFilterManager(embedder=mock_embedder, store=mock_store)
 

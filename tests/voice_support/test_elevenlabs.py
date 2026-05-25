@@ -2,17 +2,17 @@
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from machine_core.plugins.voice_support.base import SpeakOptions
+from voice_support.base import SpeakOptions
 
 
 class TestElevenLabsProvider:
     def test_import(self):
-        from machine_core.plugins.voice_support.providers.elevenlabs import (
+        from voice_support.providers.elevenlabs import (
             ElevenLabsProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.elevenlabs.AsyncElevenLabs",
+            "voice_support.providers.elevenlabs.AsyncElevenLabs",
             MagicMock(),
         ):
             provider = ElevenLabsProvider(api_key="test-key")
@@ -20,7 +20,7 @@ class TestElevenLabsProvider:
 
     @pytest.mark.asyncio
     async def test_speak_streams(self):
-        from machine_core.plugins.voice_support.providers.elevenlabs import (
+        from voice_support.providers.elevenlabs import (
             ElevenLabsProvider,
         )
 
@@ -32,7 +32,7 @@ class TestElevenLabsProvider:
         mock_client.generate = AsyncMock(return_value=mock_stream())
 
         with patch(
-            "machine_core.plugins.voice_support.providers.elevenlabs.AsyncElevenLabs",
+            "voice_support.providers.elevenlabs.AsyncElevenLabs",
             return_value=mock_client,
         ):
             provider = ElevenLabsProvider(api_key="test-key")
@@ -43,12 +43,12 @@ class TestElevenLabsProvider:
 
     @pytest.mark.asyncio
     async def test_listen_raises(self):
-        from machine_core.plugins.voice_support.providers.elevenlabs import (
+        from voice_support.providers.elevenlabs import (
             ElevenLabsProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.elevenlabs.AsyncElevenLabs",
+            "voice_support.providers.elevenlabs.AsyncElevenLabs",
             MagicMock(),
         ):
             provider = ElevenLabsProvider(api_key="test-key")
@@ -57,12 +57,12 @@ class TestElevenLabsProvider:
 
     @pytest.mark.asyncio
     async def test_connect_raises(self):
-        from machine_core.plugins.voice_support.providers.elevenlabs import (
+        from voice_support.providers.elevenlabs import (
             ElevenLabsProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.elevenlabs.AsyncElevenLabs",
+            "voice_support.providers.elevenlabs.AsyncElevenLabs",
             MagicMock(),
         ):
             provider = ElevenLabsProvider(api_key="test-key")

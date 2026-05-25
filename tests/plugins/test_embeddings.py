@@ -1,7 +1,7 @@
 """Tests for embeddings builtin plugin."""
 
 import pytest
-from machine_core.plugins.embeddings.schemas import EmbeddingRequest, EmbeddingResult
+from embeddings.schemas import EmbeddingRequest, EmbeddingResult
 
 
 def test_embedding_request_single():
@@ -45,7 +45,7 @@ async def test_plugin_setup_registers_category():
         ],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.embeddings:EmbeddingsPlugin",
+            entry_point="embeddings:EmbeddingsPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)

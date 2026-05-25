@@ -1,8 +1,8 @@
 """Tests for prompt injection defense processor."""
 
 import pytest
-from machine_core.plugins.processor_support.base import ProcessorData, TripWire
-from machine_core.plugins.processor_support.builtin.prompt_injection import (
+from processor_support.base import ProcessorData, TripWire
+from processor_support.builtin.prompt_injection import (
     PromptInjectionProcessor,
 )
 

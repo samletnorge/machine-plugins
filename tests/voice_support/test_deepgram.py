@@ -2,17 +2,17 @@
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from machine_core.plugins.voice_support.base import ListenOptions
+from voice_support.base import ListenOptions
 
 
 class TestDeepgramProvider:
     def test_import(self):
-        from machine_core.plugins.voice_support.providers.deepgram import (
+        from voice_support.providers.deepgram import (
             DeepgramProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.deepgram.DeepgramClient",
+            "voice_support.providers.deepgram.DeepgramClient",
             MagicMock(),
         ):
             provider = DeepgramProvider(api_key="test-key")
@@ -20,7 +20,7 @@ class TestDeepgramProvider:
 
     @pytest.mark.asyncio
     async def test_listen_returns_text(self):
-        from machine_core.plugins.voice_support.providers.deepgram import (
+        from voice_support.providers.deepgram import (
             DeepgramProvider,
         )
 
@@ -33,11 +33,11 @@ class TestDeepgramProvider:
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.deepgram.DeepgramClient",
+            "voice_support.providers.deepgram.DeepgramClient",
             return_value=mock_client,
         ):
             with patch(
-                "machine_core.plugins.voice_support.providers.deepgram.PrerecordedOptions",
+                "voice_support.providers.deepgram.PrerecordedOptions",
                 MagicMock(),
             ):
                 provider = DeepgramProvider(api_key="test-key")
@@ -50,12 +50,12 @@ class TestDeepgramProvider:
 
     @pytest.mark.asyncio
     async def test_speak_raises(self):
-        from machine_core.plugins.voice_support.providers.deepgram import (
+        from voice_support.providers.deepgram import (
             DeepgramProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.deepgram.DeepgramClient",
+            "voice_support.providers.deepgram.DeepgramClient",
             MagicMock(),
         ):
             provider = DeepgramProvider(api_key="test-key")
@@ -64,12 +64,12 @@ class TestDeepgramProvider:
 
     @pytest.mark.asyncio
     async def test_connect_raises(self):
-        from machine_core.plugins.voice_support.providers.deepgram import (
+        from voice_support.providers.deepgram import (
             DeepgramProvider,
         )
 
         with patch(
-            "machine_core.plugins.voice_support.providers.deepgram.DeepgramClient",
+            "voice_support.providers.deepgram.DeepgramClient",
             MagicMock(),
         ):
             provider = DeepgramProvider(api_key="test-key")

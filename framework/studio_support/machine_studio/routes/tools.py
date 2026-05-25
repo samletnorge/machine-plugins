@@ -4,7 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
-from machine_core.plugins.studio_support.dependencies import get_machine
+from studio_support.dependencies import get_machine
 
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))

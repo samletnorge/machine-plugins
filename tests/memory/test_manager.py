@@ -2,10 +2,10 @@
 
 import pytest
 
-from machine_core.plugins.memory_support.manager import MemoryManager
-from machine_core.plugins.memory_support.in_memory_storage import InMemoryStorage
-from machine_core.plugins.memory_support.windowing import LastNWindow
-from machine_core.plugins.memory_support.thread import MessageRole
+from memory_support.manager import MemoryManager
+from memory_support.in_memory_storage import InMemoryStorage
+from memory_support.windowing import LastNWindow
+from memory_support.thread import MessageRole
 
 
 @pytest.fixture

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from machine_core.plugins.tool_support.schemas import ToolDefinition
+from tool_support.schemas import ToolDefinition
 
 
 def build_system_message(instruction: str) -> dict[str, str]:

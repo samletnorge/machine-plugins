@@ -1,7 +1,7 @@
 """Tests for token counting and cost calculation."""
 
 import pytest
-from machine_core.plugins.observability_support.cost import (
+from observability_support.cost import (
     CostTracker,
     ModelPricing,
     UsageRecord,

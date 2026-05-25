@@ -1,7 +1,7 @@
 """Tests for the Scorer ABC and EvalScore model."""
 
 import pytest
-from machine_core.plugins.eval_support.scorer import EvalScore, Scorer
+from eval_support.scorer import EvalScore, Scorer
 
 
 def test_eval_score_valid():

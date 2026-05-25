@@ -1,7 +1,7 @@
 import pytest
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.step import (
+from workflow_support.step import (
     step,
     Step,
     StepContext,

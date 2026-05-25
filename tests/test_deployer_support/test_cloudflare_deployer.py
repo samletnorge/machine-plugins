@@ -1,8 +1,8 @@
 """Tests for Cloudflare deployer."""
 
 import pytest
-from machine_core.plugins.deployer_support.cloudflare import CloudflareDeployer
-from machine_core.plugins.deployer_support.base import DeployConfig, DeployStatus
+from deployer_support.cloudflare import CloudflareDeployer
+from deployer_support.base import DeployConfig, DeployStatus
 
 
 @pytest.fixture

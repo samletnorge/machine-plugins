@@ -9,7 +9,7 @@ from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
-from machine_core.plugins.model_provider_support.schemas import (
+from model_provider_support.schemas import (
     ModelRequest,
     ModelResponse,
 )

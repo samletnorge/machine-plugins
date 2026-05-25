@@ -4,10 +4,10 @@ import pytest
 from unittest.mock import AsyncMock, patch
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.adapters.base import ExternalEngineAdapter
-from machine_core.plugins.workflow_support.adapters.inngest import InngestAdapter
-from machine_core.plugins.workflow_support.workflow import Workflow
-from machine_core.plugins.workflow_support.step import step, StepContext
+from workflow_support.adapters.base import ExternalEngineAdapter
+from workflow_support.adapters.inngest import InngestAdapter
+from workflow_support.workflow import Workflow
+from workflow_support.step import step, StepContext
 
 
 class Val(BaseModel):

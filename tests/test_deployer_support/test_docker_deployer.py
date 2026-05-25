@@ -1,8 +1,8 @@
 """Tests for Docker deployer."""
 
 import pytest
-from machine_core.plugins.deployer_support.docker import DockerDeployer
-from machine_core.plugins.deployer_support.base import DeployConfig, DeployStatus
+from deployer_support.docker import DockerDeployer
+from deployer_support.base import DeployConfig, DeployStatus
 
 
 @pytest.fixture

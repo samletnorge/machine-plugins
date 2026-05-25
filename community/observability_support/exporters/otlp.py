@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from opentelemetry.sdk.trace.export import SpanExporter
 
-from machine_core.plugins.observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig
 
 _DEFAULT_ENDPOINT = "http://localhost:4318/v1/traces"
 

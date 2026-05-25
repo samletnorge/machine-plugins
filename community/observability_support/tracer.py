@@ -13,8 +13,8 @@ from opentelemetry.sdk.trace.export import (
 )
 from opentelemetry.trace import StatusCode, Span
 
-from machine_core.plugins.observability_support.config import ObservabilityConfig
-from machine_core.plugins.observability_support.spans import (
+from observability_support.config import ObservabilityConfig
+from observability_support.spans import (
     SpanKind,
     create_span_attributes,
 )

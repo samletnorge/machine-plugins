@@ -1,6 +1,6 @@
 """Tests for span attribute constants and helpers."""
 
-from machine_core.plugins.observability_support.spans import (
+from observability_support.spans import (
     SpanKind,
     SpanAttributes,
     create_span_attributes,

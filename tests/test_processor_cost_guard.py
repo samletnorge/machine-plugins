@@ -1,8 +1,8 @@
 """Tests for cost guard processor."""
 
 import pytest
-from machine_core.plugins.processor_support.base import ProcessorData, TripWire
-from machine_core.plugins.processor_support.builtin.cost_guard import CostGuardProcessor
+from processor_support.base import ProcessorData, TripWire
+from processor_support.builtin.cost_guard import CostGuardProcessor
 
 
 @pytest.mark.asyncio

@@ -4,15 +4,15 @@ import tempfile
 import pytest
 from unittest.mock import AsyncMock
 
-from machine_core.plugins.browser_support.base import (
+from browser_support.base import (
     NavigateResult,
     ScreenshotResult,
 )
-from machine_core.plugins.browser_support.tools import (
+from browser_support.tools import (
     create_browser_tools,
     ScreenshotInput,
 )
-from machine_core.plugins.workspace_support.workspace import (
+from workspace_support.workspace import (
     AgentWorkspace,
     WorkspaceConfig,
 )

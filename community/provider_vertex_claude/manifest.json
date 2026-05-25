@@ -30,6 +30,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.provider_vertex_claude:VertexClaudeProviderPlugin"
+    "entry_point": "provider_vertex_claude:VertexClaudeProviderPlugin"
   }
 }

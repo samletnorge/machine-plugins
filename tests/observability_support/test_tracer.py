@@ -2,9 +2,9 @@
 
 import pytest
 import asyncio
-from machine_core.plugins.observability_support.tracer import MachineTracer
-from machine_core.plugins.observability_support.config import ObservabilityConfig
-from machine_core.plugins.observability_support.spans import SpanKind, SpanAttributes
+from observability_support.tracer import MachineTracer
+from observability_support.config import ObservabilityConfig
+from observability_support.spans import SpanKind, SpanAttributes
 from tests.observability_support.helpers import InMemorySpanExporter
 
 

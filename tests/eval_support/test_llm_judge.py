@@ -2,8 +2,8 @@
 
 import pytest
 from unittest.mock import AsyncMock, patch
-from machine_core.plugins.eval_support.llm_judge import LLMJudgeScorer
-from machine_core.plugins.eval_support.scorer import EvalScore
+from eval_support.llm_judge import LLMJudgeScorer
+from eval_support.scorer import EvalScore
 
 
 class MockJudge(LLMJudgeScorer):

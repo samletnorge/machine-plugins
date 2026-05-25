@@ -1,7 +1,7 @@
 """Tests for agent-support builtin plugin."""
 
 import pytest
-from machine_core.plugins.agent_support.schemas import (
+from agent_support.schemas import (
     AgentDefinition,
     AgentRunner,
     AgentRunResult,
@@ -77,7 +77,7 @@ async def test_plugin_setup_registers_category():
         ],
         transport=TransportConfig(
             type="in-process",
-            entry_point="machine_core.plugins.agent_support:AgentSupportPlugin",
+            entry_point="agent_support:AgentSupportPlugin",
         ),
     )
     m.plugins.register_manifest(manifest)

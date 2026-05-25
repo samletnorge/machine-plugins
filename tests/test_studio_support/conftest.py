@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 import pytest
 from fastapi.testclient import TestClient
 
-from machine_core.plugins.studio_support.app import create_studio_app
+from studio_support.app import create_studio_app
 
 
 class FakeAgent:

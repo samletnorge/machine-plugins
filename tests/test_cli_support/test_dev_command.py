@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from typer.testing import CliRunner
-from machine_core.plugins.cli_support.main import app
+from cli_support.main import app
 
 runner = CliRunner()
 
@@ -15,7 +15,7 @@ def test_dev_requires_project(tmp_path, monkeypatch):
     assert result.exit_code != 0
 
 
-@patch("machine_core.plugins.cli_support.commands.dev_cmd.subprocess.run")
+@patch("cli_support.commands.dev_cmd.subprocess.run")
 def test_dev_starts_uvicorn(mock_run, mock_machine_project, monkeypatch):
     """machine dev starts uvicorn with reload."""
     monkeypatch.chdir(mock_machine_project)
@@ -31,7 +31,7 @@ def test_dev_custom_port(mock_machine_project, monkeypatch):
     """machine dev --port sets the port."""
     monkeypatch.chdir(mock_machine_project)
     with patch(
-        "machine_core.plugins.cli_support.commands.dev_cmd.subprocess.run"
+        "cli_support.commands.dev_cmd.subprocess.run"
     ) as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
         runner.invoke(app, ["dev", "--port", "9000"])

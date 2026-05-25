@@ -6,8 +6,8 @@ import inspect
 import functools
 from typing import Any, Callable, TypeVar
 
-from machine_core.plugins.observability_support.tracer import MachineTracer
-from machine_core.plugins.observability_support.spans import SpanKind
+from observability_support.tracer import MachineTracer
+from observability_support.spans import SpanKind
 
 F = TypeVar("F", bound=Callable[..., Any])
 

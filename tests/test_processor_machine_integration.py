@@ -1,26 +1,26 @@
 """Tests for processor integration with Machine via the plugin system."""
 
 import pytest
-from machine_core.plugins.processor_support.base import (
+from processor_support.base import (
     Processor,
     ProcessorData,
     ProcessorResult,
     TripWire,
 )
-from machine_core.plugins.processor_support.runner import ProcessorRunner
-from machine_core.plugins.processor_support.builtin.pii import PIIProcessor
-from machine_core.plugins.processor_support.builtin.prompt_injection import (
+from processor_support.runner import ProcessorRunner
+from processor_support.builtin.pii import PIIProcessor
+from processor_support.builtin.prompt_injection import (
     PromptInjectionProcessor,
 )
-from machine_core.plugins.processor_support.builtin.token_limiter import (
+from processor_support.builtin.token_limiter import (
     TokenLimiterProcessor,
 )
-from machine_core.plugins.processor_support.builtin.cost_guard import CostGuardProcessor
-from machine_core.plugins.processor_support.builtin.regex_filter import (
+from processor_support.builtin.cost_guard import CostGuardProcessor
+from processor_support.builtin.regex_filter import (
     RegexFilterProcessor,
 )
-from machine_core.plugins.processor_support.builtin.cache import CacheProcessor
-from machine_core.plugins.processor_support.builtin.tool_search import (
+from processor_support.builtin.cache import CacheProcessor
+from processor_support.builtin.tool_search import (
     ToolSearchProcessor,
 )
 

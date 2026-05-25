@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
-from machine_core.plugins.vectorstore_support.schemas import (
+from vectorstore_support.schemas import (
     VectorStoreConfig,
     SearchRequest,
     SearchResult,

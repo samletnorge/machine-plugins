@@ -2,10 +2,10 @@
 
 import pytest
 from unittest.mock import AsyncMock, patch
-from machine_core.plugins.eval_support.scorers.context_precision import (
+from eval_support.scorers.context_precision import (
     ContextPrecisionScorer,
 )
-from machine_core.plugins.eval_support.scorers.context_recall import ContextRecallScorer
+from eval_support.scorers.context_recall import ContextRecallScorer
 
 
 def test_context_precision_name():

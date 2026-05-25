@@ -1,8 +1,8 @@
 """Tests for tool search processor (RAG-based tool discovery wrapper)."""
 
 import pytest
-from machine_core.plugins.processor_support.base import ProcessorData
-from machine_core.plugins.processor_support.builtin.tool_search import (
+from processor_support.base import ProcessorData
+from processor_support.builtin.tool_search import (
     ToolSearchProcessor,
 )
 

@@ -2,11 +2,11 @@
 
 import pytest
 from unittest.mock import AsyncMock, patch
-from machine_core.plugins.eval_support.scorers.tone import ToneScorer
-from machine_core.plugins.eval_support.scorers.prompt_alignment import (
+from eval_support.scorers.tone import ToneScorer
+from eval_support.scorers.prompt_alignment import (
     PromptAlignmentScorer,
 )
-from machine_core.plugins.eval_support.scorers.tool_call_accuracy import (
+from eval_support.scorers.tool_call_accuracy import (
     ToolCallAccuracyScorer,
 )
 

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from machine_core.plugins.rag_support.chunking.base import Chunker
-from machine_core.plugins.rag_support.models import Chunk
+from rag_support.chunking.base import Chunker
+from rag_support.models import Chunk
 
 
 class TokenChunker(Chunker):

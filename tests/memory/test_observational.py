@@ -2,13 +2,13 @@
 
 import pytest
 
-from machine_core.plugins.memory_support.observational import (
+from memory_support.observational import (
     FactExtractor,
     ObservationalMemory,
     facts_to_system_prompt,
 )
-from machine_core.plugins.memory_support.thread import Message, MessageRole, Fact
-from machine_core.plugins.memory_support.in_memory_storage import InMemoryStorage
+from memory_support.thread import Message, MessageRole, Fact
+from memory_support.in_memory_storage import InMemoryStorage
 
 
 def _user(content: str) -> Message:

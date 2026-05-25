@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import AsyncIterator
 
-from machine_core.plugins.voice_support.base import (
+from voice_support.base import (
     VoiceProvider,
     SpeakOptions,
     ListenOptions,

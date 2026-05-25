@@ -4,7 +4,7 @@ import pytest
 import json
 import csv
 from pathlib import Path
-from machine_core.plugins.eval_support.dataset import Dataset, EvalSample
+from eval_support.dataset import Dataset, EvalSample
 
 
 def test_eval_sample_minimal():

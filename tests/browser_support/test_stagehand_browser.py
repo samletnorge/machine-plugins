@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 
 def _make_mock_stagehand(mock_page):
     """Helper to create a StagehandBrowser with mocked internals."""
-    from machine_core.plugins.browser_support.stagehand_browser import StagehandBrowser
+    from browser_support.stagehand_browser import StagehandBrowser
 
     sb = StagehandBrowser.__new__(StagehandBrowser)
     sb._inner_browser = AsyncMock()
@@ -21,7 +21,7 @@ def _make_mock_stagehand(mock_page):
 
 @pytest.mark.asyncio
 async def test_stagehand_navigate_delegates(mock_page):
-    from machine_core.plugins.browser_support.base import NavigateResult
+    from browser_support.base import NavigateResult
 
     sb = _make_mock_stagehand(mock_page)
     sb._inner_browser.navigate.return_value = NavigateResult(
@@ -35,7 +35,7 @@ async def test_stagehand_navigate_delegates(mock_page):
 
 @pytest.mark.asyncio
 async def test_stagehand_click_resolves_natural_language(mock_page):
-    from machine_core.plugins.browser_support.base import BrowserResult
+    from browser_support.base import BrowserResult
 
     sb = _make_mock_stagehand(mock_page)
     sb._resolve_selector.return_value = "button.login-btn"
@@ -53,7 +53,7 @@ async def test_stagehand_click_resolves_natural_language(mock_page):
 
 @pytest.mark.asyncio
 async def test_stagehand_fill_resolves_natural_language(mock_page):
-    from machine_core.plugins.browser_support.base import BrowserResult
+    from browser_support.base import BrowserResult
 
     sb = _make_mock_stagehand(mock_page)
     sb._resolve_selector.return_value = "input#email"
@@ -67,7 +67,7 @@ async def test_stagehand_fill_resolves_natural_language(mock_page):
 
 @pytest.mark.asyncio
 async def test_stagehand_get_text_resolves(mock_page):
-    from machine_core.plugins.browser_support.base import ElementResult
+    from browser_support.base import ElementResult
 
     sb = _make_mock_stagehand(mock_page)
     sb._resolve_selector.return_value = "h1.page-title"

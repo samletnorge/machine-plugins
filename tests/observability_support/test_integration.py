@@ -3,10 +3,10 @@
 import pytest
 import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
-from machine_core.plugins.observability_support import ObservabilitySupportPlugin
-from machine_core.plugins.observability_support.tracer import MachineTracer
-from machine_core.plugins.observability_support.config import ObservabilityConfig
-from machine_core.plugins.observability_support.spans import SpanAttributes, SpanKind
+from observability_support import ObservabilitySupportPlugin
+from observability_support.tracer import MachineTracer
+from observability_support.config import ObservabilityConfig
+from observability_support.spans import SpanAttributes, SpanKind
 from tests.observability_support.helpers import InMemorySpanExporter
 
 
@@ -21,7 +21,7 @@ def tracer_and_exporter():
 
 
 async def test_instrument_agent_wraps_run(tracer_and_exporter):
-    from machine_core.plugins.observability_support import instrument_agent
+    from observability_support import instrument_agent
 
     tracer, exporter = tracer_and_exporter
 
@@ -42,7 +42,7 @@ async def test_instrument_agent_wraps_run(tracer_and_exporter):
 
 
 async def test_instrument_tool_wraps_execute(tracer_and_exporter):
-    from machine_core.plugins.observability_support import instrument_tool
+    from observability_support import instrument_tool
 
     tracer, exporter = tracer_and_exporter
 
@@ -65,7 +65,7 @@ async def test_instrument_tool_wraps_execute(tracer_and_exporter):
 
 
 async def test_instrument_agent_records_errors(tracer_and_exporter):
-    from machine_core.plugins.observability_support import instrument_agent
+    from observability_support import instrument_agent
 
     tracer, exporter = tracer_and_exporter
 
@@ -84,18 +84,18 @@ async def test_instrument_agent_records_errors(tracer_and_exporter):
 
 
 def test_setup_observability_returns_tracer_and_cost_tracker():
-    from machine_core.plugins.observability_support import setup_observability
+    from observability_support import setup_observability
 
     config = ObservabilityConfig(exporter="console", service_name="my-app")
     tracer, cost_tracker = setup_observability(config)
     assert isinstance(tracer, MachineTracer)
-    from machine_core.plugins.observability_support.cost import CostTracker
+    from observability_support.cost import CostTracker
 
     assert isinstance(cost_tracker, CostTracker)
 
 
 def test_setup_observability_disabled():
-    from machine_core.plugins.observability_support import setup_observability
+    from observability_support import setup_observability
 
     config = ObservabilityConfig(enabled=False)
     tracer, cost_tracker = setup_observability(config)

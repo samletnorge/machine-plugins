@@ -45,7 +45,7 @@ async def test_cross_category_registration():
     """Register items across categories via Machine API."""
     m = await _machine_with_all_builtins()
 
-    from machine_core.plugins.tool_support.schemas import ToolDefinition
+    from tool_support.schemas import ToolDefinition
 
     calc_tool = ToolDefinition(
         name="calculator",
@@ -55,7 +55,7 @@ async def test_cross_category_registration():
     )
     m.register("tool", "calculator", calc_tool)
 
-    from machine_core.plugins.agent_support.schemas import AgentDefinition
+    from agent_support.schemas import AgentDefinition
 
     agent_def = AgentDefinition(
         name="math-agent",

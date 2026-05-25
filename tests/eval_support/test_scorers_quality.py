@@ -2,11 +2,11 @@
 
 import pytest
 from unittest.mock import AsyncMock, patch
-from machine_core.plugins.eval_support.scorers.completeness import CompletenessScorer
-from machine_core.plugins.eval_support.scorers.content_similarity import (
+from eval_support.scorers.completeness import CompletenessScorer
+from eval_support.scorers.content_similarity import (
     ContentSimilarityScorer,
 )
-from machine_core.plugins.eval_support.scorers.summarization import SummarizationScorer
+from eval_support.scorers.summarization import SummarizationScorer
 
 
 def test_completeness_name():

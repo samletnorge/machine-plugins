@@ -1,13 +1,13 @@
 """Tests for rerankers."""
 
 import pytest
-from machine_core.plugins.rag_support.rerankers.base import BaseReranker
-from machine_core.plugins.rag_support.rerankers.llm import LLMReranker
-from machine_core.plugins.rag_support.rerankers.cross_encoder import (
+from rag_support.rerankers.base import BaseReranker
+from rag_support.rerankers.llm import LLMReranker
+from rag_support.rerankers.cross_encoder import (
     CrossEncoderReranker,
 )
-from machine_core.plugins.vectorstore_support.schemas import SearchResult
-from machine_core.plugins.rag_support.models import RankedResult
+from vectorstore_support.schemas import SearchResult
+from rag_support.models import RankedResult
 
 
 def test_base_is_abstract():

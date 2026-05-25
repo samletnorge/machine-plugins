@@ -23,6 +23,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.provider_github_copilot:CopilotProviderPlugin"
+    "entry_point": "provider_github_copilot:CopilotProviderPlugin"
   }
 }

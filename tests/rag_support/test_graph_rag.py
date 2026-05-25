@@ -1,13 +1,13 @@
 """Tests for GraphRAG."""
 
 import pytest
-from machine_core.plugins.rag_support.graph import (
+from rag_support.graph import (
     KnowledgeGraph,
     GraphNode,
     GraphEdge,
     GraphRAG,
 )
-from machine_core.plugins.vectorstore_support.schemas import SearchResult
+from vectorstore_support.schemas import SearchResult
 
 
 def test_graph_node():

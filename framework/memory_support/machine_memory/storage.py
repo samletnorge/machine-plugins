@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from machine_core.plugins.memory_support.thread import Thread, Message, Fact
+    from memory_support.thread import Thread, Message, Fact
 
 
 class BaseStorage(ABC):

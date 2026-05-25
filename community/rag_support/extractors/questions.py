@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from typing import Any
-from machine_core.plugins.rag_support.extractors.base import MetadataExtractor
+from rag_support.extractors.base import MetadataExtractor
 
 
 class QuestionsExtractor(MetadataExtractor):

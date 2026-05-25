@@ -1,7 +1,7 @@
 """Tests for observability configuration."""
 
 import pytest
-from machine_core.plugins.observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig
 
 
 def test_default_config():

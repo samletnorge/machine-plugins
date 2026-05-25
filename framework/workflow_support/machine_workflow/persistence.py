@@ -6,7 +6,7 @@ import json
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from machine_core.plugins.workflow_support.run import WorkflowRun
+from workflow_support.run import WorkflowRun
 
 
 class RunStore(ABC):

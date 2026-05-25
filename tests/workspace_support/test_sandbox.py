@@ -3,7 +3,7 @@
 import os
 import pytest
 from unittest.mock import MagicMock, patch
-from machine_core.plugins.workspace_support.sandbox import (
+from workspace_support.sandbox import (
     Sandbox,
     ExecutionResult,
     LocalSandbox,
@@ -102,7 +102,7 @@ async def test_docker_sandbox_execute_python():
     mock_client.containers.run = MagicMock(return_value=mock_container)
 
     with patch(
-        "machine_core.plugins.workspace_support.sandbox._get_docker_client",
+        "workspace_support.sandbox._get_docker_client",
         return_value=mock_client,
     ):
         sb = DockerSandbox(image="python:3.12-slim")
@@ -123,7 +123,7 @@ async def test_docker_sandbox_execute_error():
     mock_client.containers.run = MagicMock(return_value=mock_container)
 
     with patch(
-        "machine_core.plugins.workspace_support.sandbox._get_docker_client",
+        "workspace_support.sandbox._get_docker_client",
         return_value=mock_client,
     ):
         sb = DockerSandbox(image="python:3.12-slim")
@@ -142,7 +142,7 @@ async def test_docker_sandbox_upload():
     mock_client.containers.run = MagicMock(return_value=mock_container)
 
     with patch(
-        "machine_core.plugins.workspace_support.sandbox._get_docker_client",
+        "workspace_support.sandbox._get_docker_client",
         return_value=mock_client,
     ):
         sb = DockerSandbox(image="python:3.12-slim")
@@ -156,7 +156,7 @@ async def test_docker_sandbox_cleanup():
     mock_container = MagicMock()
     mock_container.remove = MagicMock()
 
-    with patch("machine_core.plugins.workspace_support.sandbox._get_docker_client"):
+    with patch("workspace_support.sandbox._get_docker_client"):
         sb = DockerSandbox(image="python:3.12-slim")
         sb._container = mock_container
         await sb.cleanup()

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from html.parser import HTMLParser
-from machine_core.plugins.rag_support.chunking.base import Chunker
-from machine_core.plugins.rag_support.models import Chunk
+from rag_support.chunking.base import Chunker
+from rag_support.models import Chunk
 
 _BLOCK_TAGS = {
     "div",

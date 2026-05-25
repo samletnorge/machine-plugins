@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import MagicMock
-from machine_core.plugins.rag_support import RagSupportPlugin
+from rag_support import RagSupportPlugin
 
 
 def test_plugin_class_exists():

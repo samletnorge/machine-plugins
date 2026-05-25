@@ -1,15 +1,15 @@
 """Tests for RAG data models and ABCs."""
 
 import pytest
-from machine_core.plugins.rag_support.models import (
+from rag_support.models import (
     Chunk,
     RankedResult,
     DocumentMetadata,
     IngestDocument,
 )
-from machine_core.plugins.rag_support.chunking.base import Chunker
-from machine_core.plugins.rag_support.extractors.base import MetadataExtractor
-from machine_core.plugins.rag_support.rerankers.base import BaseReranker
+from rag_support.chunking.base import Chunker
+from rag_support.extractors.base import MetadataExtractor
+from rag_support.rerankers.base import BaseReranker
 
 
 def test_chunk_has_required_fields():

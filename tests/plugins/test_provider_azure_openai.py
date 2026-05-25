@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, patch, MagicMock
 
 from machine_core import Machine
 from machine_core.plugin.manifest import PluginManifest
-from machine_core.plugins.model_provider_support.schemas import (
+from model_provider_support.schemas import (
     ModelProviderConfig,
     ModelRequest,
     ModelResponse,
@@ -24,7 +24,7 @@ async def test_azure_manifest_has_dependencies():
 class TestAzureOpenAIProvider:
     @pytest.fixture
     def provider(self):
-        from machine_core.plugins.provider_azure_openai.provider import (
+        from provider_azure_openai.provider import (
             AzureOpenAILLMProvider,
         )
 
@@ -55,7 +55,7 @@ class TestAzureOpenAIProvider:
         assert result.output == "Azure says hello"
 
     async def test_generate_with_token_auth(self):
-        from machine_core.plugins.provider_azure_openai.provider import (
+        from provider_azure_openai.provider import (
             AzureOpenAILLMProvider,
         )
 

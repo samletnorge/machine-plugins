@@ -1,10 +1,10 @@
 import pytest
 from pydantic import BaseModel
 
-from machine_core.plugins.workflow_support.step import step, StepContext
-from machine_core.plugins.workflow_support.workflow import Workflow
-from machine_core.plugins.workflow_support.run import RunStatus
-from machine_core.plugins.workflow_support.engine import DefaultExecutionEngine
+from workflow_support.step import step, StepContext
+from workflow_support.workflow import Workflow
+from workflow_support.run import RunStatus
+from workflow_support.engine import DefaultExecutionEngine
 
 
 class Counter(BaseModel):

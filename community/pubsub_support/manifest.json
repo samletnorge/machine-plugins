@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.pubsub_support:PubSubSupportPlugin"
+    "entry_point": "pubsub_support:PubSubSupportPlugin"
   }
 }

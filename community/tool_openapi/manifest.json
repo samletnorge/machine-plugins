@@ -10,6 +10,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_core.plugins.tool_openapi:ToolOpenAPIPlugin"
+    "entry_point": "tool_openapi:ToolOpenAPIPlugin"
   }
 }

@@ -2,12 +2,12 @@
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from machine_core.plugins.voice_support.base import SpeakOptions
+from voice_support.base import SpeakOptions
 
 
 class TestFishAudioProvider:
     def test_import(self):
-        from machine_core.plugins.voice_support.providers.fish_audio import (
+        from voice_support.providers.fish_audio import (
             FishAudioProvider,
         )
 
@@ -16,7 +16,7 @@ class TestFishAudioProvider:
 
     @pytest.mark.asyncio
     async def test_speak_streams(self):
-        from machine_core.plugins.voice_support.providers.fish_audio import (
+        from voice_support.providers.fish_audio import (
             FishAudioProvider,
         )
 
@@ -36,7 +36,7 @@ class TestFishAudioProvider:
         mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch(
-            "machine_core.plugins.voice_support.providers.fish_audio.httpx.AsyncClient",
+            "voice_support.providers.fish_audio.httpx.AsyncClient",
             return_value=mock_client,
         ):
             provider = FishAudioProvider(api_key="test-key")
@@ -47,7 +47,7 @@ class TestFishAudioProvider:
 
     @pytest.mark.asyncio
     async def test_listen_raises(self):
-        from machine_core.plugins.voice_support.providers.fish_audio import (
+        from voice_support.providers.fish_audio import (
             FishAudioProvider,
         )
 
@@ -57,7 +57,7 @@ class TestFishAudioProvider:
 
     @pytest.mark.asyncio
     async def test_connect_raises(self):
-        from machine_core.plugins.voice_support.providers.fish_audio import (
+        from voice_support.providers.fish_audio import (
             FishAudioProvider,
         )
 
