@@ -159,11 +159,28 @@ def generate_routes(machine: Any) -> APIRouter:
                     try:
                         result = await fn(**kwargs)
                     except TypeError as e:
-                        # Retry with positional body
+                        # Retry: inspect signature and build typed request if possible
                         logger.debug(f"Retrying with positional arg: {e}")
                         try:
-                            body = kwargs
-                            result = await fn(body)
+                            import inspect
+
+                            sig = inspect.signature(fn)
+                            params = [
+                                p for p in sig.parameters.values() if p.name != "self"
+                            ]
+                            if (
+                                params
+                                and params[0].annotation != inspect.Parameter.empty
+                            ):
+                                ann = params[0].annotation
+                                # If annotation is a Pydantic BaseModel, construct it
+                                if hasattr(ann, "model_validate"):
+                                    typed_arg = ann.model_validate(kwargs)
+                                    result = await fn(typed_arg)
+                                else:
+                                    result = await fn(kwargs)
+                            else:
+                                result = await fn(kwargs)
                         except Exception:
                             raise HTTPException(500, str(e))
                     except Exception as e:
