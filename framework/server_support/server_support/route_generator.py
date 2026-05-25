@@ -73,6 +73,20 @@ def _coerce_kwargs(fn: Any, kwargs: dict[str, Any]) -> dict[str, Any]:
             and hasattr(ann, "model_validate")
         ):
             coerced[key] = ann.model_validate(value)
+        elif ann is not None and isinstance(value, list):
+            # Handle list[PydanticModel] — e.g. list[SearchResult]
+            origin = typing.get_origin(ann)
+            if origin is list:
+                args = typing.get_args(ann)
+                if args and hasattr(args[0], "model_validate"):
+                    coerced[key] = [
+                        args[0].model_validate(item) if isinstance(item, dict) else item
+                        for item in value
+                    ]
+                else:
+                    coerced[key] = value
+            else:
+                coerced[key] = value
         else:
             coerced[key] = value
     return coerced
