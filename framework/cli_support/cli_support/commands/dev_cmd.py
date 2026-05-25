@@ -100,8 +100,14 @@ def dev_command(
         "MACHINE_CORE_ROOT": str(root),
     }
 
+    # Use the project's venv Python so all project plugins are importable
+    venv_python = root / ".venv" / "bin" / "python"
+    if not venv_python.exists():
+        console.print("[red]Error: No .venv found. Run 'uv sync' first.[/red]")
+        raise typer.Exit(code=1)
+
     cmd = [
-        sys.executable,
+        str(venv_python),
         "-m",
         "uvicorn",
         "cli_support.commands._dev_server:app",
