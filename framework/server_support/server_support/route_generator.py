@@ -25,11 +25,19 @@ def _serialize(obj: Any) -> Any:
     if hasattr(obj, "model_dump"):
         return obj.model_dump()
     if hasattr(obj, "__dict__"):
-        return {
-            k: v
-            for k, v in obj.__dict__.items()
-            if not k.startswith("_") and not callable(v)
-        }
+        # Collect instance attrs + class-level public non-callable attrs
+        attrs = {}
+        for k, v in vars(type(obj)).items():
+            if (
+                not k.startswith("_")
+                and not callable(v)
+                and not isinstance(v, (classmethod, staticmethod, property))
+            ):
+                attrs[k] = v
+        for k, v in obj.__dict__.items():
+            if not k.startswith("_") and not callable(v):
+                attrs[k] = v
+        return attrs
     return str(obj)
 
 
