@@ -40,6 +40,7 @@ def init_command(
 
     templates = {
         "project/pyproject.toml.j2": target / "pyproject.toml",
+        "project/.gitignore.j2": target / ".gitignore",
         "project/src/__init__.py.j2": target / "src" / "__init__.py",
         "project/src/main.py.j2": target / "src" / "main.py",
         "project/src/agents/example.py.j2": target / "src" / "agents" / "example.py",
