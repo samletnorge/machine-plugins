@@ -4,24 +4,38 @@ version = "0.1.0"
 description = "A machine-core AI agent project"
 requires-python = ">=3.12"
 dependencies = [
-    "machine-core @ git+ssh://git@github.com/samletnorge/machine-core.git",
-    "machine-core-server-support @ git+ssh://git@github.com/samletnorge/machine-plugins.git#subdirectory=framework/server_support",
-    "machine-core-agent-support @ git+ssh://git@github.com/samletnorge/machine-plugins.git#subdirectory=framework/agent_support",
-    "machine-core-tool-support @ git+ssh://git@github.com/samletnorge/machine-plugins.git#subdirectory=framework/tool_support",
+    "server_support",
 ]
 
-[tool.machine-core]
-entry = "src.main:machine"
-plugins = [    
-    "agent_support",
-    "tool_support",
-    "server_support",
+[dependency-groups]
+extra = [
     "eval_support",
     "tool_openapi",
     "tool_filter_rag",
     "rag_support",
     "provider_ollama",
-    "model_provider_support",
+]
+
+[tool.uv.sources]
+server_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/server_support" }
+eval_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-eval-support.git", subdirectory = "framework/eval_support" }
+tool_openapi = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/tool_openapi" }
+tool_filter_rag = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/tool_filter_rag" }
+rag_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/rag_support" }
+provider_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_ollama" }
+
+[tool.uv]
+default-groups = "all"
+
+[tool.machine-core]
+entry = "src.main:machine"
+plugins = [    
+    "eval_support",
+    "tool_openapi",
+    "tool_filter_rag",
+    "rag_support",
+    "provider_ollama",
+    "server_support",
 ]
 
 [tool.hatch.metadata]
