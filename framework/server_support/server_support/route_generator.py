@@ -151,6 +151,28 @@ def generate_routes(machine: Any) -> APIRouter:
                         try:
                             gen = await fn(**kwargs)
                             return sse_response(gen)
+                        except TypeError:
+                            # Same retry logic for stream
+                            import inspect, typing
+
+                            sig = inspect.signature(fn)
+                            params = [
+                                p for p in sig.parameters.values() if p.name != "self"
+                            ]
+                            ann = None
+                            if (
+                                params
+                                and params[0].annotation != inspect.Parameter.empty
+                            ):
+                                ann = params[0].annotation
+                            if isinstance(ann, str):
+                                hints = typing.get_type_hints(fn)
+                                ann = hints.get(params[0].name)
+                            if ann and hasattr(ann, "model_validate"):
+                                gen = await fn(ann.model_validate(kwargs))
+                            else:
+                                gen = await fn(kwargs)
+                            return sse_response(gen)
                         except Exception as e:
                             logger.error(f"Stream error: {e}")
                             raise HTTPException(500, str(e))
@@ -163,22 +185,28 @@ def generate_routes(machine: Any) -> APIRouter:
                         logger.debug(f"Retrying with positional arg: {e}")
                         try:
                             import inspect
+                            import typing
 
                             sig = inspect.signature(fn)
                             params = [
                                 p for p in sig.parameters.values() if p.name != "self"
                             ]
+                            ann = None
                             if (
                                 params
                                 and params[0].annotation != inspect.Parameter.empty
                             ):
                                 ann = params[0].annotation
-                                # If annotation is a Pydantic BaseModel, construct it
-                                if hasattr(ann, "model_validate"):
-                                    typed_arg = ann.model_validate(kwargs)
-                                    result = await fn(typed_arg)
-                                else:
-                                    result = await fn(kwargs)
+
+                            # Resolve string annotations (from __future__ import annotations)
+                            if isinstance(ann, str):
+                                hints = typing.get_type_hints(fn)
+                                first_param_name = params[0].name
+                                ann = hints.get(first_param_name)
+
+                            if ann and hasattr(ann, "model_validate"):
+                                typed_arg = ann.model_validate(kwargs)
+                                result = await fn(typed_arg)
                             else:
                                 result = await fn(kwargs)
                         except Exception:
