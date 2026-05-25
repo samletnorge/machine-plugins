@@ -1,5 +1,5 @@
 {
-  "name": "cli-support",
+  "name": "cli_support",
   "version": "0.1.0",
   "description": "machine CLI — scaffold, dev, build, deploy, and studio commands",
   "schema_version": "1.0.0",
