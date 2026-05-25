@@ -1,5 +1,5 @@
 {
-  "name": "tool-support",
+  "name": "tool_support",
   "version": "0.5.0",
   "description": "Defines the 'tool' category with ToolDefinition schema and @tool decorator",
   "schema_version": "1.0.0",
