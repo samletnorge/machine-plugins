@@ -14,28 +14,35 @@ from loguru import logger
 from .sse import sse_response
 
 
+def _is_json_safe(v: Any) -> bool:
+    """Check if a value is JSON-serializable without recursion issues."""
+    return isinstance(v, (str, int, float, bool, type(None), list, tuple, dict))
+
+
 def _serialize(obj: Any) -> Any:
     """Serialize an arbitrary object to JSON-safe form."""
     if obj is None or isinstance(obj, (str, int, float, bool)):
         return obj
     if isinstance(obj, dict):
-        return obj
+        return {k: v for k, v in obj.items() if _is_json_safe(v)}
     if isinstance(obj, (list, tuple)):
         return [_serialize(i) for i in obj]
     if hasattr(obj, "model_dump"):
         return obj.model_dump()
     if hasattr(obj, "__dict__"):
         # Collect instance attrs + class-level public non-callable attrs
+        # Only include JSON-safe values to avoid circular refs
         attrs = {}
         for k, v in vars(type(obj)).items():
             if (
                 not k.startswith("_")
                 and not callable(v)
                 and not isinstance(v, (classmethod, staticmethod, property))
+                and _is_json_safe(v)
             ):
                 attrs[k] = v
         for k, v in obj.__dict__.items():
-            if not k.startswith("_") and not callable(v):
+            if not k.startswith("_") and not callable(v) and _is_json_safe(v):
                 attrs[k] = v
         return attrs
     return str(obj)
