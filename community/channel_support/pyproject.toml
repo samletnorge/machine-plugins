@@ -5,6 +5,12 @@ description = "Channel category: in-memory and WebSocket channels"
 requires-python = ">=3.12"
 dependencies = []
 
+
+[tool.hatch.build.targets.wheel]
+
+[tool.hatch.build.targets.wheel.force-include]
+"manifest.json" = "channel_support/manifest.json"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

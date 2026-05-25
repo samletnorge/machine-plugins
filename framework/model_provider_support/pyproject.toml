@@ -11,3 +11,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["model_provider_support"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"manifest.json" = "model_provider_support/manifest.json"

@@ -21,6 +21,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["server_support"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"manifest.json" = "server_support/manifest.json"
+
 
 [tool.uv.sources]
 machine_core = { git = "git+ssh://git@github.com/samletnorge/machine-core.git" }

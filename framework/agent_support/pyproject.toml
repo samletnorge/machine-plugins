@@ -11,3 +11,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["agent_support"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"manifest.json" = "agent_support/manifest.json"

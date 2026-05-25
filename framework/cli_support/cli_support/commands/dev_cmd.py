@@ -9,6 +9,7 @@ import sys
 import typer
 from rich.console import Console
 
+from cli_support.manifest_sync import sync_manifests
 from cli_support.utils import (
     find_project_root,
     load_machine_config,
@@ -31,6 +32,10 @@ def dev_command(
 
     config = load_machine_config(root)
     entry = config.get("entry", "src.main:machine")
+
+    # Sync plugin manifests from site-packages to ~/.config/machine-core/plugins/
+    console.print("[dim]Syncing plugin manifests...[/dim]")
+    sync_manifests(project_root=root)
 
     console.print(f"[green]Starting dev server...[/green]")
     console.print(f"  URL: http://{host}:{port}")

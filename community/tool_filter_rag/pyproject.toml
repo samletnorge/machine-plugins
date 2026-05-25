@@ -12,3 +12,4 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["."]
 sources = {"." = "tool_filter_rag"}
+

@@ -5,6 +5,12 @@ description = "Google GenAI embedding provider"
 requires-python = ">=3.12"
 dependencies = ["google-genai>=1.0"]
 
+
+[tool.hatch.build.targets.wheel]
+
+[tool.hatch.build.targets.wheel.force-include]
+"manifest.json" = "embeddings_google/manifest.json"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

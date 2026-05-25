@@ -5,6 +5,12 @@ description = "Vertex AI Claude LLM provider for machine-core"
 requires-python = ">=3.12"
 dependencies = ["pydantic-ai>=0.0.1", "anthropic>=0.40"]
 
+
+[tool.hatch.build.targets.wheel]
+
+[tool.hatch.build.targets.wheel.force-include]
+"manifest.json" = "provider_vertex_claude/manifest.json"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

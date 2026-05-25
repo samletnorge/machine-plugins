@@ -11,3 +11,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["machine_storage"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"manifest.json" = "storage_support/manifest.json"

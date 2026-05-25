@@ -37,3 +37,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["cli_support"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"manifest.json" = "cli_support/manifest.json"

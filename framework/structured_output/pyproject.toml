@@ -11,3 +11,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["machine_structured_output"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"manifest.json" = "structured_output/manifest.json"
