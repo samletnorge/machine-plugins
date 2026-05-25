@@ -78,7 +78,15 @@ def generate_routes(machine: Any) -> APIRouter:
         def _make_list(cat: str = _cat):
             async def _list():
                 items = machine.list_category(cat)
-                return [_serialize(v) for v in items.values()]
+                result = []
+                for name, impl in items.items():
+                    serialized = _serialize(impl)
+                    if isinstance(serialized, dict):
+                        entry = {"name": name, **serialized}
+                    else:
+                        entry = {"name": name, "value": serialized}
+                    result.append(entry)
+                return result
 
             return _list
 
@@ -96,7 +104,10 @@ def generate_routes(machine: Any) -> APIRouter:
                 item = machine.resolve(cat, name)
                 if item is None:
                     raise HTTPException(404, f"{cat} '{name}' not found")
-                return _serialize(item)
+                serialized = _serialize(item)
+                if isinstance(serialized, dict):
+                    return {"name": name, **serialized}
+                return {"name": name, "value": serialized}
 
             return _get
 
