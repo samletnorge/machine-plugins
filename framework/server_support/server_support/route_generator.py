@@ -214,8 +214,7 @@ def generate_routes(machine: Any) -> APIRouter:
                                 result = fn(kwargs)
                             if inspect.isawaitable(result):
                                 result = await result
-                        except Exception as retry_err:
-                            logger.error(f"Retry also failed: {retry_err!r}")
+                        except Exception:
                             raise HTTPException(500, str(e))
                     except Exception as e:
                         logger.error(f"Operation error: {e}")
