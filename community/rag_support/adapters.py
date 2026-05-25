@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from embeddings.schemas import EmbeddingRequest
-
 
 class EmbedderAdapter:
     """Wraps a machine-core embedding provider into the interface SemanticChunker expects.
@@ -19,6 +17,8 @@ class EmbedderAdapter:
         self._model = model
 
     async def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        from embeddings.schemas import EmbeddingRequest
+
         request = EmbeddingRequest(input=texts, model_ref=self._model)
         result = await self._provider.embed(request)
         return result.vectors
