@@ -38,6 +38,31 @@ def _extract_path_params(path_template: str) -> list[str]:
     return re.findall(r"\{(\w+)\}", path_template)
 
 
+def _coerce_kwargs(fn: Any, kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Coerce kwargs values to their annotated Pydantic types if applicable.
+
+    For multi-param functions like run(definition: AgentDefinition, input: str, ...),
+    this converts raw dicts to Pydantic model instances where type hints indicate one.
+    """
+    try:
+        hints = typing.get_type_hints(fn)
+    except Exception:
+        return kwargs
+
+    coerced = {}
+    for key, value in kwargs.items():
+        ann = hints.get(key)
+        if (
+            ann is not None
+            and isinstance(value, dict)
+            and hasattr(ann, "model_validate")
+        ):
+            coerced[key] = ann.model_validate(value)
+        else:
+            coerced[key] = value
+    return coerced
+
+
 def generate_routes(machine: Any) -> APIRouter:
     """Generate an APIRouter with routes for every category and operation."""
     router = APIRouter(prefix="/api")
@@ -151,7 +176,8 @@ def generate_routes(machine: Any) -> APIRouter:
                     # Stream handling
                     if _is_stream:
                         try:
-                            gen = fn(**kwargs)
+                            typed_kwargs = _coerce_kwargs(fn, kwargs)
+                            gen = fn(**typed_kwargs)
                             if inspect.isawaitable(gen):
                                 gen = await gen
                             return sse_response(gen)
@@ -183,7 +209,9 @@ def generate_routes(machine: Any) -> APIRouter:
 
                     # Normal call
                     try:
-                        result = fn(**kwargs)
+                        # Pre-validate kwargs against type hints for Pydantic models
+                        typed_kwargs = _coerce_kwargs(fn, kwargs)
+                        result = fn(**typed_kwargs)
                         if inspect.isawaitable(result):
                             result = await result
                     except TypeError as e:
