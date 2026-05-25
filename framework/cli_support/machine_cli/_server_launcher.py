@@ -56,7 +56,7 @@ def ensure_server_running(server_url: str, port: int, console: Console) -> None:
         sys.executable,
         "-m",
         "uvicorn",
-        "machine_cli.commands._dev_server:app",
+        "cli_support.commands._dev_server:app",
         "--host",
         "127.0.0.1",
         "--port",

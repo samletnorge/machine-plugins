@@ -9,7 +9,7 @@ import sys
 import typer
 from rich.console import Console
 
-from machine_cli.utils import (
+from cli_support.utils import (
     find_project_root,
     load_machine_config,
 )
@@ -99,7 +99,7 @@ def dev_command(
         sys.executable,
         "-m",
         "uvicorn",
-        "machine_cli.commands._dev_server:app",
+        "cli_support.commands._dev_server:app",
         "--reload",
         "--host",
         host,

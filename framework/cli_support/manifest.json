@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_cli:CLISupportPlugin"
+    "entry_point": "cli_support:CLISupportPlugin"
   }
 }

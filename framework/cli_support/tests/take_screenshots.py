@@ -4,7 +4,7 @@ import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 from pathlib import Path
 
-from machine_cli.tui.app import MachineApp
+from cli_support.tui.app import MachineApp
 
 
 OUTPUT_DIR = Path(__file__).parent.parent / "screenshots"
@@ -15,7 +15,7 @@ async def take_screenshots():
 
     # Mock server being down for plugins/services tabs
     with patch(
-        "machine_cli.tui.screens.plugins.httpx.AsyncClient"
+        "cli_support.tui.screens.plugins.httpx.AsyncClient"
     ) as mock_plugins_client:
         import httpx as _httpx
 
@@ -26,7 +26,7 @@ async def take_screenshots():
         mock_plugins_client.return_value = mock_instance
 
         with patch(
-            "machine_cli.tui.screens.services.httpx.AsyncClient"
+            "cli_support.tui.screens.services.httpx.AsyncClient"
         ) as mock_svc_client:
             mock_svc_instance = AsyncMock()
             mock_svc_instance.get.side_effect = _httpx.ConnectError("refused")
@@ -49,7 +49,7 @@ async def take_screenshots():
             mock_plugin2.version = "0.5.0"
             mock_plugin2.description = "Tool support"
 
-            with patch("machine_cli.tui.screens.store.RegistryClient") as mock_rc:
+            with patch("cli_support.tui.screens.store.RegistryClient") as mock_rc:
                 mock_client_inst = AsyncMock()
                 mock_client_inst.list_plugins = AsyncMock(
                     return_value=[mock_plugin, mock_plugin2]
@@ -57,7 +57,7 @@ async def take_screenshots():
                 mock_client_inst.search_plugins = AsyncMock(return_value=[mock_plugin])
                 mock_rc.return_value = mock_client_inst
 
-                with patch("machine_cli.tui.screens.store.PluginInstaller") as mock_pi:
+                with patch("cli_support.tui.screens.store.PluginInstaller") as mock_pi:
                     mock_installer = MagicMock()
                     mock_installer.installed_plugins.return_value = ["agent_support"]
                     mock_installer.is_installed.side_effect = lambda n: (

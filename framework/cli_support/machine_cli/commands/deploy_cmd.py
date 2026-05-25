@@ -7,7 +7,7 @@ import asyncio
 import typer
 from rich.console import Console
 
-from machine_cli.utils import (
+from cli_support.utils import (
     find_project_root,
     load_machine_config,
     load_machine_instance,

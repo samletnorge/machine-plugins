@@ -8,12 +8,12 @@ import typer
 from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 
-from machine_cli.utils import find_project_root
+from cli_support.utils import find_project_root
 
 console = Console()
 
 env = Environment(
-    loader=PackageLoader("machine_cli", "scaffolds"),
+    loader=PackageLoader("cli_support", "scaffolds"),
     autoescape=select_autoescape(),
     keep_trailing_newline=True,
 )

@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, patch, MagicMock
 import pytest
 from textual.widgets import ListView, Static, Button, Label, Log
 
-from machine_cli.tui.app import MachineApp
+from cli_support.tui.app import MachineApp
 
 
 # --- Helpers ---
@@ -38,7 +38,7 @@ class TestPluginsScreen:
     @pytest.mark.asyncio
     async def test_shows_server_offline_when_not_running(self):
         """Plugins tab shows offline message when server is unreachable."""
-        with patch("machine_cli.tui.screens.plugins.httpx.AsyncClient") as mock_client:
+        with patch("cli_support.tui.screens.plugins.httpx.AsyncClient") as mock_client:
             import httpx
 
             mock_instance = AsyncMock()
@@ -58,7 +58,7 @@ class TestPluginsScreen:
     @pytest.mark.asyncio
     async def test_shows_categories_when_server_running(self):
         """Plugins tab shows categories from server."""
-        with patch("machine_cli.tui.screens.plugins.httpx.AsyncClient") as mock_client:
+        with patch("cli_support.tui.screens.plugins.httpx.AsyncClient") as mock_client:
             mock_instance = AsyncMock()
             mock_instance.get = AsyncMock(
                 return_value=mock_health_response({"agent": 1, "tool": 0})
@@ -88,12 +88,12 @@ class TestStoreScreen:
         mock_plugin.version = "0.5.0"
         mock_plugin.description = "Agent support plugin"
 
-        with patch("machine_cli.tui.screens.store.RegistryClient") as mock_rc:
+        with patch("cli_support.tui.screens.store.RegistryClient") as mock_rc:
             mock_client_instance = AsyncMock()
             mock_client_instance.list_plugins = AsyncMock(return_value=[mock_plugin])
             mock_rc.return_value = mock_client_instance
 
-            with patch("machine_cli.tui.screens.store.PluginInstaller") as mock_pi:
+            with patch("cli_support.tui.screens.store.PluginInstaller") as mock_pi:
                 mock_installer = MagicMock()
                 mock_installer.installed_plugins.return_value = []
                 mock_pi.return_value = mock_installer
@@ -109,11 +109,11 @@ class TestStoreScreen:
     @pytest.mark.asyncio
     async def test_install_button_disabled_initially(self):
         """Install button starts disabled."""
-        with patch("machine_cli.tui.screens.store.RegistryClient") as mock_rc:
+        with patch("cli_support.tui.screens.store.RegistryClient") as mock_rc:
             mock_rc.return_value = AsyncMock()
             mock_rc.return_value.list_plugins = AsyncMock(return_value=[])
 
-            with patch("machine_cli.tui.screens.store.PluginInstaller") as mock_pi:
+            with patch("cli_support.tui.screens.store.PluginInstaller") as mock_pi:
                 mock_pi.return_value = MagicMock()
                 mock_pi.return_value.installed_plugins.return_value = []
 
@@ -132,7 +132,7 @@ class TestServicesScreen:
     @pytest.mark.asyncio
     async def test_shows_stopped_when_server_down(self):
         """Services tab shows stopped status."""
-        with patch("machine_cli.tui.screens.services.httpx.AsyncClient") as mock_client:
+        with patch("cli_support.tui.screens.services.httpx.AsyncClient") as mock_client:
             import httpx
 
             mock_instance = AsyncMock()
@@ -151,7 +151,7 @@ class TestServicesScreen:
     @pytest.mark.asyncio
     async def test_start_button_enabled_when_stopped(self):
         """Start button is enabled when server is stopped."""
-        with patch("machine_cli.tui.screens.services.httpx.AsyncClient") as mock_client:
+        with patch("cli_support.tui.screens.services.httpx.AsyncClient") as mock_client:
             import httpx
 
             mock_instance = AsyncMock()
@@ -170,7 +170,7 @@ class TestServicesScreen:
     @pytest.mark.asyncio
     async def test_shows_running_when_server_up(self):
         """Services tab shows running status."""
-        with patch("machine_cli.tui.screens.services.httpx.AsyncClient") as mock_client:
+        with patch("cli_support.tui.screens.services.httpx.AsyncClient") as mock_client:
             mock_instance = AsyncMock()
             mock_instance.get = AsyncMock(return_value=mock_health_response())
             mock_instance.__aenter__ = AsyncMock(return_value=mock_instance)
@@ -225,7 +225,7 @@ class TestMachineApp:
     @pytest.mark.asyncio
     async def test_app_starts_and_has_tabs(self):
         """App starts with all 4 tabs."""
-        with patch("machine_cli.tui.screens.plugins.httpx.AsyncClient") as mock_client:
+        with patch("cli_support.tui.screens.plugins.httpx.AsyncClient") as mock_client:
             import httpx
 
             mock_instance = AsyncMock()
@@ -246,7 +246,7 @@ class TestMachineApp:
     @pytest.mark.asyncio
     async def test_quit_binding(self):
         """Pressing q quits the app."""
-        with patch("machine_cli.tui.screens.plugins.httpx.AsyncClient") as mock_client:
+        with patch("cli_support.tui.screens.plugins.httpx.AsyncClient") as mock_client:
             import httpx
 
             mock_instance = AsyncMock()

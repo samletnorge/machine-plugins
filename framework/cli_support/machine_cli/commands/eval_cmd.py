@@ -8,7 +8,7 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
-from machine_cli.utils import find_project_root
+from cli_support.utils import find_project_root
 
 console = Console()
 
