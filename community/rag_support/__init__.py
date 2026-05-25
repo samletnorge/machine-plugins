@@ -28,6 +28,39 @@ __all__ = [
 ]
 
 
+class _LazyLLMAdapter:
+    """Defers provider resolution until first generate() call.
+
+    This avoids load-order issues where rag-support (a category definer)
+    loads before model providers are registered.
+    """
+
+    def __init__(self, machine: Any, provider_name: str, model: str | None = None):
+        self._machine = machine
+        self._provider_name = provider_name
+        self._model = model
+        self._adapter: Any = None
+
+    def _resolve(self) -> Any:
+        if self._adapter is None:
+            from .adapters import LLMAdapter
+
+            provider = self._machine.resolve("model_provider", self._provider_name)
+            if provider is None:
+                raise ValueError(
+                    f"Model provider '{self._provider_name}' not found. "
+                    f"Available: {list(self._machine.list_category('model_provider').keys())}"
+                )
+            self._adapter = LLMAdapter(provider, model=self._model)
+        return self._adapter
+
+    async def generate(self, prompt: str, **kwargs: Any) -> str:
+        return await self._resolve().generate(prompt, **kwargs)
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._resolve(), name)
+
+
 class RagSupportPlugin:
     """Plugin that provides RAG pipeline components.
 
@@ -142,7 +175,10 @@ class RagSupportPlugin:
         )
 
     def _register_llm_components(self, ctx: "PluginContext") -> None:
-        """Register LLM-dependent reranker and extractors if LLM provider is configured."""
+        """Register LLM-dependent reranker and extractors if LLM provider is configured.
+
+        Uses lazy LLM resolution to avoid load-order dependency on model providers.
+        """
         from .rerankers.llm import LLMReranker
         from .extractors.title import TitleExtractor
         from .extractors.summary import SummaryExtractor
@@ -157,51 +193,33 @@ class RagSupportPlugin:
         if reranker_cfg and isinstance(reranker_cfg, dict):
             provider_name = reranker_cfg.get("provider")
             if provider_name:
-                provider = ctx._machine.resolve("model_provider", provider_name)
-                if provider:
-                    from .adapters import LLMAdapter
-
-                    llm = LLMAdapter(provider, model=reranker_cfg.get("model"))
-                    ctx.register("reranker", "llm", LLMReranker(llm=llm))
-                    logger.info(
-                        "rag-support: registered LLM reranker (provider={})",
-                        provider_name,
-                    )
-                else:
-                    logger.warning(
-                        "rag-support: LLM reranker not registered — "
-                        "model provider '{}' not found",
-                        provider_name,
-                    )
+                llm = _LazyLLMAdapter(
+                    ctx._machine, provider_name, reranker_cfg.get("model")
+                )
+                ctx.register("reranker", "llm", LLMReranker(llm=llm))
+                logger.info(
+                    "rag-support: registered LLM reranker (provider={}, lazy)",
+                    provider_name,
+                )
 
         if extractor_cfg and isinstance(extractor_cfg, dict):
             provider_name = extractor_cfg.get("provider")
             if provider_name:
-                provider = ctx._machine.resolve("model_provider", provider_name)
-                if provider:
-                    from .adapters import LLMAdapter
-
-                    llm = LLMAdapter(provider, model=extractor_cfg.get("model"))
-                    ctx.register("metadata_extractor", "title", TitleExtractor(llm=llm))
-                    ctx.register(
-                        "metadata_extractor", "summary", SummaryExtractor(llm=llm)
-                    )
-                    ctx.register(
-                        "metadata_extractor", "keywords", KeywordsExtractor(llm=llm)
-                    )
-                    ctx.register(
-                        "metadata_extractor", "questions", QuestionsExtractor(llm=llm)
-                    )
-                    logger.info(
-                        "rag-support: registered 4 extractors (provider={})",
-                        provider_name,
-                    )
-                else:
-                    logger.warning(
-                        "rag-support: extractors not registered — "
-                        "model provider '{}' not found",
-                        provider_name,
-                    )
+                llm = _LazyLLMAdapter(
+                    ctx._machine, provider_name, extractor_cfg.get("model")
+                )
+                ctx.register("metadata_extractor", "title", TitleExtractor(llm=llm))
+                ctx.register("metadata_extractor", "summary", SummaryExtractor(llm=llm))
+                ctx.register(
+                    "metadata_extractor", "keywords", KeywordsExtractor(llm=llm)
+                )
+                ctx.register(
+                    "metadata_extractor", "questions", QuestionsExtractor(llm=llm)
+                )
+                logger.info(
+                    "rag-support: registered 4 extractors (provider={}, lazy)",
+                    provider_name,
+                )
 
         if not reranker_cfg and not extractor_cfg:
             logger.debug(

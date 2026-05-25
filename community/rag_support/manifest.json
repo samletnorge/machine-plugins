@@ -4,7 +4,7 @@
   "description": "RAG pipeline: chunking, metadata extraction, reranking, GraphRAG, and pipeline orchestration",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["chunker:register", "reranker:register", "metadata_extractor:register", "rag_pipeline:register"],
+  "capabilities": ["categories:define", "chunker:register", "reranker:register", "metadata_extractor:register", "rag_pipeline:register"],
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {
