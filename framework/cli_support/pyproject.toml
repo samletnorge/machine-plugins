@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "machine CLI tooling for machine-core"
 requires-python = ">=3.12"
 dependencies = [
+    "machine-core @ git+ssh://git@github.com/samletnorge/machine-core.git",
     "typer>=0.12.0", 
     "rich>=13.0.0", 
     "jinja2>=3.1.0", 
@@ -23,6 +24,12 @@ framework = [
 
 [tool.uv]
 default-groups = "all"
+
+[project.scripts]
+machine = "cli_support.main:app"
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [build-system]
 requires = ["hatchling"]
