@@ -1,5 +1,5 @@
 {
-  "name": "agent-runtime-pydantic",
+  "name": "agent_runtime_pydantic",
   "version": "0.1.0",
   "description": "Pydantic-AI based agent runtime with tool-calling loop",
   "schema_version": "1.0.0",

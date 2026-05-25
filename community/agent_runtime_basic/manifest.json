@@ -1,5 +1,5 @@
 {
-  "name": "agent-runtime-basic",
+  "name": "agent_runtime_basic",
   "version": "0.1.0",
   "description": "Basic agent runtime with custom loop, no pydantic-ai dependency",
   "schema_version": "1.0.0",

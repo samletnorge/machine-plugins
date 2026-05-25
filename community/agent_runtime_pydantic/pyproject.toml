@@ -1,14 +1,14 @@
 [project]
-name = "machine-core-agent-runtime-pydantic"
+name = "agent_runtime_pydantic"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = ["pydantic-ai>=1.0.0"]
 
 
 [tool.hatch.build.targets.wheel]
+packages = ["."]
+sources = {"." = "agent_runtime_pydantic"}
 
-[tool.hatch.build.targets.wheel.force-include]
-"manifest.json" = "agent_runtime_pydantic/manifest.json"
 
 [build-system]
 requires = ["hatchling"]
