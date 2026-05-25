@@ -106,11 +106,26 @@ def dev_command(
         console.print("[red]Error: No .venv found. Run 'uv sync' first.[/red]")
         raise typer.Exit(code=1)
 
+    # Write a dev server bootstrap script into the project so it's importable
+    # from the project's venv (which doesn't have cli_support installed)
+    dev_server_code = f'''\
+"""Auto-generated dev server for machine dev. Do not edit."""
+import os, sys
+sys.path.insert(0, os.environ.get("MACHINE_CORE_ROOT", "."))
+import importlib
+module = importlib.import_module("{entry.rpartition(":")[0]}")
+machine = getattr(module, "{entry.rpartition(":")[2]}")
+from server_support.app import create_app
+app = create_app(machine)
+'''
+    dev_server_file = root / "_machine_dev_server.py"
+    dev_server_file.write_text(dev_server_code)
+
     cmd = [
         str(venv_python),
         "-m",
         "uvicorn",
-        "cli_support.commands._dev_server:app",
+        "_machine_dev_server:app",
         "--reload",
         "--host",
         host,
@@ -124,4 +139,8 @@ def dev_command(
         cmd.extend(["--reload-dir", str(src_dir)])
 
     full_env = {**os.environ, **env_vars}
-    subprocess.run(cmd, cwd=str(root), env=full_env)
+    try:
+        subprocess.run(cmd, cwd=str(root), env=full_env)
+    finally:
+        # Clean up generated dev server file
+        dev_server_file.unlink(missing_ok=True)
