@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-rag-support"
+name = "rag_support"
 version = "0.1.0"
 description = "RAG pipeline plugin for machine-core"
 requires-python = ">=3.12"
