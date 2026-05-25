@@ -41,6 +41,11 @@ plugins = [
     "provider_ollama",
 ]
 
+# Per-plugin configuration (overrides manifest defaults & env vars)
+[tool.machine-core.plugin_configs.provider-ollama]
+base_url = "http://localhost:9012"
+model = "gemma4:latest"
+
 [tool.hatch.metadata]
 allow-direct-references = true
 
