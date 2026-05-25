@@ -56,7 +56,7 @@ def dev_command(
 
     # Ensure agent_support is installed
     try:
-        import machine_agent  # noqa: F401
+        import agent_support  # noqa: F401
     except ImportError:
         console.print("[yellow]Installing agent-support plugin...[/yellow]")
         subprocess.run(
@@ -74,7 +74,7 @@ def dev_command(
 
     # Ensure tool_support is installed
     try:
-        import machine_tool  # noqa: F401
+        import tool_support  # noqa: F401
     except ImportError:
         console.print("[yellow]Installing tool-support plugin...[/yellow]")
         subprocess.run(
