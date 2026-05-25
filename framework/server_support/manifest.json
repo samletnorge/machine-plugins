@@ -1,5 +1,5 @@
 {
-  "name": "server-support",
+  "name": "server_support",
   "version": "0.11.0",
   "description": "Auto-generates FastAPI HTTP endpoints from Machine registry for agents, tools, workflows, and memory",
   "schema_version": "1.0.0",
@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_server:ServerSupportPlugin"
+    "entry_point": "server_support:ServerSupportPlugin"
   }
 }
