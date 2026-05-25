@@ -11,6 +11,7 @@ dependencies = [
     "machine_core",
     "agent_support",
     "tool_support",
+    "model_provider_support",
 ]
 
 [build-system]
@@ -25,3 +26,4 @@ packages = ["server_support"]
 machine_core = { git = "git+ssh://git@github.com/samletnorge/machine-core.git" }
 agent_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/agent_support" }
 tool_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/tool_support" }
+model_provider_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/model_provider_support" }

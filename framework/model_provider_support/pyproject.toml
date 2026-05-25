@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-model-provider-support"
+name = "model_provider_support"
 version = "0.5.0"
 description = "Defines the model_provider category for any model type"
 requires-python = ">=3.12"
@@ -10,4 +10,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["machine_model_provider"]
+packages = ["model_provider_support"]
