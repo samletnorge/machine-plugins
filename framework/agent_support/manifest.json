@@ -1,5 +1,5 @@
 {
-  "name": "agent-support",
+  "name": "agent_support",
   "version": "0.5.0",
   "description": "Defines the 'agent' category with AgentDefinition, handoff protocol, and agent lifecycle hooks",
   "schema_version": "1.0.0",
@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_agent:AgentSupportPlugin"
+    "entry_point": "agent_support:AgentSupportPlugin"
   }
 }
