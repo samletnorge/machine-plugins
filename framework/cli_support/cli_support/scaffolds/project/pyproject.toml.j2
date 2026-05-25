@@ -29,7 +29,11 @@ default-groups = "all"
 
 [tool.machine-core]
 entry = "src.main:machine"
-plugins = [    
+plugins = [
+    "tool_support",
+    "model_provider_support",
+    "agent_support",  
+    "voice_support",    
     "server_support",
     "eval_support",
     "tool_openapi",

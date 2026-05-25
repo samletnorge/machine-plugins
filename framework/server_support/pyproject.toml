@@ -12,6 +12,8 @@ dependencies = [
     "agent_support",
     "tool_support",
     "model_provider_support",
+    "vectorstore_support",
+    "voice_support",
 ]
 
 [build-system]
@@ -24,9 +26,15 @@ packages = ["server_support"]
 [tool.hatch.build.targets.wheel.force-include]
 "manifest.json" = "server_support/manifest.json"
 
+[tool.machine-core]
+plugins = [
+    "voice_support",   
+]
 
 [tool.uv.sources]
 machine_core = { git = "git+ssh://git@github.com/samletnorge/machine-core.git" }
 agent_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/agent_support" }
 tool_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/tool_support" }
 model_provider_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/model_provider_support" }
+vectorstore_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/vectorstore_support" }
+voice_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/voice_support" }

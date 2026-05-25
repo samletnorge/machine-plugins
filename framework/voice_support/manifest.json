@@ -1,5 +1,5 @@
 {
-  "name": "voice-support",
+  "name": "voice_support",
   "version": "0.1.0",
   "description": "Voice abstraction layer with TTS, STT, and realtime voice providers",
   "schema_version": "1.0.0",
@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_voice:VoiceSupportPlugin"
+    "entry_point": "voice_support:VoiceSupportPlugin"
   }
 }
