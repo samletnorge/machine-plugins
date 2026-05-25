@@ -19,6 +19,10 @@ from .converters import pydantic_result_to_agent_run_result, tool_definition_to_
 class PydanticAgentRunner:
     """Agent runtime that wraps pydantic-ai Agent for the tool-calling loop."""
 
+    description = "Pydantic-AI based agent runtime with structured output support"
+    supports_streaming = False
+    supports_tools = True
+
     def __init__(
         self,
         model_resolver: Callable[[str], Any],

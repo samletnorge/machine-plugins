@@ -31,6 +31,10 @@ from .messages import (
 class BasicAgentRunner:
     """Agent runtime using a manual loop: model -> tool calls -> execute -> repeat."""
 
+    description = "Custom loop agent runtime — no external framework dependency"
+    supports_streaming = False
+    supports_tools = True
+
     def __init__(
         self,
         provider_resolver: Callable[[str], Any],
