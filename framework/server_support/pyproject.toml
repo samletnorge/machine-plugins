@@ -3,7 +3,13 @@ name = "server_support"
 version = "0.11.0"
 description = "Auto-generated FastAPI HTTP server for machine-core"
 requires-python = ">=3.12"
-dependencies = ["fastapi>=0.100.0", "sse-starlette>=1.6.0", "uvicorn[standard]>=0.20.0", "loguru>=0.7.0"]
+dependencies = [
+    "fastapi>=0.100.0", 
+    "sse-starlette>=1.6.0", 
+    "uvicorn[standard]>=0.20.0", 
+    "loguru>=0.7.0",
+    "machine_core",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -11,3 +17,18 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["server_support"]
+
+
+[tool.uv.sources]
+machine_core = { git = "git+ssh://git@github.com/samletnorge/machine-core.git" }
+agent_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/agent_support" }
+tool_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/tool_support" }
+
+[dependency-groups]
+framework = [
+    "agent_support",
+    "tool_support",
+]
+
+[tool.uv]
+default-groups = "all"
