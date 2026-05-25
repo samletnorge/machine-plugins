@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import inspect
 import re
+import typing
 from typing import Any
 
 from fastapi import APIRouter, Request, HTTPException
@@ -149,12 +151,12 @@ def generate_routes(machine: Any) -> APIRouter:
                     # Stream handling
                     if _is_stream:
                         try:
-                            gen = await fn(**kwargs)
+                            gen = fn(**kwargs)
+                            if inspect.isawaitable(gen):
+                                gen = await gen
                             return sse_response(gen)
                         except TypeError:
                             # Same retry logic for stream
-                            import inspect, typing
-
                             sig = inspect.signature(fn)
                             params = [
                                 p for p in sig.parameters.values() if p.name != "self"
@@ -169,9 +171,11 @@ def generate_routes(machine: Any) -> APIRouter:
                                 hints = typing.get_type_hints(fn)
                                 ann = hints.get(params[0].name)
                             if ann and hasattr(ann, "model_validate"):
-                                gen = await fn(ann.model_validate(kwargs))
+                                gen = fn(ann.model_validate(kwargs))
                             else:
-                                gen = await fn(kwargs)
+                                gen = fn(kwargs)
+                            if inspect.isawaitable(gen):
+                                gen = await gen
                             return sse_response(gen)
                         except Exception as e:
                             logger.error(f"Stream error: {e}")
@@ -179,14 +183,13 @@ def generate_routes(machine: Any) -> APIRouter:
 
                     # Normal call
                     try:
-                        result = await fn(**kwargs)
+                        result = fn(**kwargs)
+                        if inspect.isawaitable(result):
+                            result = await result
                     except TypeError as e:
                         # Retry: inspect signature and build typed request if possible
                         logger.debug(f"Retrying with positional arg: {e}")
                         try:
-                            import inspect
-                            import typing
-
                             sig = inspect.signature(fn)
                             params = [
                                 p for p in sig.parameters.values() if p.name != "self"
@@ -206,9 +209,11 @@ def generate_routes(machine: Any) -> APIRouter:
 
                             if ann and hasattr(ann, "model_validate"):
                                 typed_arg = ann.model_validate(kwargs)
-                                result = await fn(typed_arg)
+                                result = fn(typed_arg)
                             else:
-                                result = await fn(kwargs)
+                                result = fn(kwargs)
+                            if inspect.isawaitable(result):
+                                result = await result
                         except Exception as retry_err:
                             logger.error(f"Retry also failed: {retry_err!r}")
                             raise HTTPException(500, str(e))
