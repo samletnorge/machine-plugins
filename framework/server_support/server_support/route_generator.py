@@ -209,7 +209,8 @@ def generate_routes(machine: Any) -> APIRouter:
                                 result = await fn(typed_arg)
                             else:
                                 result = await fn(kwargs)
-                        except Exception:
+                        except Exception as retry_err:
+                            logger.error(f"Retry also failed: {retry_err!r}")
                             raise HTTPException(500, str(e))
                     except Exception as e:
                         logger.error(f"Operation error: {e}")
