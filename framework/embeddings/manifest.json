@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_embeddings:EmbeddingsPlugin"
+    "entry_point": "embeddings:EmbeddingsPlugin"
   }
 }
