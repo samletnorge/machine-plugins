@@ -30,12 +30,12 @@ default-groups = "all"
 [tool.machine-core]
 entry = "src.main:machine"
 plugins = [    
+    "server_support",
     "eval_support",
     "tool_openapi",
     "tool_filter_rag",
     "rag_support",
     "provider_ollama",
-    "server_support",
 ]
 
 [tool.hatch.metadata]
