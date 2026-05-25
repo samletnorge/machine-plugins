@@ -51,6 +51,10 @@ model = "gemma4:latest"
 [tool.machine-core.plugin_configs.eval-support]
 judge_llm = { provider = "ollama", model = "gemma4:latest" }
 
+[tool.machine-core.plugin_configs.rag-support]
+reranker_llm = { provider = "ollama", model = "gemma4:latest" }
+extractor_llm = { provider = "ollama", model = "gemma4:latest" }
+
 [tool.hatch.metadata]
 allow-direct-references = true
 
