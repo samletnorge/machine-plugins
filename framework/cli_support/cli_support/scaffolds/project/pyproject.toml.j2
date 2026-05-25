@@ -34,17 +34,20 @@ plugins = [
     "model_provider_support",
     "agent_support",  
     "server_support",
+    "provider_ollama",
     "eval_support",
     "tool_openapi",
     "tool_filter_rag",
     "rag_support",
-    "provider_ollama",
 ]
 
 # Per-plugin configuration (overrides manifest defaults & env vars)
 [tool.machine-core.plugin_configs.provider-ollama]
 base_url = "http://localhost:9012"
 model = "gemma4:latest"
+
+[tool.machine-core.plugin_configs.eval-support]
+judge_llm = { provider = "ollama", model = "gemma4:latest" }
 
 [tool.hatch.metadata]
 allow-direct-references = true
