@@ -1,5 +1,5 @@
 [project]
-name = "tool-filter-rag"
+name = "tool_filter_rag"
 version = "0.1.0"
 description = "Semantic tool filtering for machine-core"
 requires-python = ">=3.12"
