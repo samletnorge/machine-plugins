@@ -9,6 +9,8 @@ dependencies = [
     "uvicorn[standard]>=0.20.0", 
     "loguru>=0.7.0",
     "machine_core",
+    "agent_support",
+    "tool_support",
 ]
 
 [build-system]
@@ -23,12 +25,3 @@ packages = ["server_support"]
 machine_core = { git = "git+ssh://git@github.com/samletnorge/machine-core.git" }
 agent_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/agent_support" }
 tool_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/tool_support" }
-
-[dependency-groups]
-framework = [
-    "agent_support",
-    "tool_support",
-]
-
-[tool.uv]
-default-groups = "all"
