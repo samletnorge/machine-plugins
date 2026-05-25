@@ -17,7 +17,7 @@ module = importlib.import_module(module_path)
 machine = getattr(module, attr_name)
 
 try:
-    from machine_server.app import create_app
+    from server_support.app import create_app
 except ImportError:
     raise ImportError(
         "server-support plugin is required for 'machine dev'.\n"

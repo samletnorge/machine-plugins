@@ -38,7 +38,7 @@ def dev_command(
 
     # Ensure server_support is installed (required for machine dev)
     try:
-        import machine_server  # noqa: F401
+        import server_support  # noqa: F401
     except ImportError:
         console.print("[yellow]Installing server-support plugin...[/yellow]")
         subprocess.run(

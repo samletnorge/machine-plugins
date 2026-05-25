@@ -37,7 +37,7 @@ def ensure_server_running(server_url: str, port: int, console: Console) -> None:
 
     # Check that server_support is available
     try:
-        import machine_server  # noqa: F401
+        import server_support  # noqa: F401
     except ImportError:
         console.print(
             "[yellow]server-support not installed, skipping auto-start.[/yellow]"

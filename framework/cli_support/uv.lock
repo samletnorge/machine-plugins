@@ -54,6 +54,7 @@ source = { editable = "." }
 dependencies = [
     { name = "httpx" },
     { name = "jinja2" },
+    { name = "machine-core" },
     { name = "rich" },
     { name = "server-support" },
     { name = "textual" },
@@ -69,6 +70,7 @@ framework = [
 requires-dist = [
     { name = "httpx", specifier = ">=0.27" },
     { name = "jinja2", specifier = ">=3.1.0" },
+    { name = "machine-core", git = "ssh://git@github.com/samletnorge/machine-core.git" },
     { name = "rich", specifier = ">=13.0.0" },
     { name = "server-support", git = "ssh://git@github.com/samletnorge/machine-plugins.git?subdirectory=framework%2Fserver_support" },
     { name = "textual", specifier = ">=3.0" },
