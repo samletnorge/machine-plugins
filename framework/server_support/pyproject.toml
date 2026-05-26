@@ -16,6 +16,8 @@ dependencies = [
     "voice_support",
     "agent_runtime_pydantic",
     "agent_runtime_basic",
+    "embeddings",
+    "embeddings_ollama",
 ]
 
 [build-system]
@@ -38,3 +40,5 @@ vectorstore_support = { git = "git+ssh://git@github.com/samletnorge/machine-plug
 voice_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/voice_support" }
 agent_runtime_pydantic = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_runtime_pydantic" }
 agent_runtime_basic = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_runtime_basic" }
+embeddings = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/embeddings" }
+embeddings_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/embeddings_ollama" }
