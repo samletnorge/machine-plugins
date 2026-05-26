@@ -131,7 +131,7 @@ class BrregPipeline:
         total_docs = len(merged_docs)
 
         # Batch settings
-        EMBED_BATCH_SIZE = 64  # Embed N texts in one call
+        EMBED_BATCH_SIZE = 256  # Embed N texts in one call
 
         try:
             from tqdm import tqdm
@@ -187,8 +187,9 @@ class BrregPipeline:
             org_nr = doc.get("organisasjonsnummer", "unknown")
             doc_json = json.dumps(doc, ensure_ascii=False, default=str)
 
-            # Chunk
-            if chunker:
+            # Only chunk if document exceeds 30K chars (~40K token context window)
+            # Most company records are 1-5KB, so they stay as a single chunk.
+            if chunker and len(doc_json) > 30000:
                 chunks = chunker.chunk(doc_json)
             else:
                 chunks = [
