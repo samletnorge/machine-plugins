@@ -1,5 +1,5 @@
 {
-  "name": "embeddings-ollama",
+  "name": "embeddings_ollama",
   "version": "0.1.0",
   "description": "Ollama embedding provider via OpenAI-compatible API",
   "schema_version": "1.0.0",
