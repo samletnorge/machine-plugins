@@ -110,6 +110,71 @@ class TestOllamaProviderGenerate:
         payload = call_args.kwargs.get("json") or call_args[1].get("json")
         assert len(payload["messages"]) == 2
 
+    async def test_generate_preserves_tool_calls(self, provider):
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = {
+            "model": "llama3.2",
+            "message": {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                    {
+                        "id": "call_1",
+                        "type": "function",
+                        "function": {
+                            "name": "hentEnhet",
+                            "arguments": '{"organisasjonsnummer": "923209069"}',
+                        },
+                    }
+                ],
+            },
+            "prompt_eval_count": 10,
+            "eval_count": 3,
+        }
+
+        with patch("httpx.AsyncClient") as MockClient:
+            client_instance = AsyncMock()
+            client_instance.post.return_value = mock_resp
+            client_instance.__aenter__ = AsyncMock(return_value=client_instance)
+            client_instance.__aexit__ = AsyncMock(return_value=False)
+            MockClient.return_value = client_instance
+
+            request = ModelRequest(
+                provider="ollama",
+                model="llama3.2",
+                input=[{"role": "user", "content": "Fetch company 923209069"}],
+                parameters={
+                    "tools": [
+                        {
+                            "type": "function",
+                            "function": {
+                                "name": "hentEnhet",
+                                "description": "Fetch company by organization number",
+                                "parameters": {
+                                    "type": "object",
+                                    "properties": {
+                                        "organisasjonsnummer": {"type": "string"}
+                                    },
+                                },
+                            },
+                        }
+                    ]
+                },
+            )
+            result = await provider.generate(request)
+
+        assert result.output == ""
+        assert result.tool_calls == [
+            {
+                "id": "call_1",
+                "type": "function",
+                "function": {
+                    "name": "hentEnhet",
+                    "arguments": '{"organisasjonsnummer": "923209069"}',
+                },
+            }
+        ]
+
     async def test_generate_http_error_raises(self, provider):
         import httpx
 

@@ -48,15 +48,17 @@ class OllamaLLMProvider:
             data = resp.json()
 
         duration = (time.monotonic() - start) * 1000
+        message = data.get("message", {})
         return ModelResponse(
             provider="ollama",
             model=data.get("model", request.model or self.model),
-            output=data["message"]["content"],
+            output=message.get("content"),
             usage={
                 "prompt_tokens": data.get("prompt_eval_count", 0),
                 "completion_tokens": data.get("eval_count", 0),
             },
             duration_ms=duration,
+            tool_calls=message.get("tool_calls"),
         )
 
     async def stream(self, request: ModelRequest) -> AsyncIterator[str]:
