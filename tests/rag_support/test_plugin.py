@@ -105,7 +105,7 @@ async def test_plugin_registers_semantic_chunker_with_config():
         config={
             "semantic_chunker": {
                 "provider": "ollama",
-                "model": "nomic-embed-text:latest",
+                "model": "qwen3-embedding:8b:latest",
             },
         }
     )

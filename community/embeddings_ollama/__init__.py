@@ -19,7 +19,7 @@ class OllamaEmbeddingPlugin:
         from .provider import OllamaEmbeddingProvider
 
         base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-        model = os.environ.get("OLLAMA_EMBED_MODEL", "nomic-embed-text")
+        model = os.environ.get("OLLAMA_EMBED_MODEL", "qwen3-embedding:8b")
 
         provider = OllamaEmbeddingProvider(base_url=base_url, model=model)
         ctx.register("embedding", "ollama", provider)

@@ -11,7 +11,7 @@ from embeddings.schemas import EmbeddingRequest, EmbeddingResult
 
 class OllamaEmbeddingProvider:
     def __init__(
-        self, base_url: str = "http://localhost:11434", model: str = "nomic-embed-text"
+        self, base_url: str = "http://localhost:11434", model: str = "qwen3-embedding:8b"
     ):
         self.base_url = base_url
         self.model = model

@@ -23,10 +23,10 @@ class TestOllamaEmbeddingProvider:
         )
 
         return OllamaEmbeddingProvider(
-            base_url="http://localhost:11434", model="nomic-embed-text"
+            base_url="http://localhost:11434", model="qwen3-embedding:8b"
         )
 
-    def _mock_response(self, vectors, model="nomic-embed-text"):
+    def _mock_response(self, vectors, model="qwen3-embedding:8b"):
         resp = MagicMock()
         resp.raise_for_status = MagicMock()
         resp.json.return_value = {
@@ -50,7 +50,7 @@ class TestOllamaEmbeddingProvider:
         assert isinstance(result, EmbeddingResult)
         assert result.vectors == vectors
         assert result.dimensions == 3
-        assert result.model_ref == "nomic-embed-text"
+        assert result.model_ref == "qwen3-embedding:8b"
 
     async def test_embed_batch(self, provider):
         vectors = [[0.1, 0.2], [0.3, 0.4]]
