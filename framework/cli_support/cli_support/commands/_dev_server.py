@@ -27,7 +27,7 @@ except ImportError:
 app = create_app(machine)
 
 try:
-    from machine_studio.app import create_studio_app
+    from studio_support.app import create_studio_app
 
     studio = create_studio_app(machine)
     app.mount("/_studio", studio)

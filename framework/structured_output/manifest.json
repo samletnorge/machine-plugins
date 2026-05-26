@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_structured_output:StructuredOutputPlugin"
+    "entry_point": "structured_output:StructuredOutputPlugin"
   }
 }

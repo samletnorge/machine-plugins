@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_studio:StudioSupportPlugin"
+    "entry_point": "studio_support:StudioSupportPlugin"
   }
 }
