@@ -5,11 +5,12 @@ description = "A machine-core AI agent project"
 requires-python = ">=3.12"
 dependencies = [
     "server_support",
+    "agent-brreg-expert",
 ]
 
 [tool.uv.sources]
 server_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/server_support" }
-
+agent-brreg-expert = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_brreg_expert" }
 
 [tool.uv]
 default-groups = "all"
