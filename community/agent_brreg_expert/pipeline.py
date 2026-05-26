@@ -73,10 +73,17 @@ class BrregPipeline:
         start = time.monotonic()
         table = self._config.get("vectorstore_table", "brreg_companies")
 
-        # Step 1: Download all registries in parallel
+        # Step 1: Download all registries
+        # Download entities first (largest file, ~200MB) to avoid server throttling
         logger.info("brreg-pipeline: starting bulk download...")
-        entities, sub_entities, roles, frivillig, parti = await asyncio.gather(
-            download_entities(),
+        try:
+            entities = await download_entities()
+        except Exception as e:
+            logger.error("Failed to download entities: {}", e)
+            return {"status": "error", "error": str(e)}
+
+        # Download remaining in parallel (smaller files)
+        sub_entities, roles, frivillig, parti = await asyncio.gather(
             download_sub_entities(),
             download_roles(),
             download_frivillig(),
@@ -85,9 +92,6 @@ class BrregPipeline:
         )
 
         # Handle partial failures
-        if isinstance(entities, Exception):
-            logger.error("Failed to download entities: {}", entities)
-            return {"status": "error", "error": str(entities)}
         if isinstance(sub_entities, Exception):
             logger.warning("Failed to download sub-entities: {}", sub_entities)
             sub_entities = []

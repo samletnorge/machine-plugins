@@ -55,29 +55,49 @@ def parse_csv_bytes(data: bytes, delimiter: str = ";") -> list[dict[str, Any]]:
     return [dict(row) for row in reader]
 
 
-async def _stream_download(url: str, label: str) -> bytes:
-    """Stream-download a large file with progress logging."""
-    logger.info("Streaming download: {} from {}", label, url)
-    chunks: list[bytes] = []
-    total = 0
-    async with httpx.AsyncClient(
-        timeout=httpx.Timeout(DOWNLOAD_TIMEOUT, connect=30.0)
-    ) as client:
-        async with client.stream("GET", url) as resp:
-            resp.raise_for_status()
-            expected = resp.headers.get("content-length", "?")
-            async for chunk in resp.aiter_bytes(chunk_size=1024 * 256):
-                chunks.append(chunk)
-                total += len(chunk)
-                if total % (50 * 1024 * 1024) < len(chunk):
-                    logger.info(
-                        "{}: downloaded {} MB / {} bytes expected",
-                        label,
-                        total // (1024 * 1024),
-                        expected,
-                    )
-    logger.info("{}: download complete ({} MB)", label, total // (1024 * 1024))
-    return b"".join(chunks)
+MAX_RETRIES = 3
+
+
+async def _stream_download(url: str, label: str, retries: int = MAX_RETRIES) -> bytes:
+    """Stream-download a large file with progress logging and retries."""
+    import asyncio
+
+    for attempt in range(1, retries + 1):
+        logger.info("Streaming download (attempt {}): {} from {}", attempt, label, url)
+        chunks: list[bytes] = []
+        total = 0
+        try:
+            async with httpx.AsyncClient(
+                timeout=httpx.Timeout(DOWNLOAD_TIMEOUT, connect=30.0)
+            ) as client:
+                async with client.stream("GET", url) as resp:
+                    resp.raise_for_status()
+                    expected = resp.headers.get("content-length", "?")
+                    async for chunk in resp.aiter_bytes(chunk_size=1024 * 256):
+                        chunks.append(chunk)
+                        total += len(chunk)
+                        if total % (50 * 1024 * 1024) < len(chunk):
+                            logger.info(
+                                "{}: downloaded {} MB / {} bytes expected",
+                                label,
+                                total // (1024 * 1024),
+                                expected,
+                            )
+            logger.info("{}: download complete ({} MB)", label, total // (1024 * 1024))
+            return b"".join(chunks)
+        except (httpx.RemoteProtocolError, httpx.ReadTimeout, httpx.ReadError) as e:
+            if attempt < retries:
+                wait = 5 * attempt
+                logger.warning(
+                    "{}: download failed at {} MB ({}), retrying in {}s...",
+                    label,
+                    total // (1024 * 1024),
+                    e,
+                    wait,
+                )
+                await asyncio.sleep(wait)
+            else:
+                raise
 
 
 async def download_entities() -> list[dict[str, Any]]:
