@@ -1,0 +1,282 @@
+"""BrregPipeline — ingest + retrieve for Norwegian company data."""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import time
+from typing import Any
+
+from loguru import logger
+
+try:
+    from embeddings.schemas import EmbeddingRequest
+    from rag_support.models import RankedResult
+    from vectorstore_support.schemas import SearchRequest, UpsertRequest
+except ImportError:
+    # Lightweight fallbacks for testing without full framework
+    from dataclasses import dataclass, field as dc_field
+
+    @dataclass
+    class EmbeddingRequest:  # type: ignore[no-redef]
+        input: str | list[str] = ""
+        model_ref: str | None = None
+        parameters: dict = dc_field(default_factory=dict)
+
+    @dataclass
+    class RankedResult:  # type: ignore[no-redef]
+        id: str = ""
+        text: str = ""
+        original_score: float = 0.0
+        rerank_score: float = 0.0
+        metadata: dict = dc_field(default_factory=dict)
+
+    @dataclass
+    class SearchRequest:  # type: ignore[no-redef]
+        query_vector: list = dc_field(default_factory=list)
+        top_k: int = 10
+        table: str = ""
+
+    @dataclass
+    class UpsertRequest:  # type: ignore[no-redef]
+        id: str = ""
+        vector: list = dc_field(default_factory=list)
+        text: str = ""
+        metadata: dict = dc_field(default_factory=dict)
+        table: str = ""
+
+
+from .ingestor import (
+    download_entities,
+    download_sub_entities,
+    download_roles,
+    download_frivillig,
+    download_parti,
+)
+from .merger import merge_entities
+
+# Batch size for upsert operations
+UPSERT_BATCH_SIZE = 100
+
+
+class BrregPipeline:
+    """RAG pipeline for Brønnøysundregistrene company data."""
+
+    description = "Norwegian companies RAG pipeline — ingest all Brreg registries, retrieve with reranking"
+
+    def __init__(self, machine: Any, config: dict[str, Any]) -> None:
+        self._machine = machine
+        self._config = config
+
+    async def ingest(self, **kwargs: Any) -> dict[str, Any]:
+        """Full ingestion: download → merge → chunk → extract → embed → upsert."""
+        start = time.monotonic()
+        table = self._config.get("vectorstore_table", "brreg_companies")
+
+        # Step 1: Download all registries in parallel
+        logger.info("brreg-pipeline: starting bulk download...")
+        entities, sub_entities, roles, frivillig, parti = await asyncio.gather(
+            download_entities(),
+            download_sub_entities(),
+            download_roles(),
+            download_frivillig(),
+            download_parti(),
+            return_exceptions=True,
+        )
+
+        # Handle partial failures
+        if isinstance(entities, Exception):
+            logger.error("Failed to download entities: {}", entities)
+            return {"status": "error", "error": str(entities)}
+        if isinstance(sub_entities, Exception):
+            logger.warning("Failed to download sub-entities: {}", sub_entities)
+            sub_entities = []
+        if isinstance(roles, Exception):
+            logger.warning("Failed to download roles: {}", roles)
+            roles = []
+        if isinstance(frivillig, Exception):
+            logger.warning("Failed to download frivillig: {}", frivillig)
+            frivillig = []
+        if isinstance(parti, Exception):
+            logger.warning("Failed to download parti: {}", parti)
+            parti = []
+
+        # Step 2: Merge per org number
+        logger.info("brreg-pipeline: merging {} entities...", len(entities))
+        merged_docs = merge_entities(
+            entities,
+            sub_entities,
+            roles,
+            frivillig_records=frivillig,
+            parti_records=parti,
+        )
+        logger.info("brreg-pipeline: merged into {} documents", len(merged_docs))
+
+        # Step 3: Process each document (chunk → extract → embed → upsert)
+        embedder = self._machine.resolve("embedding", "ollama")
+        vectorstore = self._machine.resolve("vector_store", "lancedb")
+        chunker = self._machine.resolve("chunker", "json")
+        summary_extractor = self._machine.resolve("metadata_extractor", "summary")
+        keywords_extractor = self._machine.resolve("metadata_extractor", "keywords")
+
+        if not embedder or not vectorstore:
+            return {"status": "error", "error": "Missing embedder or vectorstore"}
+
+        docs_processed = 0
+        chunks_upserted = 0
+        upsert_batch: list = []
+
+        for doc in merged_docs:
+            org_nr = doc.get("organisasjonsnummer", "unknown")
+            doc_json = json.dumps(doc, ensure_ascii=False, default=str)
+
+            # Chunk
+            if chunker:
+                chunks = chunker.chunk(doc_json)
+            else:
+                chunks = [
+                    type("C", (), {"text": doc_json, "index": 0, "metadata": {}})()
+                ]
+
+            for chunk in chunks:
+                chunk_id = f"{org_nr}_{chunk.index}"
+
+                # Extract metadata
+                summary_text = ""
+                keywords = []
+                if summary_extractor:
+                    try:
+                        meta = await summary_extractor.extract(chunk.text)
+                        summary_text = meta.summary or ""
+                    except Exception as e:
+                        logger.debug(
+                            "Summary extraction failed for {}: {}", chunk_id, e
+                        )
+
+                if keywords_extractor:
+                    try:
+                        meta = await keywords_extractor.extract(chunk.text)
+                        keywords = meta.keywords or []
+                    except Exception as e:
+                        logger.debug(
+                            "Keywords extraction failed for {}: {}", chunk_id, e
+                        )
+
+                # Embed the summary (or chunk text if no summary)
+                embed_text = summary_text if summary_text else chunk.text[:2000]
+                try:
+                    embed_result = await embedder.embed(
+                        EmbeddingRequest(input=embed_text)
+                    )
+                    vector = embed_result.vectors[0]
+                except Exception as e:
+                    logger.warning("Embedding failed for {}: {}", chunk_id, e)
+                    continue
+
+                # Build upsert record
+                metadata = {
+                    "org_nr": org_nr,
+                    "name": doc.get("navn", ""),
+                    "keywords": keywords,
+                    "kommune": doc.get("forretningsadresse", {}).get("kommune", "")
+                    if isinstance(doc.get("forretningsadresse"), dict)
+                    else "",
+                    "naeringskode": doc.get("naeringskode1", {}).get("kode", "")
+                    if isinstance(doc.get("naeringskode1"), dict)
+                    else "",
+                    "type": doc.get("organisasjonsform", {}).get("kode", "")
+                    if isinstance(doc.get("organisasjonsform"), dict)
+                    else "",
+                    "summary": summary_text,
+                }
+
+                upsert_batch.append(
+                    UpsertRequest(
+                        id=chunk_id,
+                        vector=vector,
+                        text=chunk.text,
+                        metadata=metadata,
+                        table=table,
+                    )
+                )
+                chunks_upserted += 1
+
+                # Flush batch
+                if len(upsert_batch) >= UPSERT_BATCH_SIZE:
+                    await vectorstore.upsert(upsert_batch)
+                    upsert_batch = []
+
+            docs_processed += 1
+            if docs_processed % 1000 == 0:
+                logger.info(
+                    "brreg-pipeline: processed {}/{} documents",
+                    docs_processed,
+                    len(merged_docs),
+                )
+
+        # Flush remaining
+        if upsert_batch:
+            await vectorstore.upsert(upsert_batch)
+
+        duration = time.monotonic() - start
+        logger.info(
+            "brreg-pipeline: ingestion complete — {} docs, {} chunks in {:.1f}s",
+            docs_processed,
+            chunks_upserted,
+            duration,
+        )
+        return {
+            "status": "completed",
+            "documents_processed": docs_processed,
+            "chunks_upserted": chunks_upserted,
+            "duration_seconds": round(duration, 1),
+        }
+
+    async def retrieve(self, query: str, **kwargs: Any) -> list[RankedResult]:
+        """Retrieve relevant chunks: embed → vector search → rerank."""
+        table = self._config.get("vectorstore_table", "brreg_companies")
+        retrieve_top_k = self._config.get("retrieve_top_k", 20)
+        rerank_top_k = self._config.get("rerank_top_k", 5)
+
+        embedder = self._machine.resolve("embedding", "ollama")
+        vectorstore = self._machine.resolve("vector_store", "lancedb")
+        reranker = self._machine.resolve("reranker", "llm")
+
+        if not embedder or not vectorstore:
+            logger.warning(
+                "brreg-pipeline: retrieve called but embedder/vectorstore missing"
+            )
+            return []
+
+        # Embed query
+        embed_result = await embedder.embed(EmbeddingRequest(input=query))
+        query_vector = embed_result.vectors[0]
+
+        # Vector search
+        candidates = await vectorstore.search(
+            SearchRequest(
+                query_vector=query_vector,
+                top_k=retrieve_top_k,
+                table=table,
+            )
+        )
+
+        if not candidates:
+            return []
+
+        # Rerank
+        if reranker:
+            ranked = await reranker.rerank(query=query, results=candidates)
+            return ranked[:rerank_top_k]
+
+        # No reranker — return raw results as RankedResult
+        return [
+            RankedResult(
+                id=c.id,
+                text=c.text or "",
+                original_score=c.score,
+                rerank_score=c.score,
+                metadata=c.metadata,
+            )
+            for c in candidates[:rerank_top_k]
+        ]
