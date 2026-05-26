@@ -89,7 +89,7 @@ class ConfigScreen(Widget):
                 pass
 
         # 4. Server URL setting
-        server_url = getattr(self.app, "server_url", "http://localhost:8000")
+        server_url = getattr(self.app, "server_url", "http://localhost:8008")
         self._config_items["server"] = (
             f"Server URL: {server_url}\n\n"
             f"Plugin directory: {PLUGIN_DIR}\n"

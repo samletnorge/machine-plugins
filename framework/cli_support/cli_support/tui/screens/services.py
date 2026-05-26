@@ -6,6 +6,7 @@ import asyncio
 import os
 import subprocess
 import sys
+from urllib.parse import urlparse
 
 from textual.app import ComposeResult
 from textual.containers import Vertical, Horizontal
@@ -18,6 +19,11 @@ import httpx
 SERVER_LOG_FILE = (
     __import__("pathlib").Path.home() / ".config" / "machine-core" / "server.log"
 )
+
+
+def _server_port(server_url: str) -> int:
+    parsed = urlparse(server_url)
+    return parsed.port or 8008
 
 
 class ServicesScreen(Widget):
@@ -70,7 +76,7 @@ class ServicesScreen(Widget):
                 if self._server_process is None and self._tail_task is None:
                     self._start_log_tail()
 
-        except (httpx.ConnectError, httpx.ReadTimeout):
+        except httpx.HTTPError:
             status.update(
                 f"Server: [red]● stopped[/red]\nExpected at: {self.app.server_url}"
             )
@@ -110,7 +116,7 @@ class ServicesScreen(Widget):
                     "--host",
                     "127.0.0.1",
                     "--port",
-                    "8000",
+                    str(_server_port(self.app.server_url)),
                     "--log-level",
                     "info",
                 ],
@@ -131,7 +137,7 @@ class ServicesScreen(Widget):
                         if resp.status_code == 200:
                             log.write_line("[green]Server is healthy![/green]")
                             break
-                except (httpx.ConnectError, httpx.ReadTimeout):
+                except httpx.HTTPError:
                     continue
             else:
                 log.write_line(
@@ -168,8 +174,9 @@ class ServicesScreen(Widget):
         else:
             # Try to kill by port
             try:
+                port = str(_server_port(self.app.server_url))
                 result = subprocess.run(
-                    ["lsof", "-ti", ":8000"],
+                    ["lsof", "-ti", f":{port}"],
                     capture_output=True,
                     text=True,
                 )
@@ -178,18 +185,18 @@ class ServicesScreen(Widget):
                     for pid in pids:
                         subprocess.run(["kill", pid.strip()], capture_output=True)
                     log.write_line(
-                        f"Killed process(es) on port 8000: {', '.join(pids)}"
+                        f"Killed process(es) on port {port}: {', '.join(pids)}"
                     )
                 else:
-                    log.write_line("No process found on port 8000.")
+                    log.write_line(f"No process found on port {port}.")
             except FileNotFoundError:
                 # lsof not available, try fuser
                 try:
-                    subprocess.run(["fuser", "-k", "8000/tcp"], capture_output=True)
+                    subprocess.run(["fuser", "-k", f"{port}/tcp"], capture_output=True)
                     log.write_line("Server stopped (killed by port).")
                 except Exception:
                     log.write_line(
-                        "[red]Could not stop server. Try: kill $(lsof -ti:8000)[/red]"
+                        f"[red]Could not stop server. Try: kill $(lsof -ti:{port})[/red]"
                     )
 
         await asyncio.sleep(0.5)

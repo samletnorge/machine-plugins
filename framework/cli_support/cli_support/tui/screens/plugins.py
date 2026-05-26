@@ -87,7 +87,7 @@ class PluginsScreen(Widget):
                                 )
                         except Exception:
                             pass
-        except (httpx.ConnectError, httpx.ReadTimeout):
+        except httpx.HTTPError:
             pass
 
         # Source 2: Local manifests in ~/.config/machine-core/plugins/

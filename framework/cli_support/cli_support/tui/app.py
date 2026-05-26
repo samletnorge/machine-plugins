@@ -17,7 +17,7 @@ class MachineApp(App):
         ("?", "help", "Help"),
     ]
 
-    def __init__(self, server_url: str = "http://localhost:8000") -> None:
+    def __init__(self, server_url: str = "http://localhost:8008") -> None:
         super().__init__()
         self.server_url = server_url
 

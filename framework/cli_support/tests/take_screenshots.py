@@ -67,7 +67,7 @@ async def take_screenshots():
 
                     from textual.widgets import TabbedContent
 
-                    app = MachineApp(server_url="http://localhost:8000")
+                    app = MachineApp(server_url="http://localhost:8008")
                     async with app.run_test(size=(120, 35)) as pilot:
                         tabs = app.query_one(TabbedContent)
 

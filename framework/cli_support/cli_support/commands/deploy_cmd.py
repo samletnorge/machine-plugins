@@ -28,7 +28,7 @@ def deploy_command(
         "-t",
         help="Deployment target (docker, dokploy, vercel, cloudflare).",
     ),
-    port: int = typer.Option(8000, "--port", "-p", help="Port to expose."),
+    port: int = typer.Option(8008, "--port", "-p", help="Port to expose."),
     env: list[str] = typer.Option(
         [], "--env", "-e", help="Environment variables (KEY=VALUE)."
     ),

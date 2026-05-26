@@ -20,7 +20,7 @@ console = Console()
 
 def dev_command(
     port: int = typer.Option(
-        8000, "--port", "-p", help="Port to run the dev server on."
+        8008, "--port", "-p", help="Port to run the dev server on."
     ),
     host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to."),
 ):

@@ -39,7 +39,7 @@ def main(
         from .tui.app import MachineApp
         from ._server_launcher import ensure_server_running
 
-        port = 8000
+        port = 8008
         server_url = f"http://127.0.0.1:{port}"
 
         # Auto-start server in background if not already running

@@ -67,7 +67,7 @@ class TestPluginsScreen:
             mock_instance.__aexit__ = AsyncMock(return_value=None)
             mock_client.return_value = mock_instance
 
-            app = MachineApp(server_url="http://localhost:8000")
+            app = MachineApp(server_url="http://localhost:8008")
             async with app.run_test() as pilot:
                 await pilot.pause()
                 list_view = app.query_one("#plugin-list", ListView)
@@ -98,7 +98,7 @@ class TestStoreScreen:
                 mock_installer.installed_plugins.return_value = []
                 mock_pi.return_value = mock_installer
 
-                app = MachineApp(server_url="http://localhost:8000")
+                app = MachineApp(server_url="http://localhost:8008")
                 async with app.run_test() as pilot:
                     # Switch to Store tab
                     await pilot.click("#store-tab")
@@ -117,7 +117,7 @@ class TestStoreScreen:
                 mock_pi.return_value = MagicMock()
                 mock_pi.return_value.installed_plugins.return_value = []
 
-                app = MachineApp(server_url="http://localhost:8000")
+                app = MachineApp(server_url="http://localhost:8008")
                 async with app.run_test() as pilot:
                     await pilot.click("#store-tab")
                     await pilot.pause()
@@ -177,7 +177,7 @@ class TestServicesScreen:
             mock_instance.__aexit__ = AsyncMock(return_value=None)
             mock_client.return_value = mock_instance
 
-            app = MachineApp(server_url="http://localhost:8000")
+            app = MachineApp(server_url="http://localhost:8008")
             async with app.run_test() as pilot:
                 await pilot.click("#services-tab")
                 await pilot.pause()
@@ -192,7 +192,7 @@ class TestConfigScreen:
     @pytest.mark.asyncio
     async def test_shows_server_settings(self):
         """Config tab always shows server settings."""
-        app = MachineApp(server_url="http://localhost:8000")
+        app = MachineApp(server_url="http://localhost:8008")
         async with app.run_test() as pilot:
             await pilot.click("#config-tab")
             await pilot.pause()
@@ -209,7 +209,7 @@ class TestConfigScreen:
         )
         monkeypatch.chdir(tmp_path)
 
-        app = MachineApp(server_url="http://localhost:8000")
+        app = MachineApp(server_url="http://localhost:8008")
         async with app.run_test() as pilot:
             await pilot.click("#config-tab")
             await pilot.pause()
