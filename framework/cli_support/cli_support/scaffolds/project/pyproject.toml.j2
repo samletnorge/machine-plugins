@@ -39,6 +39,10 @@ plugins = [
 base_url = "http://localhost:9012"
 model = "gemma4:latest"
 
+[tool.machine-core.plugin_configs.embeddings_ollama]
+base_url = "http://localhost:9012"
+model = "qwen3-embedding:8b"
+
 [tool.machine-core.plugin_configs.eval_support]
 judge_llm = { provider = "ollama", model = "gemma4:latest" }
 

@@ -6,6 +6,20 @@
   "language": "python",
   "capabilities": ["embedding:register"],
   "dependencies": ["httpx>=0.28"],
+  "config_schema": {
+    "base_url": {
+      "type": "string",
+      "default": "http://localhost:11434",
+      "env": "OLLAMA_BASE_URL",
+      "description": "Ollama server base URL"
+    },
+    "model": {
+      "type": "string",
+      "default": "qwen3-embedding:8b",
+      "env": "OLLAMA_EMBED_MODEL",
+      "description": "Default embedding model"
+    }
+  },
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {
