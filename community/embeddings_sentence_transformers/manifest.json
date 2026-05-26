@@ -2,19 +2,21 @@
   "name": "embeddings_sentence_transformers",
   "version": "0.1.0",
   "description": "SentenceTransformers embedding provider for machine-core",
-  "category": "embedding",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["embedding:register"],
   "transport": {
-    "type": "in-process"
+    "type": "in-process",
+    "entry_point": "embeddings_sentence_transformers:EmbeddingsSentenceTransformersPlugin"
   },
   "dependencies": ["embeddings"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
   "config_schema": {
-    "type": "object",
-    "properties": {
-      "model": {
-        "type": "string",
-        "default": "all-MiniLM-L6-v2",
-        "description": "SentenceTransformers model name"
-      }
+    "model": {
+      "type": "string",
+      "default": "all-MiniLM-L6-v2",
+      "description": "SentenceTransformers model name"
     }
   }
 }
