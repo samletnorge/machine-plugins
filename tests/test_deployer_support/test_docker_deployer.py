@@ -12,7 +12,7 @@ def docker_deployer():
 
 @pytest.fixture
 def deploy_config():
-    return DeployConfig(target="docker", port=8000, env_vars={"API_KEY": "test"})
+    return DeployConfig(target="docker", port=8008, env_vars={"API_KEY": "test"})
 
 
 def test_docker_deployer_name(docker_deployer):
@@ -31,7 +31,7 @@ async def test_generate_dockerfile(docker_deployer, deploy_config, tmp_path):
     content = dockerfile.read_text()
     assert "FROM python" in content
     assert "uvicorn" in content
-    assert "8000" in content
+    assert "8008" in content
 
 
 @pytest.mark.asyncio
@@ -45,7 +45,7 @@ async def test_generate_docker_compose(docker_deployer, deploy_config, tmp_path)
     assert compose.exists()
     content = compose.read_text()
     assert "services" in content
-    assert "8000" in content
+    assert "8008" in content
 
 
 @pytest.mark.asyncio

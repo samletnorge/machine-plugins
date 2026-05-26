@@ -18,7 +18,7 @@ def dokploy_deployer():
 def deploy_config():
     return DeployConfig(
         target="dokploy",
-        port=8000,
+        port=8008,
         env_vars={"API_KEY": "test"},
         extra={
             "application_id": "app-123",
@@ -34,9 +34,7 @@ def test_dokploy_deployer_name(dokploy_deployer):
 @pytest.mark.asyncio
 async def test_dokploy_deploy_calls_api(dokploy_deployer, deploy_config):
     """DokployDeployer calls Dokploy API to trigger deployment."""
-    with patch(
-        "deployer_support.dokploy.httpx.AsyncClient"
-    ) as mock_client_cls:
+    with patch("deployer_support.dokploy.httpx.AsyncClient") as mock_client_cls:
         mock_client = AsyncMock()
         mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
@@ -51,9 +49,7 @@ async def test_dokploy_deploy_calls_api(dokploy_deployer, deploy_config):
 @pytest.mark.asyncio
 async def test_dokploy_deploy_sets_env_vars(dokploy_deployer, deploy_config):
     """DokployDeployer saves environment variables before deploying."""
-    with patch(
-        "deployer_support.dokploy.httpx.AsyncClient"
-    ) as mock_client_cls:
+    with patch("deployer_support.dokploy.httpx.AsyncClient") as mock_client_cls:
         mock_client = AsyncMock()
         mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
         mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)

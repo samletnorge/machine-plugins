@@ -5,7 +5,7 @@ Auto-discovers endpoints from /openapi.json and builds namespaces dynamically.
 Usage:
     from server_support.client import MachineClient
 
-    client = MachineClient(base_url="http://localhost:8000")
+    client = MachineClient(base_url="http://localhost:8008")
 
     # Agents (auto-discovered)
     agents = client.agent.list()
@@ -89,7 +89,7 @@ class MachineClient:
 
     def __init__(
         self,
-        base_url: str = "http://localhost:8000",
+        base_url: str = "http://localhost:8008",
         *,
         api_key: Optional[str] = None,
         http_client: Any = None,

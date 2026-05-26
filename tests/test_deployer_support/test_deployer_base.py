@@ -14,7 +14,7 @@ def test_deploy_config_defaults():
     config = DeployConfig(target="docker")
     assert config.target == "docker"
     assert config.env_vars == {}
-    assert config.port == 8000
+    assert config.port == 8008
 
 
 def test_deploy_config_custom():

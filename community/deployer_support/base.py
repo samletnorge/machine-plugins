@@ -31,7 +31,7 @@ class DeployConfig(BaseModel):
     env_vars: dict[str, str] = Field(
         default_factory=dict, description="Environment variables to set"
     )
-    port: int = Field(default=8000, description="Port to expose")
+    port: int = Field(default=8008, description="Port to expose")
     region: str | None = Field(default=None, description="Deployment region")
     replicas: int = Field(default=1, description="Number of replicas")
     extra: dict[str, Any] = Field(

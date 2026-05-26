@@ -11,4 +11,4 @@ def test_is_server_running_tolerates_read_errors(monkeypatch):
 
     monkeypatch.setattr("cli_support._server_launcher.httpx.get", boom)
 
-    assert is_server_running("http://127.0.0.1:8000") is False
+    assert is_server_running("http://127.0.0.1:8008") is False
