@@ -16,7 +16,7 @@ from loguru import logger
 ENHETER_URL = "https://data.brreg.no/enhetsregisteret/api/enheter/lastned"
 UNDERENHETER_URL = "https://data.brreg.no/enhetsregisteret/api/underenheter/lastned"
 ROLLER_URL = "https://data.brreg.no/enhetsregisteret/api/roller/totalbestand"
-FRIVILLIG_URL = "https://data.brreg.no/frivillighetsregisteret/api/totalbestand/csv"
+FRIVILLIG_URL = "https://data.brreg.no/frivillighetsregisteret/api/frivillige-organisasjoner/totalbestand/csv"
 PARTI_URL = "https://data.brreg.no/partiregisteret/api/lastned/csv"
 
 # Timeout for large downloads (30 min)
@@ -59,8 +59,10 @@ MAX_RETRIES = 3
 
 
 async def _stream_download(url: str, label: str, retries: int = MAX_RETRIES) -> bytes:
-    """Stream-download a large file with progress logging and retries."""
+    """Stream-download a large file with tqdm progress and retries."""
     import asyncio
+
+    from tqdm import tqdm
 
     for attempt in range(1, retries + 1):
         logger.info("Streaming download (attempt {}): {} from {}", attempt, label, url)
@@ -72,17 +74,20 @@ async def _stream_download(url: str, label: str, retries: int = MAX_RETRIES) -> 
             ) as client:
                 async with client.stream("GET", url) as resp:
                     resp.raise_for_status()
-                    expected = resp.headers.get("content-length", "?")
+                    expected_str = resp.headers.get("content-length")
+                    expected = int(expected_str) if expected_str else None
+                    pbar = tqdm(
+                        total=expected,
+                        unit="B",
+                        unit_scale=True,
+                        desc=f"⬇ {label}",
+                        leave=True,
+                    )
                     async for chunk in resp.aiter_bytes(chunk_size=1024 * 256):
                         chunks.append(chunk)
                         total += len(chunk)
-                        if total % (50 * 1024 * 1024) < len(chunk):
-                            logger.info(
-                                "{}: downloaded {} MB / {} bytes expected",
-                                label,
-                                total // (1024 * 1024),
-                                expected,
-                            )
+                        pbar.update(len(chunk))
+                    pbar.close()
             logger.info("{}: download complete ({} MB)", label, total // (1024 * 1024))
             return b"".join(chunks)
         except (httpx.RemoteProtocolError, httpx.ReadTimeout, httpx.ReadError) as e:

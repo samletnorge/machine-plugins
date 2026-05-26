@@ -116,12 +116,12 @@ class BrregPipeline:
         )
         logger.info("brreg-pipeline: merged into {} documents", len(merged_docs))
 
-        # Step 3: Process each document (chunk → extract → embed → upsert)
+        # Step 3: Process each document (chunk → embed → upsert)
+        # NOTE: We skip LLM-based metadata extraction for bulk ingestion (too slow).
+        # Instead we use structured fields directly from the registry data.
         embedder = self._machine.resolve("embedding", "ollama")
         vectorstore = self._machine.resolve("vector_store", "lancedb")
         chunker = self._machine.resolve("chunker", "json")
-        summary_extractor = self._machine.resolve("metadata_extractor", "summary")
-        keywords_extractor = self._machine.resolve("metadata_extractor", "keywords")
 
         if not embedder or not vectorstore:
             return {"status": "error", "error": "Missing embedder or vectorstore"}
@@ -129,6 +129,14 @@ class BrregPipeline:
         docs_processed = 0
         chunks_upserted = 0
         upsert_batch: list = []
+        total_docs = len(merged_docs)
+
+        try:
+            from tqdm import tqdm
+
+            progress = tqdm(total=total_docs, desc="Ingesting", unit="doc")
+        except ImportError:
+            progress = None
 
         for doc in merged_docs:
             org_nr = doc.get("organisasjonsnummer", "unknown")
@@ -145,29 +153,23 @@ class BrregPipeline:
             for chunk in chunks:
                 chunk_id = f"{org_nr}_{chunk.index}"
 
-                # Extract metadata
-                summary_text = ""
-                keywords = []
-                if summary_extractor:
-                    try:
-                        meta = await summary_extractor.extract(chunk.text)
-                        summary_text = meta.summary or ""
-                    except Exception as e:
-                        logger.debug(
-                            "Summary extraction failed for {}: {}", chunk_id, e
-                        )
+                # Use structured metadata from the document (no LLM calls)
+                name = doc.get("navn", "")
+                kommune = ""
+                addr = doc.get("forretningsadresse")
+                if isinstance(addr, dict):
+                    kommune = addr.get("kommune", "")
+                naeringskode = ""
+                nk = doc.get("naeringskode1")
+                if isinstance(nk, dict):
+                    naeringskode = nk.get("kode", "")
+                org_type = ""
+                of = doc.get("organisasjonsform")
+                if isinstance(of, dict):
+                    org_type = of.get("kode", "")
 
-                if keywords_extractor:
-                    try:
-                        meta = await keywords_extractor.extract(chunk.text)
-                        keywords = meta.keywords or []
-                    except Exception as e:
-                        logger.debug(
-                            "Keywords extraction failed for {}: {}", chunk_id, e
-                        )
-
-                # Embed the summary (or chunk text if no summary)
-                embed_text = summary_text if summary_text else chunk.text[:2000]
+                # Embed the chunk text directly
+                embed_text = chunk.text[:2000]
                 try:
                     embed_result = await embedder.embed(
                         EmbeddingRequest(input=embed_text)
@@ -177,21 +179,12 @@ class BrregPipeline:
                     logger.warning("Embedding failed for {}: {}", chunk_id, e)
                     continue
 
-                # Build upsert record
                 metadata = {
                     "org_nr": org_nr,
-                    "name": doc.get("navn", ""),
-                    "keywords": keywords,
-                    "kommune": doc.get("forretningsadresse", {}).get("kommune", "")
-                    if isinstance(doc.get("forretningsadresse"), dict)
-                    else "",
-                    "naeringskode": doc.get("naeringskode1", {}).get("kode", "")
-                    if isinstance(doc.get("naeringskode1"), dict)
-                    else "",
-                    "type": doc.get("organisasjonsform", {}).get("kode", "")
-                    if isinstance(doc.get("organisasjonsform"), dict)
-                    else "",
-                    "summary": summary_text,
+                    "name": name,
+                    "kommune": kommune,
+                    "naeringskode": naeringskode,
+                    "type": org_type,
                 }
 
                 upsert_batch.append(
@@ -211,12 +204,17 @@ class BrregPipeline:
                     upsert_batch = []
 
             docs_processed += 1
-            if docs_processed % 1000 == 0:
+            if progress:
+                progress.update(1)
+            elif docs_processed % 10000 == 0:
                 logger.info(
                     "brreg-pipeline: processed {}/{} documents",
                     docs_processed,
-                    len(merged_docs),
+                    total_docs,
                 )
+
+        if progress:
+            progress.close()
 
         # Flush remaining
         if upsert_batch:
