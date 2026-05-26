@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import time
 from typing import TYPE_CHECKING, Any
+
+from embeddings.schemas import EmbeddingRequest, EmbeddingResult
 
 if TYPE_CHECKING:
     from machine_core.plugin.context import PluginContext
@@ -38,13 +41,23 @@ class EmbeddingsSentenceTransformersPlugin:
             self._model = SentenceTransformer(self._model_name)
         return self._model
 
-    async def embed(self, texts: list[str], **kwargs: Any) -> list[list[float]]:
-        """Embed a list of texts into vectors."""
-        model = self._get_model()
-        embeddings = model.encode(texts, convert_to_numpy=True)
-        return embeddings.tolist()
+    async def invoke(self, request: Any) -> Any:
+        if isinstance(request, EmbeddingRequest):
+            return await self.embed(request)
+        raise TypeError(f"Unsupported request type: {type(request)}")
 
-    async def embed_query(self, text: str, **kwargs: Any) -> list[float]:
-        """Embed a single query text."""
-        result = await self.embed([text], **kwargs)
-        return result[0]
+    async def embed(self, request: EmbeddingRequest) -> EmbeddingResult:
+        """Embed text input into vectors."""
+        start = time.monotonic()
+        model = self._get_model()
+        texts = request.input if isinstance(request.input, list) else [request.input]
+        embeddings = model.encode(texts, convert_to_numpy=True)
+        vectors = embeddings.tolist()
+        dimensions = len(vectors[0]) if vectors else 0
+        return EmbeddingResult(
+            vectors=vectors,
+            model_ref=request.model_ref or self._model_name,
+            dimensions=dimensions,
+            usage={"input_count": len(texts)},
+            duration_ms=(time.monotonic() - start) * 1000,
+        )
