@@ -116,9 +116,9 @@ class BrregPipeline:
         )
         logger.info("brreg-pipeline: merged into {} documents", len(merged_docs))
 
-        # Step 3: Process each document (chunk → embed → upsert)
-        # NOTE: We skip LLM-based metadata extraction for bulk ingestion (too slow).
-        # Instead we use structured fields directly from the registry data.
+        # Step 3: Process documents in batches (chunk → batch embed → upsert)
+        # We use structured metadata from the registry data directly.
+        # LLM-based extraction is available but skipped for bulk (too slow at 1M+ docs).
         embedder = self._machine.resolve("embedding", "ollama")
         vectorstore = self._machine.resolve("vector_store", "lancedb")
         chunker = self._machine.resolve("chunker", "json")
@@ -128,8 +128,10 @@ class BrregPipeline:
 
         docs_processed = 0
         chunks_upserted = 0
-        upsert_batch: list = []
         total_docs = len(merged_docs)
+
+        # Batch settings
+        EMBED_BATCH_SIZE = 64  # Embed N texts in one call
 
         try:
             from tqdm import tqdm
@@ -137,6 +139,49 @@ class BrregPipeline:
             progress = tqdm(total=total_docs, desc="Ingesting", unit="doc")
         except ImportError:
             progress = None
+
+        # Accumulate chunks for batch embedding
+        pending_texts: list[str] = []
+        pending_meta: list[dict] = []
+
+        async def flush_pending() -> None:
+            """Embed and upsert a batch of pending chunks."""
+            nonlocal chunks_upserted
+            if not pending_texts:
+                return
+            try:
+                embed_result = await embedder.embed(
+                    EmbeddingRequest(input=pending_texts)
+                )
+                vectors = embed_result.vectors
+            except Exception as e:
+                logger.warning(
+                    "Batch embedding failed ({} texts): {}", len(pending_texts), e
+                )
+                pending_texts.clear()
+                pending_meta.clear()
+                return
+
+            upsert_batch = []
+            for i, vec in enumerate(vectors):
+                m = pending_meta[i]
+                upsert_batch.append(
+                    UpsertRequest(
+                        id=m["chunk_id"],
+                        vector=vec,
+                        text=m["text"],
+                        metadata=m["metadata"],
+                        table=table,
+                    )
+                )
+            chunks_upserted += len(upsert_batch)
+
+            # Upsert in sub-batches
+            for j in range(0, len(upsert_batch), UPSERT_BATCH_SIZE):
+                await vectorstore.upsert(upsert_batch[j : j + UPSERT_BATCH_SIZE])
+
+            pending_texts.clear()
+            pending_meta.clear()
 
         for doc in merged_docs:
             org_nr = doc.get("organisasjonsnummer", "unknown")
@@ -150,58 +195,42 @@ class BrregPipeline:
                     type("C", (), {"text": doc_json, "index": 0, "metadata": {}})()
                 ]
 
+            # Extract structured metadata (no LLM needed)
+            name = doc.get("navn", "")
+            kommune = ""
+            addr = doc.get("forretningsadresse")
+            if isinstance(addr, dict):
+                kommune = addr.get("kommune", "")
+            naeringskode = ""
+            nk = doc.get("naeringskode1")
+            if isinstance(nk, dict):
+                naeringskode = nk.get("kode", "")
+            org_type = ""
+            of = doc.get("organisasjonsform")
+            if isinstance(of, dict):
+                org_type = of.get("kode", "")
+
             for chunk in chunks:
                 chunk_id = f"{org_nr}_{chunk.index}"
-
-                # Use structured metadata from the document (no LLM calls)
-                name = doc.get("navn", "")
-                kommune = ""
-                addr = doc.get("forretningsadresse")
-                if isinstance(addr, dict):
-                    kommune = addr.get("kommune", "")
-                naeringskode = ""
-                nk = doc.get("naeringskode1")
-                if isinstance(nk, dict):
-                    naeringskode = nk.get("kode", "")
-                org_type = ""
-                of = doc.get("organisasjonsform")
-                if isinstance(of, dict):
-                    org_type = of.get("kode", "")
-
-                # Embed the chunk text directly
                 embed_text = chunk.text[:2000]
-                try:
-                    embed_result = await embedder.embed(
-                        EmbeddingRequest(input=embed_text)
-                    )
-                    vector = embed_result.vectors[0]
-                except Exception as e:
-                    logger.warning("Embedding failed for {}: {}", chunk_id, e)
-                    continue
 
-                metadata = {
-                    "org_nr": org_nr,
-                    "name": name,
-                    "kommune": kommune,
-                    "naeringskode": naeringskode,
-                    "type": org_type,
-                }
-
-                upsert_batch.append(
-                    UpsertRequest(
-                        id=chunk_id,
-                        vector=vector,
-                        text=chunk.text,
-                        metadata=metadata,
-                        table=table,
-                    )
+                pending_texts.append(embed_text)
+                pending_meta.append(
+                    {
+                        "chunk_id": chunk_id,
+                        "text": chunk.text,
+                        "metadata": {
+                            "org_nr": org_nr,
+                            "name": name,
+                            "kommune": kommune,
+                            "naeringskode": naeringskode,
+                            "type": org_type,
+                        },
+                    }
                 )
-                chunks_upserted += 1
 
-                # Flush batch
-                if len(upsert_batch) >= UPSERT_BATCH_SIZE:
-                    await vectorstore.upsert(upsert_batch)
-                    upsert_batch = []
+                if len(pending_texts) >= EMBED_BATCH_SIZE:
+                    await flush_pending()
 
             docs_processed += 1
             if progress:
@@ -213,12 +242,11 @@ class BrregPipeline:
                     total_docs,
                 )
 
+        # Flush remaining
+        await flush_pending()
+
         if progress:
             progress.close()
-
-        # Flush remaining
-        if upsert_batch:
-            await vectorstore.upsert(upsert_batch)
 
         duration = time.monotonic() - start
         logger.info(
