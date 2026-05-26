@@ -15,6 +15,7 @@ except ImportError:
     @dataclass
     class AgentDefinition:
         name: str = ""
+        description: str = ""
         model_ref: str | None = None
         instruction: str | None = None
         max_steps: int | None = None
@@ -162,6 +163,7 @@ class BrregAgentRunner:
 
         enriched_definition = AgentDefinition(
             name="brreg-expert",
+            description="Norwegian companies expert — RAG + live Brreg API tools",
             model_ref=getattr(definition, "model_ref", None)
             or self._config.get("model_ref", "ollama/gemma4:latest"),
             instruction=instruction,
