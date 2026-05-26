@@ -131,7 +131,7 @@ class BrregPipeline:
         total_docs = len(merged_docs)
 
         # Batch settings
-        EMBED_BATCH_SIZE = 256  # Embed N texts in one call
+        EMBED_BATCH_SIZE = 128  # Embed N texts in one call
 
         try:
             from tqdm import tqdm
