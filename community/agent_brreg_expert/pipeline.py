@@ -72,6 +72,7 @@ class BrregPipeline:
         """Full ingestion: download → merge → chunk → extract → embed → upsert."""
         start = time.monotonic()
         table = self._config.get("vectorstore_table", "brreg_companies")
+        embedding_provider = self._config.get("embedding_provider", "ollama")
 
         # Step 1: Download all registries
         # Download entities first (largest file, ~200MB) to avoid server throttling
@@ -119,7 +120,7 @@ class BrregPipeline:
         # Step 3: Process documents in batches (chunk → batch embed → upsert)
         # We use structured metadata from the registry data directly.
         # LLM-based extraction is available but skipped for bulk (too slow at 1M+ docs).
-        embedder = self._machine.resolve("embedding", "ollama")
+        embedder = self._machine.resolve("embedding", embedding_provider)
         vectorstore = self._machine.resolve("vector_store", "lancedb")
         chunker = self._machine.resolve("chunker", "json")
 
@@ -268,8 +269,9 @@ class BrregPipeline:
         table = self._config.get("vectorstore_table", "brreg_companies")
         retrieve_top_k = self._config.get("retrieve_top_k", 20)
         rerank_top_k = self._config.get("rerank_top_k", 5)
+        embedding_provider = self._config.get("embedding_provider", "ollama")
 
-        embedder = self._machine.resolve("embedding", "ollama")
+        embedder = self._machine.resolve("embedding", embedding_provider)
         vectorstore = self._machine.resolve("vector_store", "lancedb")
         reranker = self._machine.resolve("reranker", "llm")
 

@@ -32,6 +32,10 @@
     "model_ref": {
       "type": "string",
       "default": "ollama/gemma4:latest"
+    },
+    "embedding_provider": {
+      "type": "string",
+      "default": "ollama"
     }
   },
   "transport": {
