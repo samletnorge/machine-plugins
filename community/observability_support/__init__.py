@@ -1,4 +1,4 @@
-"""observability-support: OpenTelemetry tracing, cost tracking, and exporter backends."""
+"""observability_support: OpenTelemetry tracing, cost tracking, and exporter backends."""
 
 from __future__ import annotations
 

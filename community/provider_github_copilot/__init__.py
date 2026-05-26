@@ -1,4 +1,4 @@
-"""provider-github-copilot: GitHub Copilot via OAuth device flow + pydantic-ai."""
+"""provider_github_copilot: GitHub Copilot via OAuth device flow + pydantic-ai."""
 
 from __future__ import annotations
 

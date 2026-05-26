@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-deployer-support"
+name = "deployer_support"
 version = "0.1.0"
 description = "Deployment target category and built-in deployers for machine-core"
 requires-python = ">=3.12"

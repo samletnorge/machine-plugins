@@ -1,4 +1,4 @@
-"""provider-vertex-claude: Vertex AI Claude LLM provider via pydantic-ai."""
+"""provider_vertex_claude: Vertex AI Claude LLM provider via pydantic-ai."""
 
 from __future__ import annotations
 

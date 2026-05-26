@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-browser-support"
+name = "browser_support"
 version = "0.5.0"
 description = "Defines the browser category for browser automation"
 requires-python = ">=3.12"

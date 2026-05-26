@@ -1,4 +1,4 @@
-"""provider-ollama: Pure httpx Ollama LLM provider."""
+"""provider_ollama: Pure httpx Ollama LLM provider."""
 
 from __future__ import annotations
 

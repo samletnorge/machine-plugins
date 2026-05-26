@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-provider-azure-openai"
+name = "provider_azure_openai"
 version = "0.1.0"
 description = "Azure OpenAI LLM provider for machine-core"
 requires-python = ">=3.12"

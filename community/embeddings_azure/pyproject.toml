@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-embeddings-azure"
+name = "embeddings_azure"
 version = "0.1.0"
 description = "Azure OpenAI embedding provider"
 requires-python = ">=3.12"

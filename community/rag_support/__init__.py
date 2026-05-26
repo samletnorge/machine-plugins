@@ -31,7 +31,7 @@ __all__ = [
 class _LazyLLMAdapter:
     """Defers provider resolution until first generate() call.
 
-    This avoids load-order issues where rag-support (a category definer)
+    This avoids load-order issues where rag_support (a category definer)
     loads before model providers are registered.
     """
 
@@ -142,7 +142,7 @@ class RagSupportPlugin:
         cfg = self._config.get("semantic_chunker")
         if not cfg or not isinstance(cfg, dict):
             logger.debug(
-                "rag-support: semantic chunker not registered "
+                "rag_support: semantic chunker not registered "
                 "(no semantic_chunker configured)"
             )
             return
@@ -154,7 +154,7 @@ class RagSupportPlugin:
         provider = ctx._machine.resolve("embedding", provider_name)
         if provider is None:
             logger.warning(
-                "rag-support: semantic chunker not registered — "
+                "rag_support: semantic chunker not registered — "
                 "embedding provider '{}' not found in registry",
                 provider_name,
             )
@@ -171,7 +171,7 @@ class RagSupportPlugin:
             SemanticChunker(embedder=embedder, similarity_threshold=threshold),
         )
         logger.info(
-            "rag-support: registered semantic chunker (provider={})", provider_name
+            "rag_support: registered semantic chunker (provider={})", provider_name
         )
 
     def _register_llm_components(self, ctx: "PluginContext") -> None:
@@ -198,7 +198,7 @@ class RagSupportPlugin:
                 )
                 ctx.register("reranker", "llm", LLMReranker(llm=llm))
                 logger.info(
-                    "rag-support: registered LLM reranker (provider={}, lazy)",
+                    "rag_support: registered LLM reranker (provider={}, lazy)",
                     provider_name,
                 )
 
@@ -217,13 +217,13 @@ class RagSupportPlugin:
                     "metadata_extractor", "questions", QuestionsExtractor(llm=llm)
                 )
                 logger.info(
-                    "rag-support: registered 4 extractors (provider={}, lazy)",
+                    "rag_support: registered 4 extractors (provider={}, lazy)",
                     provider_name,
                 )
 
         if not reranker_cfg and not extractor_cfg:
             logger.debug(
-                "rag-support: LLM components not registered "
+                "rag_support: LLM components not registered "
                 "(no reranker_llm or extractor_llm configured)"
             )
 
@@ -234,7 +234,7 @@ class RagSupportPlugin:
         cfg = self._config.get("reranker_cross_encoder")
         if not cfg or not isinstance(cfg, dict):
             logger.debug(
-                "rag-support: cross-encoder reranker not registered "
+                "rag_support: cross-encoder reranker not registered "
                 "(no reranker_cross_encoder configured)"
             )
             return
@@ -249,11 +249,11 @@ class RagSupportPlugin:
             model = CrossEncoder(model_name)
             ctx.register("reranker", "cross_encoder", CrossEncoderReranker(model=model))
             logger.info(
-                "rag-support: registered cross-encoder reranker (model={})", model_name
+                "rag_support: registered cross-encoder reranker (model={})", model_name
             )
         except ImportError:
             logger.warning(
-                "rag-support: cross-encoder reranker not registered — "
+                "rag_support: cross-encoder reranker not registered — "
                 "sentence-transformers not installed. "
                 "Install with: pip install sentence-transformers"
             )

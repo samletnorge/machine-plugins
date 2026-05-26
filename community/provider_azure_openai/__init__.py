@@ -1,4 +1,4 @@
-"""provider-azure-openai: Azure OpenAI LLM provider via pydantic-ai."""
+"""provider_azure_openai: Azure OpenAI LLM provider via pydantic-ai."""
 
 from __future__ import annotations
 

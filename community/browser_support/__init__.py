@@ -1,4 +1,4 @@
-"""browser-support: Browser automation category with Playwright and Stagehand backends."""
+"""browser_support: Browser automation category with Playwright and Stagehand backends."""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING

@@ -1,4 +1,4 @@
-"""workspace-support: Sandbox, filesystem, and skills categories for agent workspaces."""
+"""workspace_support: Sandbox, filesystem, and skills categories for agent workspaces."""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING

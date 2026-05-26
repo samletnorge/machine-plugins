@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-provider-vertex-claude"
+name = "provider_vertex_claude"
 version = "0.1.0"
 description = "Vertex AI Claude LLM provider for machine-core"
 requires-python = ">=3.12"

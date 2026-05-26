@@ -1,4 +1,4 @@
-"""embeddings-azure: Azure OpenAI embedding provider."""
+"""embeddings_azure: Azure OpenAI embedding provider."""
 
 from __future__ import annotations
 

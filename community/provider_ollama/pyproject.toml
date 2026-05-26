@@ -1,5 +1,5 @@
 [project]
-name = "provider-ollama"
+name = "provider_ollama"
 version = "0.1.0"
 description = "Ollama LLM provider for machine-core"
 requires-python = ">=3.12"

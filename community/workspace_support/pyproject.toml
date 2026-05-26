@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-workspace-support"
+name = "workspace_support"
 version = "0.5.0"
 description = "Defines the workspace category for workspace management"
 requires-python = ">=3.12"

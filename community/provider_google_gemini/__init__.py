@@ -1,4 +1,4 @@
-"""provider-google-gemini: Google Gemini LLM provider via pydantic-ai."""
+"""provider_google_gemini: Google Gemini LLM provider via pydantic-ai."""
 
 from __future__ import annotations
 

@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-provider-vertex-gemini"
+name = "provider_vertex_gemini"
 version = "0.1.0"
 description = "Vertex AI Gemini LLM provider for machine-core"
 requires-python = ">=3.12"

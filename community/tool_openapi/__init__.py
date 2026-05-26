@@ -1,4 +1,4 @@
-"""tool-openapi: Generate tools from OpenAPI specs."""
+"""tool_openapi: Generate tools from OpenAPI specs."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class ToolOpenAPIPlugin:
-    """In-process plugin class for tool-openapi."""
+    """In-process plugin class for tool_openapi."""
 
     async def initialize(self, **kwargs):
         """Called by transport on load."""

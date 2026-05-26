@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-channel-support"
+name = "channel_support"
 version = "0.1.0"
 description = "Channel category: in-memory and WebSocket channels"
 requires-python = ">=3.12"

@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class ObservabilityConfig(BaseModel):
-    """Configuration for the observability-support plugin.
+    """Configuration for the observability_support plugin.
 
     The `exporter` field is a string name (e.g. "console", "langfuse", "otlp").
     Exporters register themselves via ctx.register("observability_exporter", name, impl).

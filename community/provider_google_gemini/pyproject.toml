@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-provider-google-gemini"
+name = "provider_google_gemini"
 version = "0.1.0"
 description = "Google Gemini LLM provider for machine-core"
 requires-python = ">=3.12"

@@ -1,4 +1,4 @@
-"""provider-groq: Groq LLM provider via pydantic-ai."""
+"""provider_groq: Groq LLM provider via pydantic-ai."""
 
 from __future__ import annotations
 

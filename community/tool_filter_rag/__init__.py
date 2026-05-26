@@ -1,4 +1,4 @@
-"""tool-filter-rag: Semantic tool filtering via embeddings + vector store."""
+"""tool_filter_rag: Semantic tool filtering via embeddings + vector store."""
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ class _LazyToolFilterManager:
             from loguru import logger
 
             logger.debug(
-                "tool-filter-rag: cannot index — no embedding provider or vector store available"
+                "tool_filter_rag: cannot index — no embedding provider or vector store available"
             )
             return
         return await mgr.index_tools(tools)

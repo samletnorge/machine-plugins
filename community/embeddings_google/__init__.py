@@ -1,4 +1,4 @@
-"""embeddings-google: Google GenAI embedding provider."""
+"""embeddings_google: Google GenAI embedding provider."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ class GoogleEmbeddingPlugin:
             from loguru import logger
 
             logger.debug(
-                "embeddings-google: GCP_API_KEY not set, skipping. "
+                "embeddings_google: GCP_API_KEY not set, skipping. "
                 "Set GCP_API_KEY to enable Google embeddings."
             )
             return

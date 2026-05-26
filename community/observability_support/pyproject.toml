@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-observability-support"
+name = "observability_support"
 version = "0.5.0"
 description = "Defines the observability category for tracing and monitoring"
 requires-python = ">=3.12"

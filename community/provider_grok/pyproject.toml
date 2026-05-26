@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-provider-grok"
+name = "provider_grok"
 version = "0.1.0"
 description = "Grok (xAI) LLM provider for machine-core"
 requires-python = ">=3.12"
