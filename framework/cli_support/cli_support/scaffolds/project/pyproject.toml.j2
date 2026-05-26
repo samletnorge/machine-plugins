@@ -5,12 +5,12 @@ description = "A machine-core AI agent project"
 requires-python = ">=3.12"
 dependencies = [
     "server_support",
-    "agent-brreg-expert",
+    "agent_brreg_expert",
 ]
 
 [tool.uv.sources]
 server_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/server_support" }
-agent-brreg-expert = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_brreg_expert" }
+agent_brreg_expert = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_brreg_expert" }
 
 [tool.uv]
 default-groups = "all"
@@ -33,6 +33,7 @@ plugins = [
     "rag_support",
     "agent_runtime_pydantic",
     "agent_runtime_basic",
+    "agent_brreg_expert",
 ]
 
 # Per-plugin configuration (overrides manifest defaults & env vars)
