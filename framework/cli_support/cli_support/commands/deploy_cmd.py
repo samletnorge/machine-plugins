@@ -34,6 +34,12 @@ def deploy_command(
     ),
 ):
     """Deploy to target platform."""
+    if DeployConfig is None:
+        console.print(
+            "[red]deployer_support is not installed for this CLI environment.[/red]"
+        )
+        raise typer.Exit(code=1)
+
     root = find_project_root()
     if root is None:
         console.print("[red]Error: Not inside a machine-core project.[/red]")
@@ -65,7 +71,13 @@ def deploy_command(
 
     if deployer is None:
         # Fallback: import deployer directly
-        from deployer_support import _get_builtin_deployer
+        try:
+            from deployer_support import _get_builtin_deployer
+        except ImportError:
+            console.print(
+                "[red]deployer_support is not installed for this project.[/red]"
+            )
+            raise typer.Exit(code=1)
 
         deployer = _get_builtin_deployer(target)
 

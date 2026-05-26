@@ -13,6 +13,8 @@ def test_cli_help():
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
     assert "machine" in result.output.lower() or "Machine" in result.output
+    assert "--install-completion" not in result.output
+    assert "--show-completion" not in result.output
 
 
 def test_cli_version():

@@ -22,6 +22,12 @@ def studio_command(
     host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to."),
 ):
     """Launch the Studio web UI for testing agents and tools."""
+    try:
+        import studio_support  # noqa: F401
+    except ImportError:
+        console.print("[red]studio_support is not installed for this project.[/red]")
+        raise typer.Exit(code=1)
+
     root = find_project_root()
     if root is None:
         console.print("[red]Error: Not inside a machine-core project.[/red]")

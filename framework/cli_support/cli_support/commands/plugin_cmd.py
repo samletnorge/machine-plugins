@@ -16,6 +16,19 @@ except ImportError:
 plugin_app = typer.Typer(help="Manage plugins")
 
 
+def _plugin_name_aliases(name: str) -> tuple[str, ...]:
+    aliases = [name]
+    if "-" in name:
+        aliases.append(name.replace("-", "_"))
+    if "_" in name:
+        aliases.append(name.replace("_", "-"))
+    return tuple(dict.fromkeys(aliases))
+
+
+def _canonical_plugin_name(name: str) -> str:
+    return name.replace("-", "_")
+
+
 def _require_machine_core():
     if RegistryClient is None:
         typer.echo("Error: machine-core is not installed. Install it first.")
@@ -31,7 +44,8 @@ def list_plugins():
     if not installed:
         typer.echo("No plugins installed.")
         return
-    for name in sorted(installed):
+    canonical_names = {_canonical_plugin_name(name) for name in installed}
+    for name in sorted(canonical_names):
         typer.echo(f"  {name}")
 
 
@@ -82,6 +96,10 @@ def remove_plugin(name: str = typer.Argument(..., help="Plugin name to remove"))
     async def _remove():
         installer = PluginInstaller()
         await installer.uninstall(name)
+        for alias in _plugin_name_aliases(name):
+            if alias == name:
+                continue
+            await installer.uninstall(alias)
         typer.echo(f"Removed {name}")
 
     asyncio.run(_remove())

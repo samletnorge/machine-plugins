@@ -12,6 +12,7 @@ app = typer.Typer(
     help="machine-core CLI — build, test, and deploy AI agents.",
     no_args_is_help=False,
     invoke_without_command=True,
+    add_completion=False,
 )
 
 

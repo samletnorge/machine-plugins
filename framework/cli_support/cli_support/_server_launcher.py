@@ -18,7 +18,7 @@ def is_server_running(server_url: str) -> bool:
     try:
         resp = httpx.get(f"{server_url}/health", timeout=1.5)
         return resp.status_code == 200
-    except (httpx.ConnectError, httpx.ReadTimeout):
+    except httpx.HTTPError:
         return False
 
 
