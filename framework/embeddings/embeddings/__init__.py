@@ -13,7 +13,13 @@ class EmbeddingsPlugin:
         pass
 
     async def setup(self, ctx: PluginContext):
-        ctx.register_category("embedding")
+        ctx.register_category(
+            "embedding",
+            operations={
+                "embed": {"method": "POST", "on": "item"},
+                "list": {"method": "GET", "on": "collection"},
+            },
+        )
         for hook_name, opts in HOOKSPECS.items():
             ctx.register_hookspec(hook_name, **opts)
 

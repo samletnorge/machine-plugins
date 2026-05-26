@@ -19,8 +19,8 @@ class VectorStoreSupportPlugin:
         ctx.register_category(
             "vector_store",
             operations={
-                "upsert": {"method": "POST", "on": "collection"},
-                "query": {"method": "POST", "on": "collection"},
+                "upsert": {"method": "POST", "on": "item"},
+                "search": {"method": "POST", "on": "item"},
                 "delete": {"method": "POST", "on": "item"},
                 "list": {"method": "GET", "on": "collection"},
             },
