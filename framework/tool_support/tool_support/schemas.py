@@ -1,4 +1,4 @@
-"""Schemas for the tool-support plugin."""
+"""Schemas for the tool_support plugin."""
 
 from __future__ import annotations
 

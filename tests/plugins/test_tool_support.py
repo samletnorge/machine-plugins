@@ -1,4 +1,4 @@
-"""Tests for tool-support builtin plugin."""
+"""Tests for tool_support builtin plugin."""
 
 import pytest
 from pydantic import ValidationError as PydanticValidationError
@@ -86,7 +86,7 @@ async def test_plugin_setup_registers_category():
 
     m = Machine()
     manifest = PluginManifest(
-        name="tool-support",
+        name="tool_support",
         version="0.5.0",
         capabilities=[
             "categories:define",
@@ -100,7 +100,7 @@ async def test_plugin_setup_registers_category():
         ),
     )
     m.plugins.register_manifest(manifest)
-    await m.plugins.load("tool-support")
+    await m.plugins.load("tool_support")
 
     assert "tool" in m._registry
 
@@ -112,7 +112,7 @@ async def test_plugin_hookspecs_registered():
 
     m = Machine()
     manifest = PluginManifest(
-        name="tool-support",
+        name="tool_support",
         version="0.5.0",
         capabilities=[
             "categories:define",
@@ -126,7 +126,7 @@ async def test_plugin_hookspecs_registered():
         ),
     )
     m.plugins.register_manifest(manifest)
-    await m.plugins.load("tool-support")
+    await m.plugins.load("tool_support")
 
     assert "before_tool_call" in m.hooks._specs
     assert "after_tool_call" in m.hooks._specs

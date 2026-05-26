@@ -11,7 +11,7 @@ from workflow_support.workflow import Workflow
 class ExternalEngineAdapter(ABC):
     """Abstract interface for external workflow execution engines.
 
-    External adapters are separate plugins that depend on workflow-support.
+    External adapters are separate plugins that depend on workflow_support.
     They register via machine.register("workflow-adapter", "inngest", self).
     """
 

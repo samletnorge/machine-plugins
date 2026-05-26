@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-prompt-support"
+name = "prompt_support"
 version = "0.5.0"
 description = "Defines the prompt category for prompt templates"
 requires-python = ">=3.12"

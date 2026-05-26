@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-memory-support"
+name = "memory_support"
 version = "0.10.0"
 description = "Defines the memory and storage-backend categories for machine-core"
 requires-python = ">=3.12"

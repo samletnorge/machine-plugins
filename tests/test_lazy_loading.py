@@ -92,7 +92,7 @@ async def test_lazy_loading_logs_debug_message(caplog):
         await m.start()
 
     # The key assertion: Machine started without crash
-    assert m.plugins.is_loaded("tool-support")
+    assert m.plugins.is_loaded("tool_support")
     assert not m.plugins.is_loaded("needs-httpx")
     await m.shutdown()
 

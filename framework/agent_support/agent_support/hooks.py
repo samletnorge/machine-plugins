@@ -1,4 +1,4 @@
-"""Hookspec names for agent-support plugin."""
+"""Hookspec names for agent_support plugin."""
 
 HOOKSPECS = {
     "before_agent_run": {"firstresult": False},

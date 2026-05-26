@@ -63,7 +63,7 @@ def dev_command(
     try:
         import agent_support  # noqa: F401
     except ImportError:
-        console.print("[yellow]Installing agent-support plugin...[/yellow]")
+        console.print("[yellow]Installing agent_support plugin...[/yellow]")
         subprocess.run(
             [
                 sys.executable,
@@ -81,7 +81,7 @@ def dev_command(
     try:
         import tool_support  # noqa: F401
     except ImportError:
-        console.print("[yellow]Installing tool-support plugin...[/yellow]")
+        console.print("[yellow]Installing tool_support plugin...[/yellow]")
         subprocess.run(
             [
                 sys.executable,

@@ -1,4 +1,4 @@
-"""agent-support: Defines the 'agent' category with schemas, handoff, and lifecycle hooks."""
+"""agent_support: Defines the 'agent' category with schemas, handoff, and lifecycle hooks."""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING

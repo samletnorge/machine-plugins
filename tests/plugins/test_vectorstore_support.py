@@ -1,4 +1,4 @@
-"""Tests for vectorstore-support category plugin."""
+"""Tests for vectorstore_support category plugin."""
 
 import pytest
 from pydantic import ValidationError as PydanticValidationError
@@ -63,7 +63,7 @@ def test_upsert_request_minimal():
 
 
 async def test_vectorstore_category_registered():
-    """vectorstore-support should register the 'vector_store' category."""
+    """vectorstore_support should register the 'vector_store' category."""
     from machine_core import Machine
 
     m = Machine()

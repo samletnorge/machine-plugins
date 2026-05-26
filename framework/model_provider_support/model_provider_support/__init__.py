@@ -1,4 +1,4 @@
-"""model-provider-support: Defines the 'model_provider' category for any model type."""
+"""model_provider_support: Defines the 'model_provider' category for any model type."""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING

@@ -1,4 +1,4 @@
-"""vectorstore-support: Defines the 'vector_store' category."""
+"""vectorstore_support: Defines the 'vector_store' category."""
 
 from __future__ import annotations
 

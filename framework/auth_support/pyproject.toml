@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-auth-support"
+name = "auth_support"
 version = "0.1.0"
 description = "Auth provider category: JWT and API Key authentication"
 requires-python = ">=3.12"

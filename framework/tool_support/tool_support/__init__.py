@@ -1,4 +1,4 @@
-"""tool-support: Defines the 'tool' category with schemas, hooks, and @tool decorator."""
+"""tool_support: Defines the 'tool' category with schemas, hooks, and @tool decorator."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class ToolSupportPlugin:
-    """In-process plugin class for tool-support."""
+    """In-process plugin class for tool_support."""
 
     async def initialize(self, **kwargs):
         """Called by transport on load."""

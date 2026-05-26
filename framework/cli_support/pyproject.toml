@@ -1,5 +1,5 @@
 [project]
-name = "cli-support"
+name = "cli_support"
 version = "0.1.0"
 description = "machine CLI tooling for machine-core"
 requires-python = ">=3.12"

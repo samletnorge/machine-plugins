@@ -1,4 +1,4 @@
-"""Schemas for the model-provider-support plugin."""
+"""Schemas for the model_provider_support plugin."""
 
 from __future__ import annotations
 from typing import Any

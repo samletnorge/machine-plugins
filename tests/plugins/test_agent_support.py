@@ -1,4 +1,4 @@
-"""Tests for agent-support builtin plugin."""
+"""Tests for agent_support builtin plugin."""
 
 import pytest
 from agent_support.schemas import (
@@ -67,7 +67,7 @@ async def test_plugin_setup_registers_category():
 
     m = Machine()
     manifest = PluginManifest(
-        name="agent-support",
+        name="agent_support",
         version="0.5.0",
         capabilities=[
             "categories:define",
@@ -81,7 +81,7 @@ async def test_plugin_setup_registers_category():
         ),
     )
     m.plugins.register_manifest(manifest)
-    await m.plugins.load("agent-support")
+    await m.plugins.load("agent_support")
     assert "agent" in m._registry
     assert "before_agent_run" in m.hooks._specs
     assert "after_agent_run" in m.hooks._specs

@@ -1,4 +1,4 @@
-"""Schemas for the structured-output plugin."""
+"""Schemas for the structured_output plugin."""
 
 from __future__ import annotations
 from typing import Any

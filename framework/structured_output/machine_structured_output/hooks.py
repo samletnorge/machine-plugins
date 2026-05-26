@@ -1,4 +1,4 @@
-"""Hookspec names for structured-output plugin."""
+"""Hookspec names for structured_output plugin."""
 
 HOOKSPECS = {
     "before_generate_object": {"firstresult": False},

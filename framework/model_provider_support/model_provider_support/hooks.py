@@ -1,4 +1,4 @@
-"""Hookspec names for model-provider-support plugin."""
+"""Hookspec names for model_provider_support plugin."""
 
 HOOKSPECS = {
     "before_model_invoke": {"firstresult": False},

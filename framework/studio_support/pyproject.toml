@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-studio-support"
+name = "studio_support"
 version = "0.1.0"
 description = "Visual studio/playground for machine-core"
 requires-python = ">=3.12"

@@ -1,4 +1,4 @@
-"""Hook specifications for vectorstore-support."""
+"""Hook specifications for vectorstore_support."""
 
 HOOKSPECS: dict = {
     "before_search": {"firstresult": False},

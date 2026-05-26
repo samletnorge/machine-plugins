@@ -1,4 +1,4 @@
-"""workflow-support: Defines the 'workflow' and 'execution-engine' categories with lifecycle hooks."""
+"""workflow_support: Defines the 'workflow' and 'execution-engine' categories with lifecycle hooks."""
 
 from __future__ import annotations
 

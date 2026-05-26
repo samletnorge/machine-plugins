@@ -1,4 +1,4 @@
-"""Schemas for the agent-support plugin."""
+"""Schemas for the agent_support plugin."""
 
 from __future__ import annotations
 from typing import Any, Protocol, runtime_checkable

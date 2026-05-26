@@ -1,4 +1,4 @@
-"""Tests for vectorstore-lancedb plugin."""
+"""Tests for vectorstore_lancedb plugin."""
 
 import json
 from unittest.mock import MagicMock

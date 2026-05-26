@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-storage-support"
+name = "storage_support"
 version = "0.1.0"
 description = "Storage backend implementations: local and S3"
 requires-python = ">=3.12"

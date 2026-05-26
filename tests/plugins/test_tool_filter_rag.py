@@ -1,4 +1,4 @@
-"""Tests for tool-filter-rag plugin."""
+"""Tests for tool_filter_rag plugin."""
 
 import pytest
 from unittest.mock import AsyncMock

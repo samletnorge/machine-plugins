@@ -1,4 +1,4 @@
-"""Hookspec names for tool-support plugin."""
+"""Hookspec names for tool_support plugin."""
 
 HOOKSPECS = {
     "before_tool_call": {"firstresult": False},

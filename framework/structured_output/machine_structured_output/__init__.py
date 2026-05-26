@@ -1,4 +1,4 @@
-"""structured-output: Defines the 'structured_output' category for LLM-to-JSON generation."""
+"""structured_output: Defines the 'structured_output' category for LLM-to-JSON generation."""
 
 from __future__ import annotations
 from typing import TYPE_CHECKING

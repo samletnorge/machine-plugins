@@ -1,4 +1,4 @@
-"""Schemas for the vectorstore-support plugin."""
+"""Schemas for the vectorstore_support plugin."""
 
 from __future__ import annotations
 

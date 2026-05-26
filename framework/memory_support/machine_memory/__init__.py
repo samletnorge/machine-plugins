@@ -1,4 +1,4 @@
-"""memory-support: Defines the 'memory' category with thread-based conversation memory."""
+"""memory_support: Defines the 'memory' category with thread-based conversation memory."""
 
 from __future__ import annotations
 

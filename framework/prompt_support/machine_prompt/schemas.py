@@ -1,4 +1,4 @@
-"""Schemas for the prompt-support plugin."""
+"""Schemas for the prompt_support plugin."""
 
 from __future__ import annotations
 from typing import Any

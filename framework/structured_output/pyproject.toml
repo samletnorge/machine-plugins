@@ -1,5 +1,5 @@
 [project]
-name = "machine-core-structured-output"
+name = "structured_output"
 version = "0.5.0"
 description = "Defines the structured_output category for typed outputs"
 requires-python = ">=3.12"

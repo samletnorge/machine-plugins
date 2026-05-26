@@ -1,4 +1,4 @@
-"""Tests for tool-openapi plugin."""
+"""Tests for tool_openapi plugin."""
 
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
