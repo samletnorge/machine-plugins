@@ -18,6 +18,12 @@ dependencies = [
     "agent_runtime_basic",
     "embeddings",
     "embeddings_ollama",
+    "vectorstore_lancedb",
+    "eval_support",
+    "tool_openapi",
+    "tool_filter_rag",
+    "rag_support",
+    "provider_ollama",
 ]
 
 [build-system]
@@ -42,3 +48,9 @@ agent_runtime_pydantic = { git = "git+ssh://git@github.com/samletnorge/machine-p
 agent_runtime_basic = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_runtime_basic" }
 embeddings = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/embeddings" }
 embeddings_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/embeddings_ollama" }
+eval_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-eval-support.git" }
+vectorstore_lancedb = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-vectorstore-lancedb.git" }
+tool_openapi = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/tool_openapi" }
+tool_filter_rag = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/tool_filter_rag" }
+rag_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/rag_support" }
+provider_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_ollama" }
