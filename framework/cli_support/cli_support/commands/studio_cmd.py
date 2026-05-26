@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+from pathlib import Path
 
 import typer
 from rich.console import Console
@@ -22,6 +23,8 @@ def studio_command(
     host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to."),
 ):
     """Launch the Studio web UI for testing agents and tools."""
+    import studio_support
+
     root = find_project_root()
     if root is None:
         console.print("[red]Error: Not inside a machine-core project.[/red]")
@@ -47,11 +50,13 @@ def studio_command(
         "MACHINE_CORE_ROOT": str(root),
         "MACHINE_STUDIO_ENABLED": "1",
     }
+    studio_site_packages = Path(studio_support.__file__).resolve().parent.parent
 
     studio_server_code = f'''\
 """Auto-generated studio server for machine studio. Do not edit."""
 import os, sys
 sys.path.insert(0, os.environ.get("MACHINE_CORE_ROOT", "."))
+sys.path.insert(0, {str(studio_site_packages)!r})
 import importlib
 module = importlib.import_module("{entry.rpartition(":")[0]}")
 machine = getattr(module, "{entry.rpartition(":")[2]}")
