@@ -1,5 +1,5 @@
 {
-  "name": "observability-support",
+  "name": "observability_support",
   "version": "0.1.0",
   "description": "OpenTelemetry-based tracing, cost tracking, and multiple exporter backends",
   "schema_version": "1.0.0",

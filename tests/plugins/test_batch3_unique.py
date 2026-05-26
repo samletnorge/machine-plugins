@@ -18,10 +18,10 @@ async def test_all_batch3_manifests_discovered():
 
     manifests = {m.name: m for m in builtin_manifests()}
     expected = [
-        "vectorstore-support",
-        "vectorstore-lancedb",
-        "tool-openapi",
-        "tool-filter-rag",
+        "vectorstore_support",
+        "vectorstore_lancedb",
+        "tool_openapi",
+        "tool_filter_rag",
     ]
     for name in expected:
         assert name in manifests, f"Missing manifest: {name}"

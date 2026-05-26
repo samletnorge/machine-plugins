@@ -12,10 +12,10 @@ from memory_support.observational import facts_to_system_prompt
 
 @pytest.mark.asyncio
 async def test_plugin_loads_and_registers_categories():
-    """Memory-support plugin registers 'memory' and 'storage-backend' categories."""
+    """Memory_support plugin registers 'memory' and 'storage-backend' categories."""
     m = Machine()
     manifest = PluginManifest(
-        name="memory-support",
+        name="memory_support",
         version="0.10.0",
         capabilities=[
             "categories:define",
@@ -30,7 +30,7 @@ async def test_plugin_loads_and_registers_categories():
         ),
     )
     m.plugins.register_manifest(manifest)
-    await m.plugins.load("memory-support")
+    await m.plugins.load("memory_support")
 
     assert "memory" in m._registry
     assert "storage-backend" in m._registry
@@ -38,10 +38,10 @@ async def test_plugin_loads_and_registers_categories():
 
 @pytest.mark.asyncio
 async def test_plugin_hookspecs_registered():
-    """Memory-support plugin registers memory lifecycle hooks."""
+    """Memory_support plugin registers memory lifecycle hooks."""
     m = Machine()
     manifest = PluginManifest(
-        name="memory-support",
+        name="memory_support",
         version="0.10.0",
         capabilities=["categories:define", "hooks:define"],
         transport=TransportConfig(
@@ -50,7 +50,7 @@ async def test_plugin_hookspecs_registered():
         ),
     )
     m.plugins.register_manifest(manifest)
-    await m.plugins.load("memory-support")
+    await m.plugins.load("memory_support")
 
     assert "hooks/beforeMemoryStore" in m.hooks._specs
     assert "hooks/afterMemoryStore" in m.hooks._specs

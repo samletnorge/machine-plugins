@@ -1,4 +1,4 @@
-"""Tests for provider-github-copilot LLM plugin."""
+"""Tests for provider_github_copilot LLM plugin."""
 
 import time
 import pytest
@@ -79,12 +79,8 @@ class TestCopilotAuth:
         with (
             patch("httpx.AsyncClient") as MockClient,
             patch("webbrowser.open_new_tab"),
-            patch(
-                "provider_github_copilot.auth.CONFIG_DIR"
-            ) as mock_dir,
-            patch(
-                "provider_github_copilot.auth.TOKEN_FILE"
-            ) as mock_file,
+            patch("provider_github_copilot.auth.CONFIG_DIR") as mock_dir,
+            patch("provider_github_copilot.auth.TOKEN_FILE") as mock_file,
         ):
             client = AsyncMock()
             client.post = AsyncMock(side_effect=[mock_device_resp, mock_poll_resp])
@@ -162,6 +158,6 @@ async def test_copilot_manifest():
     from machine_core.plugins import builtin_manifests
 
     manifests = {m.name: m for m in builtin_manifests()}
-    assert "provider-github-copilot" in manifests
-    m = manifests["provider-github-copilot"]
+    assert "provider_github_copilot" in manifests
+    m = manifests["provider_github_copilot"]
     assert any("httpx" in d for d in m.dependencies)

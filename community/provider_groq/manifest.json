@@ -1,5 +1,5 @@
 {
-  "name": "provider-groq",
+  "name": "provider_groq",
   "version": "0.1.0",
   "description": "Groq LLM provider via pydantic-ai",
   "schema_version": "1.0.0",

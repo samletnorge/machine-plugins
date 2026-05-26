@@ -1,5 +1,5 @@
 {
-  "name": "channel-support",
+  "name": "channel_support",
   "version": "0.1.0",
   "description": "Channel integrations: in-memory and WebSocket channels",
   "schema_version": "1.0.0",

@@ -1,5 +1,5 @@
 {
-  "name": "provider-vertex-claude",
+  "name": "provider_vertex_claude",
   "version": "0.1.0",
   "description": "Vertex AI Claude LLM provider via pydantic-ai",
   "schema_version": "1.0.0",

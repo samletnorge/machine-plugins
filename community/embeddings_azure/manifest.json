@@ -1,5 +1,5 @@
 {
-  "name": "embeddings-azure",
+  "name": "embeddings_azure",
   "version": "0.1.0",
   "description": "Azure OpenAI embedding provider",
   "schema_version": "1.0.0",

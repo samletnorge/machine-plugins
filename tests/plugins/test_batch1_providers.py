@@ -13,14 +13,14 @@ async def test_all_llm_providers_discoverable():
 
     manifests = {m.name: m for m in builtin_manifests()}
     expected_providers = [
-        "provider-ollama",
-        "provider-azure-openai",
-        "provider-grok",
-        "provider-groq",
-        "provider-google-gemini",
-        "provider-vertex-gemini",
-        "provider-vertex-claude",
-        "provider-github-copilot",
+        "provider_ollama",
+        "provider_azure_openai",
+        "provider_grok",
+        "provider_groq",
+        "provider_google_gemini",
+        "provider_vertex_gemini",
+        "provider_vertex_claude",
+        "provider_github_copilot",
     ]
     for name in expected_providers:
         assert name in manifests, f"Missing manifest: {name}"
@@ -32,14 +32,14 @@ async def test_machine_starts_with_missing_provider_deps():
     await m.start()
     # At minimum, the 6 category plugins must load
     assert len(m.plugins.loaded_plugins) >= 6
-    assert "tool-support" in m.plugins.loaded_plugins
-    assert "model-provider-support" in m.plugins.loaded_plugins
+    assert "tool_support" in m.plugins.loaded_plugins
+    assert "model_provider_support" in m.plugins.loaded_plugins
     await m.shutdown()
 
 
 async def test_disabled_provider_not_loaded():
     """Disabled providers should not load."""
-    m = Machine(config=MachineConfig(disabled_plugins=["provider-ollama"]))
+    m = Machine(config=MachineConfig(disabled_plugins=["provider_ollama"]))
     await m.start()
     providers = m.list_category("model_provider")
     assert "ollama" not in providers

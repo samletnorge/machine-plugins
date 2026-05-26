@@ -1,5 +1,5 @@
 {
-  "name": "provider-google-gemini",
+  "name": "provider_google_gemini",
   "version": "0.1.0",
   "description": "Google Gemini LLM provider via pydantic-ai",
   "schema_version": "1.0.0",

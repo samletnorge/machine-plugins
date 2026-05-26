@@ -1,5 +1,5 @@
 {
-  "name": "provider-github-copilot",
+  "name": "provider_github_copilot",
   "version": "0.1.0",
   "description": "GitHub Copilot LLM provider via OAuth device flow + pydantic-ai",
   "schema_version": "1.0.0",

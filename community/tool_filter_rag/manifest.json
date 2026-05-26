@@ -1,5 +1,5 @@
 {
-  "name": "tool-filter-rag",
+  "name": "tool_filter_rag",
   "version": "0.1.0",
   "description": "Semantic tool filtering via embeddings + vector store",
   "schema_version": "1.0.0",

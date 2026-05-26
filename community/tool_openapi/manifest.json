@@ -1,5 +1,5 @@
 {
-  "name": "tool-openapi",
+  "name": "tool_openapi",
   "version": "0.1.0",
   "description": "Generate tools from OpenAPI specs",
   "schema_version": "1.0.0",

@@ -1,4 +1,4 @@
-"""Tests for provider-azure-openai LLM plugin."""
+"""Tests for provider_azure_openai LLM plugin."""
 
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
@@ -16,7 +16,7 @@ async def test_azure_manifest_has_dependencies():
     from machine_core.plugins import builtin_manifests
 
     manifests = builtin_manifests()
-    azure = next((m for m in manifests if m.name == "provider-azure-openai"), None)
+    azure = next((m for m in manifests if m.name == "provider_azure_openai"), None)
     assert azure is not None
     assert any("pydantic-ai" in d for d in azure.dependencies)
 

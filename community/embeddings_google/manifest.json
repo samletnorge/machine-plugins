@@ -1,5 +1,5 @@
 {
-  "name": "embeddings-google",
+  "name": "embeddings_google",
   "version": "0.1.0",
   "description": "Google GenAI embedding provider",
   "schema_version": "1.0.0",

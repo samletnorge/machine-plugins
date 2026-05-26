@@ -1,5 +1,5 @@
 {
-  "name": "workflow-support",
+  "name": "workflow_support",
   "version": "0.9.0",
   "description": "Defines the 'workflow' and 'execution-engine' categories with step primitives, DAG builder, and execution engines",
   "schema_version": "1.0.0",

@@ -1,4 +1,4 @@
-"""Tests for structured-output builtin plugin."""
+"""Tests for structured_output builtin plugin."""
 
 import pytest
 from pydantic import BaseModel
@@ -66,7 +66,7 @@ async def test_plugin_setup_registers_category():
 
     m = Machine()
     manifest = PluginManifest(
-        name="structured-output",
+        name="structured_output",
         version="0.5.0",
         capabilities=[
             "categories:define",
@@ -80,7 +80,7 @@ async def test_plugin_setup_registers_category():
         ),
     )
     m.plugins.register_manifest(manifest)
-    await m.plugins.load("structured-output")
+    await m.plugins.load("structured_output")
     assert "structured_output" in m._registry
     assert "before_generate_object" in m.hooks._specs
     assert "after_generate_object" in m.hooks._specs

@@ -1,4 +1,4 @@
-"""Tests for provider-ollama LLM plugin."""
+"""Tests for provider_ollama LLM plugin."""
 
 import json
 import pytest
@@ -31,7 +31,7 @@ async def test_ollama_manifest_has_dependencies():
     from machine_core.plugins import builtin_manifests
 
     manifests = builtin_manifests()
-    ollama = next((m for m in manifests if m.name == "provider-ollama"), None)
+    ollama = next((m for m in manifests if m.name == "provider_ollama"), None)
     assert ollama is not None
     assert "httpx" in " ".join(ollama.dependencies).lower()
 

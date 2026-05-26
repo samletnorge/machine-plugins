@@ -1,5 +1,5 @@
 {
-  "name": "processor-support",
+  "name": "processor_support",
   "version": "0.1.0",
   "description": "Middleware processor pipeline for agents — PII detection, moderation, token limiting, cost guard, caching, and more.",
   "schema_version": "1.0.0",

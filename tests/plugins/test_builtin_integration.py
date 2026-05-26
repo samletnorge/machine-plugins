@@ -31,7 +31,7 @@ async def test_all_builtins_load():
 async def test_disabled_plugins():
     """Disabled plugins should not load."""
     m = Machine(
-        config=MachineConfig(disabled_plugins=["prompt-support", "structured-output"])
+        config=MachineConfig(disabled_plugins=["prompt_support", "structured_output"])
     )
     await m.start()
     assert "tool" in m._registry

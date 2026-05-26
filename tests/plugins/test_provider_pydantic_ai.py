@@ -144,11 +144,11 @@ async def test_all_pydantic_ai_manifests_exist():
 
     manifests = {m.name: m for m in builtin_manifests()}
     expected = [
-        "provider-grok",
-        "provider-groq",
-        "provider-google-gemini",
-        "provider-vertex-gemini",
-        "provider-vertex-claude",
+        "provider_grok",
+        "provider_groq",
+        "provider_google_gemini",
+        "provider_vertex_gemini",
+        "provider_vertex_claude",
     ]
     for name in expected:
         assert name in manifests, f"Missing manifest for {name}"

@@ -1,5 +1,5 @@
 {
-  "name": "provider-azure-openai",
+  "name": "provider_azure_openai",
   "version": "0.1.0",
   "description": "Azure OpenAI LLM provider via pydantic-ai",
   "schema_version": "1.0.0",

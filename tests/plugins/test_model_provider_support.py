@@ -1,4 +1,4 @@
-"""Tests for model-provider-support builtin plugin."""
+"""Tests for model_provider_support builtin plugin."""
 
 import pytest
 from pydantic import ValidationError as PydanticValidationError
@@ -57,7 +57,7 @@ async def test_plugin_setup_registers_category():
 
     m = Machine()
     manifest = PluginManifest(
-        name="model-provider-support",
+        name="model_provider_support",
         version="0.5.0",
         capabilities=[
             "categories:define",
@@ -71,7 +71,7 @@ async def test_plugin_setup_registers_category():
         ),
     )
     m.plugins.register_manifest(manifest)
-    await m.plugins.load("model-provider-support")
+    await m.plugins.load("model_provider_support")
     assert "model_provider" in m._registry
 
 
@@ -81,7 +81,7 @@ async def test_plugin_hookspecs_registered():
 
     m = Machine()
     manifest = PluginManifest(
-        name="model-provider-support",
+        name="model_provider_support",
         version="0.5.0",
         capabilities=[
             "categories:define",
@@ -95,7 +95,7 @@ async def test_plugin_hookspecs_registered():
         ),
     )
     m.plugins.register_manifest(manifest)
-    await m.plugins.load("model-provider-support")
+    await m.plugins.load("model_provider_support")
     assert "before_model_invoke" in m.hooks._specs
     assert "after_model_invoke" in m.hooks._specs
     assert "on_model_error" in m.hooks._specs

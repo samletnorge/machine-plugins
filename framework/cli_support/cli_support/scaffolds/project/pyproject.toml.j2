@@ -37,7 +37,7 @@ plugins = [
 ]
 
 # Per-plugin configuration (overrides manifest defaults & env vars)
-[tool.machine-core.plugin_configs.provider-ollama]
+[tool.machine-core.plugin_configs.provider_ollama]
 base_url = "http://localhost:9012"
 model = "gemma4:latest"
 
@@ -48,7 +48,7 @@ model = "qwen3-embedding:8b"
 [tool.machine-core.plugin_configs.eval_support]
 judge_llm = { provider = "ollama", model = "gemma4:latest" }
 
-[tool.machine-core.plugin_configs.rag-support]
+[tool.machine-core.plugin_configs.rag_support]
 reranker_llm = { provider = "ollama", model = "gemma4:latest" }
 extractor_llm = { provider = "ollama", model = "gemma4:latest" }
 

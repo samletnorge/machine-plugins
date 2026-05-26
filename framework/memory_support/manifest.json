@@ -1,5 +1,5 @@
 {
-  "name": "memory-support",
+  "name": "memory_support",
   "version": "0.10.0",
   "description": "Defines the 'memory' and 'storage-backend' categories with thread-based conversation memory, working memory, observational memory, and windowing strategies",
   "schema_version": "1.0.0",

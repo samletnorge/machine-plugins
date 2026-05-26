@@ -1,5 +1,5 @@
 {
-  "name": "provider-vertex-gemini",
+  "name": "provider_vertex_gemini",
   "version": "0.1.0",
   "description": "Vertex AI Gemini LLM provider via pydantic-ai",
   "schema_version": "1.0.0",

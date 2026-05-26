@@ -1,4 +1,4 @@
-"""Tests for prompt-support builtin plugin."""
+"""Tests for prompt_support builtin plugin."""
 
 import pytest
 from prompt_support.schemas import (
@@ -125,7 +125,7 @@ async def test_plugin_setup_registers_category():
 
     m = Machine()
     manifest = PluginManifest(
-        name="prompt-support",
+        name="prompt_support",
         version="0.5.0",
         capabilities=[
             "categories:define",
@@ -139,7 +139,7 @@ async def test_plugin_setup_registers_category():
         ),
     )
     m.plugins.register_manifest(manifest)
-    await m.plugins.load("prompt-support")
+    await m.plugins.load("prompt_support")
     assert "prompt" in m._registry
     assert "before_prompt_render" in m.hooks._specs
     assert "after_prompt_render" in m.hooks._specs

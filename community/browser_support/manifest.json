@@ -1,5 +1,5 @@
 {
-  "name": "browser-support",
+  "name": "browser_support",
   "version": "0.1.0",
   "description": "Browser automation with Playwright and AI-driven element selection (Stagehand)",
   "schema_version": "1.0.0",

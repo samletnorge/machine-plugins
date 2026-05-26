@@ -164,7 +164,7 @@ def test_all_embedding_manifests():
         / "machine_core"
         / "plugins"
     )
-    expected = {"embeddings-ollama", "embeddings-azure", "embeddings-google"}
+    expected = {"embeddings_ollama", "embeddings_azure", "embeddings_google"}
     found = set()
     for manifest_path in plugins_dir.glob("embeddings_*/manifest.json"):
         with open(manifest_path) as f:

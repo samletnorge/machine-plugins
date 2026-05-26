@@ -1,5 +1,5 @@
 {
-  "name": "auth-support",
+  "name": "auth_support",
   "version": "0.1.0",
   "description": "Authentication and authorization: JWT, API Key providers with RBAC",
   "schema_version": "1.0.0",

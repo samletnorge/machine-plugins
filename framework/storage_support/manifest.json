@@ -1,5 +1,5 @@
 {
-  "name": "storage-support",
+  "name": "storage_support",
   "version": "0.1.0",
   "description": "Storage backends: local filesystem and S3-compatible storage",
   "schema_version": "1.0.0",

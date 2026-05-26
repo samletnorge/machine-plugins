@@ -1,5 +1,5 @@
 {
-  "name": "provider-grok",
+  "name": "provider_grok",
   "version": "0.1.0",
   "description": "Grok (xAI) LLM provider via pydantic-ai",
   "schema_version": "1.0.0",

@@ -1,5 +1,5 @@
 {
-  "name": "workspace-support",
+  "name": "workspace_support",
   "version": "0.1.0",
   "description": "Agent workspace with sandboxed execution, filesystem abstraction, and skills system",
   "schema_version": "1.0.0",

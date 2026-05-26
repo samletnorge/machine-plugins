@@ -1,5 +1,5 @@
 {
-  "name": "pubsub-support",
+  "name": "pubsub_support",
   "version": "0.1.0",
   "description": "PubSub event system: in-memory implementation",
   "schema_version": "1.0.0",

@@ -1,5 +1,5 @@
 {
-  "name": "provider-ollama",
+  "name": "provider_ollama",
   "version": "0.1.0",
   "description": "Ollama LLM provider — pure httpx reference implementation",
   "schema_version": "1.0.0",

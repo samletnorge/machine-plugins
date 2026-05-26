@@ -1,5 +1,5 @@
 {
-  "name": "prompt-support",
+  "name": "prompt_support",
   "version": "0.5.0",
   "description": "Defines the 'prompt' category with versioned templates, rendering, and composition",
   "schema_version": "1.0.0",
