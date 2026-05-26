@@ -133,6 +133,9 @@ class BrregAgentRunner:
         selected_tools: list = []
         for name in selected_tool_names:
             tool = all_tools.get(name)
+            if tool is None:
+                # Try with brreg_ prefix (filter indexes by original name)
+                tool = all_tools.get(f"brreg_{name}")
             if tool is not None:
                 selected_tools.append(tool)
 
