@@ -17,10 +17,14 @@ class EmbeddingsSentenceTransformersPlugin:
     def __init__(self):
         self._model = None
         self._model_name: str = "all-MiniLM-L6-v2"
+        self._encode_batch_size: int = 256
 
     async def initialize(self, config=None, **kwargs):
         config = config or {}
         self._model_name = config.get("model", self._model_name)
+        self._encode_batch_size = int(
+            config.get("encode_batch_size", self._encode_batch_size)
+        )
 
     async def setup(self, ctx: PluginContext):
         ctx.register("embedding", "sentence_transformers", self)
@@ -50,13 +54,21 @@ class EmbeddingsSentenceTransformersPlugin:
         start = time.monotonic()
         model = self._get_model()
         texts = request.input if isinstance(request.input, list) else [request.input]
-        embeddings = model.encode(texts, convert_to_numpy=True)
+        embeddings = model.encode(
+            texts,
+            batch_size=self._encode_batch_size,
+            convert_to_numpy=True,
+            show_progress_bar=False,
+        )
         vectors = embeddings.tolist()
         dimensions = len(vectors[0]) if vectors else 0
         return EmbeddingResult(
             vectors=vectors,
             model_ref=request.model_ref or self._model_name,
             dimensions=dimensions,
-            usage={"input_count": len(texts)},
+            usage={
+                "input_count": len(texts),
+                "encode_batch_size": self._encode_batch_size,
+            },
             duration_ms=(time.monotonic() - start) * 1000,
         )

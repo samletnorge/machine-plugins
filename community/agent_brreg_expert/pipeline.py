@@ -105,6 +105,7 @@ class BrregPipeline:
 
         # Step 2: Merge per org number
         logger.info("brreg-pipeline: merging {} entities...", len(entities))
+        merge_start = time.monotonic()
         merged_docs = merge_entities(
             entities,
             sub_entities,
@@ -112,7 +113,11 @@ class BrregPipeline:
             frivillig_records=frivillig,
             parti_records=parti,
         )
-        logger.info("brreg-pipeline: merged into {} documents", len(merged_docs))
+        logger.info(
+            "brreg-pipeline: merged into {} documents in {:.1f}s",
+            len(merged_docs),
+            time.monotonic() - merge_start,
+        )
 
         # Step 3: Process documents in batches (chunk → batch embed → upsert)
         # We use structured metadata from the registry data directly.
@@ -131,6 +136,7 @@ class BrregPipeline:
         # Batch settings
         embed_batch_size = self._config.get("embed_batch_size", 4096)
         upsert_batch_size = self._config.get("upsert_batch_size", 1000)
+        flush_count = 0
 
         try:
             from tqdm import tqdm
@@ -145,9 +151,12 @@ class BrregPipeline:
 
         async def flush_pending() -> None:
             """Embed and upsert a batch of pending chunks."""
-            nonlocal chunks_upserted
+            nonlocal chunks_upserted, flush_count
             if not pending_texts:
                 return
+            flush_count += 1
+            batch_size = len(pending_texts)
+            embed_start = time.monotonic()
             try:
                 embed_result = await embedder.embed(
                     EmbeddingRequest(input=pending_texts)
@@ -160,6 +169,7 @@ class BrregPipeline:
                 pending_texts.clear()
                 pending_meta.clear()
                 return
+            embed_ms = (time.monotonic() - embed_start) * 1000
 
             upsert_batch = []
             for i, vec in enumerate(vectors):
@@ -176,8 +186,26 @@ class BrregPipeline:
             chunks_upserted += len(upsert_batch)
 
             # Upsert in sub-batches
+            upsert_start = time.monotonic()
             for j in range(0, len(upsert_batch), upsert_batch_size):
                 await vectorstore.upsert(upsert_batch[j : j + upsert_batch_size])
+            upsert_ms = (time.monotonic() - upsert_start) * 1000
+
+            docs_per_sec = batch_size / max((embed_ms + upsert_ms) / 1000, 1e-9)
+            logger.info(
+                "brreg-pipeline: flush {} — texts={}, embed_ms={:.0f}, upsert_ms={:.0f}, throughput={:.1f} chunks/s",
+                flush_count,
+                batch_size,
+                embed_ms,
+                upsert_ms,
+                docs_per_sec,
+            )
+            if progress:
+                progress.set_postfix(
+                    embed_ms=f"{embed_ms:.0f}",
+                    upsert_ms=f"{upsert_ms:.0f}",
+                    flush=flush_count,
+                )
 
             pending_texts.clear()
             pending_meta.clear()

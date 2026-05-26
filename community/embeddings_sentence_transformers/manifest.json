@@ -17,6 +17,11 @@
       "type": "string",
       "default": "all-MiniLM-L6-v2",
       "description": "SentenceTransformers model name"
+    },
+    "encode_batch_size": {
+      "type": "integer",
+      "default": 256,
+      "description": "Internal SentenceTransformer.encode() batch size"
     }
   }
 }

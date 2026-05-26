@@ -48,6 +48,7 @@ model = "qwen3-embedding:8b"
 
 [tool.machine-core.plugin_configs.embeddings_sentence_transformers]
 model = "all-MiniLM-L6-v2"
+encode_batch_size = 512
 
 [tool.machine-core.plugin_configs.eval_support]
 judge_llm = { provider = "ollama", model = "gemma4:latest" }
@@ -58,8 +59,8 @@ extractor_llm = { provider = "ollama", model = "gemma4:latest" }
 
 [tool.machine-core.plugin_configs.agent_brreg_expert]
 embedding_provider = "sentence_transformers"
-embed_batch_size = 4096
-upsert_batch_size = 1000
+embed_batch_size = 20000
+upsert_batch_size = 5000
 
 
 [tool.hatch.metadata]
