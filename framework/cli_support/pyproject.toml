@@ -11,15 +11,18 @@ dependencies = [
     "textual>=3.0", 
     "httpx>=0.27",
     "server_support",
+    "studio_support",
 ]
 
 
 [tool.uv.sources]
 server_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/server_support" }
+studio_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/studio_support" }
 
 [dependency-groups]
 framework = [
     "server_support",
+    "studio_support",
 ]
 
 [tool.uv]

@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import os
 import subprocess
-import sys
 
 import typer
 from rich.console import Console
 
+from cli_support.manifest_sync import sync_manifests
 from cli_support.utils import (
     find_project_root,
     load_machine_config,
@@ -22,12 +22,6 @@ def studio_command(
     host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to."),
 ):
     """Launch the Studio web UI for testing agents and tools."""
-    try:
-        import studio_support  # noqa: F401
-    except ImportError:
-        console.print("[red]studio_support is not installed for this project.[/red]")
-        raise typer.Exit(code=1)
-
     root = find_project_root()
     if root is None:
         console.print("[red]Error: Not inside a machine-core project.[/red]")
@@ -36,8 +30,16 @@ def studio_command(
     config = load_machine_config(root)
     entry = config.get("entry", "src.main:machine")
 
+    console.print("[dim]Syncing plugin manifests...[/dim]")
+    sync_manifests(project_root=root)
+
+    venv_python = root / ".venv" / "bin" / "python"
+    if not venv_python.exists():
+        console.print("[red]Error: No .venv found. Run 'uv sync' first.[/red]")
+        raise typer.Exit(code=1)
+
     console.print(f"[green]Starting Machine Studio...[/green]")
-    console.print(f"  URL: http://{host}:{port}/studio")
+    console.print(f"  URL: http://{host}:{port}/_studio/")
     console.print(f"  Entry: {entry}")
 
     env_vars = {
@@ -46,11 +48,27 @@ def studio_command(
         "MACHINE_STUDIO_ENABLED": "1",
     }
 
+    studio_server_code = f'''\
+"""Auto-generated studio server for machine studio. Do not edit."""
+import os, sys
+sys.path.insert(0, os.environ.get("MACHINE_CORE_ROOT", "."))
+import importlib
+module = importlib.import_module("{entry.rpartition(":")[0]}")
+machine = getattr(module, "{entry.rpartition(":")[2]}")
+from server_support.app import create_app
+app = create_app(machine)
+from studio_support.app import create_studio_app
+studio = create_studio_app(machine)
+app.mount("/_studio", studio)
+'''
+    studio_server_file = root / "_machine_studio_server.py"
+    studio_server_file.write_text(studio_server_code)
+
     cmd = [
-        sys.executable,
+        str(venv_python),
         "-m",
         "uvicorn",
-        "cli_support.commands._dev_server:app",
+        "_machine_studio_server:app",
         "--host",
         host,
         "--port",
@@ -58,4 +76,7 @@ def studio_command(
     ]
 
     full_env = {**os.environ, **env_vars}
-    subprocess.run(cmd, cwd=str(root), env=full_env)
+    try:
+        subprocess.run(cmd, cwd=str(root), env=full_env)
+    finally:
+        studio_server_file.unlink(missing_ok=True)
