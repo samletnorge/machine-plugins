@@ -55,9 +55,6 @@ from .ingestor import (
 )
 from .merger import merge_entities
 
-# Batch size for upsert operations
-UPSERT_BATCH_SIZE = 100
-
 
 class BrregPipeline:
     """RAG pipeline for Brønnøysundregistrene company data."""
@@ -132,7 +129,8 @@ class BrregPipeline:
         total_docs = len(merged_docs)
 
         # Batch settings
-        EMBED_BATCH_SIZE = 256  # Bigger batch = less HTTP overhead; timeout is 300s
+        embed_batch_size = self._config.get("embed_batch_size", 4096)
+        upsert_batch_size = self._config.get("upsert_batch_size", 1000)
 
         try:
             from tqdm import tqdm
@@ -178,8 +176,8 @@ class BrregPipeline:
             chunks_upserted += len(upsert_batch)
 
             # Upsert in sub-batches
-            for j in range(0, len(upsert_batch), UPSERT_BATCH_SIZE):
-                await vectorstore.upsert(upsert_batch[j : j + UPSERT_BATCH_SIZE])
+            for j in range(0, len(upsert_batch), upsert_batch_size):
+                await vectorstore.upsert(upsert_batch[j : j + upsert_batch_size])
 
             pending_texts.clear()
             pending_meta.clear()
@@ -231,7 +229,7 @@ class BrregPipeline:
                     }
                 )
 
-                if len(pending_texts) >= EMBED_BATCH_SIZE:
+                if len(pending_texts) >= embed_batch_size:
                     await flush_pending()
 
             docs_processed += 1
