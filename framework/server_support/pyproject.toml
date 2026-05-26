@@ -24,6 +24,7 @@ dependencies = [
     "tool_filter_rag",
     "rag_support",
     "provider_ollama",
+    "embeddings_sentence_transformers",
 ]
 
 [build-system]
@@ -54,3 +55,4 @@ tool_openapi = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git
 tool_filter_rag = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/tool_filter_rag" }
 rag_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/rag_support" }
 provider_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_ollama" }
+embeddings_sentence_transformers = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/embeddings_sentence_transformers" }

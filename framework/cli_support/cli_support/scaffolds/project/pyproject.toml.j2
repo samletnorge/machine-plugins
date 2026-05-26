@@ -24,6 +24,7 @@ plugins = [
     "server_support",
     "provider_ollama",
     "embeddings",
+    "embeddings_sentence_transformers",
     "embeddings_ollama",
     "vectorstore_support",
     "vectorstore_lancedb",
@@ -45,12 +46,19 @@ model = "gemma4:latest"
 base_url = "http://localhost:9012"
 model = "qwen3-embedding:8b"
 
+[tool.machine-core.plugin_configs.embeddings_sentence_transformers]
+model = "all-MiniLM-L6-v2"
+
 [tool.machine-core.plugin_configs.eval_support]
 judge_llm = { provider = "ollama", model = "gemma4:latest" }
 
 [tool.machine-core.plugin_configs.rag_support]
 reranker_llm = { provider = "ollama", model = "gemma4:latest" }
 extractor_llm = { provider = "ollama", model = "gemma4:latest" }
+
+[tool.machine-core.plugin_configs.agent_brreg_expert]
+embedding_provider = "sentence_transformers"
+
 
 [tool.hatch.metadata]
 allow-direct-references = true
