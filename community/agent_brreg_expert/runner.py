@@ -67,8 +67,8 @@ class BrregAgentRunner:
 
     async def run(
         self,
-        definition: Any,
         input: str,
+        definition: Any = None,
         tools: list | None = None,
         context: dict[str, Any] | None = None,
     ) -> AgentRunResult:

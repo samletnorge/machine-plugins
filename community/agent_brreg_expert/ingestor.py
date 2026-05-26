@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import gzip
 import io
 import json
 import zipfile
@@ -23,9 +24,15 @@ DOWNLOAD_TIMEOUT = 1800.0
 
 
 def parse_json_stream(data: bytes) -> list[dict[str, Any]]:
-    """Parse JSON bytes (expected to be a JSON array) into list of dicts."""
+    """Parse JSON bytes (expected to be a JSON array) into list of dicts.
+
+    Handles gzip-compressed data transparently.
+    """
     if not data or data.strip() == b"":
         return []
+    # Detect gzip (magic bytes 1f 8b)
+    if data[:2] == b"\x1f\x8b":
+        data = gzip.decompress(data)
     parsed = json.loads(data)
     if isinstance(parsed, list):
         return parsed
