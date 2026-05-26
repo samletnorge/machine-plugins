@@ -128,16 +128,25 @@ class BrregAgentRunner:
             except Exception as e:
                 logger.warning("brreg-expert: tool filter failed: {}", e)
 
-        # Resolve selected tools from registry
+        # Resolve selected tools from registry (deduplicated)
         all_tools = self._machine.list_category("tool")
         selected_tools: list = []
+        seen_names: set[str] = set()
         for name in selected_tool_names:
-            tool = all_tools.get(name)
-            if tool is None:
-                # Try with brreg_ prefix (filter indexes by original name)
-                tool = all_tools.get(f"brreg_{name}")
+            if name in seen_names:
+                continue
+            tool = all_tools.get(name) or all_tools.get(f"brreg_{name}")
             if tool is not None:
                 selected_tools.append(tool)
+                seen_names.add(name)
+
+        # Always ensure the search tool (hentEnheter) is included for name lookups
+        for must_have in ("hentEnheter",):
+            if must_have not in seen_names:
+                tool = all_tools.get(f"brreg_{must_have}") or all_tools.get(must_have)
+                if tool is not None:
+                    selected_tools.append(tool)
+                    seen_names.add(must_have)
 
         # Step 3: Build context block from RAG results
         context_block = ""
