@@ -92,6 +92,38 @@ def _coerce_kwargs(fn: Any, kwargs: dict[str, Any]) -> dict[str, Any]:
     return coerced
 
 
+def _coerce_single_value(fn: Any, value: Any) -> Any:
+    """Coerce a single positional body value using the first parameter annotation."""
+    try:
+        sig = inspect.signature(fn)
+        params = [p for p in sig.parameters.values() if p.name != "self"]
+        if not params:
+            return value
+        ann = params[0].annotation
+        if ann == inspect.Parameter.empty:
+            return value
+        if isinstance(ann, str):
+            hints = typing.get_type_hints(fn)
+            ann = hints.get(params[0].name, ann)
+
+        if isinstance(value, dict) and hasattr(ann, "model_validate"):
+            return ann.model_validate(value)
+
+        origin = typing.get_origin(ann)
+        args = typing.get_args(ann)
+        if isinstance(value, list) and origin is list and args:
+            inner = args[0]
+            if hasattr(inner, "model_validate"):
+                return [
+                    inner.model_validate(item) if isinstance(item, dict) else item
+                    for item in value
+                ]
+
+        return value
+    except Exception:
+        return value
+
+
 def generate_routes(machine: Any) -> APIRouter:
     """Generate an APIRouter with routes for every category and operation."""
     router = APIRouter(prefix="/api")
@@ -185,6 +217,7 @@ def generate_routes(machine: Any) -> APIRouter:
 
                     # Build kwargs from path params + body
                     kwargs: dict[str, Any] = {}
+                    body: Any = {}
 
                     # Extract extra path params from the actual request path
                     # FastAPI path params beyond {name} need manual extraction
@@ -211,7 +244,8 @@ def generate_routes(machine: Any) -> APIRouter:
                             body = await request.json()
                         except Exception:
                             body = {}
-                        kwargs.update(body)
+                        if isinstance(body, dict):
+                            kwargs.update(body)
 
                     # Stream handling
                     if _is_stream:
@@ -239,7 +273,7 @@ def generate_routes(machine: Any) -> APIRouter:
                             if ann and hasattr(ann, "model_validate"):
                                 gen = fn(ann.model_validate(kwargs))
                             else:
-                                gen = fn(kwargs)
+                                gen = fn(_coerce_single_value(fn, body))
                             if inspect.isawaitable(gen):
                                 gen = await gen
                             return sse_response(gen)
@@ -279,7 +313,7 @@ def generate_routes(machine: Any) -> APIRouter:
                                 typed_arg = ann.model_validate(kwargs)
                                 result = fn(typed_arg)
                             else:
-                                result = fn(kwargs)
+                                result = fn(_coerce_single_value(fn, body))
                             if inspect.isawaitable(result):
                                 result = await result
                         except Exception:
