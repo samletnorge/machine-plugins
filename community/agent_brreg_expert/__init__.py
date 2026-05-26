@@ -55,14 +55,26 @@ class BrregExpertPlugin:
         for tool in tools:
             ctx.register("tool", f"brreg_{tool.name}", tool)
 
-        # --- 3. Index tools in the RAG filter ---
+        # --- 3. Index tools in the RAG filter (skip if already indexed) ---
         filter_rag = machine.resolve("tool", "__filter_rag__")
         if filter_rag and tools:
             try:
-                await filter_rag.index_tools(tools)
-                logger.info("brreg-expert: indexed {} tools in filter", len(tools))
-            except Exception as e:
-                logger.warning("brreg-expert: tool indexing failed: {}", e)
+                # Check if tools are already indexed by searching for a known tool
+                test_results = await filter_rag.filter("hentEnhet", top_k=1)
+                if test_results:
+                    logger.info(
+                        "brreg-expert: tools already indexed, skipping re-index"
+                    )
+                else:
+                    await filter_rag.index_tools(tools)
+                    logger.info("brreg-expert: indexed {} tools in filter", len(tools))
+            except Exception:
+                # First time or error — index
+                try:
+                    await filter_rag.index_tools(tools)
+                    logger.info("brreg-expert: indexed {} tools in filter", len(tools))
+                except Exception as e:
+                    logger.warning("brreg-expert: tool indexing failed: {}", e)
 
         # --- 4. Register RAG pipeline ---
         from .pipeline import BrregPipeline
