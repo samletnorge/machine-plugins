@@ -1,0 +1,41 @@
+{
+  "name": "agent_brreg_expert",
+  "version": "0.1.0",
+  "description": "Norwegian companies expert — RAG + live Brreg API tools",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["agent:register", "rag_pipeline:register", "tool:register"],
+  "dependencies": ["tool_openapi", "tool_filter_rag", "rag_support"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "config_schema": {
+    "spec_url": {
+      "type": "string",
+      "default": "https://data.brreg.no/enhetsregisteret/api/dokumentasjon/no/openapi.json"
+    },
+    "vectorstore_table": {
+      "type": "string",
+      "default": "brreg_companies"
+    },
+    "retrieve_top_k": {
+      "type": "integer",
+      "default": 20
+    },
+    "rerank_top_k": {
+      "type": "integer",
+      "default": 5
+    },
+    "tool_filter_top_k": {
+      "type": "integer",
+      "default": 5
+    },
+    "model_ref": {
+      "type": "string",
+      "default": "ollama/gemma4:latest"
+    }
+  },
+  "transport": {
+    "type": "in-process",
+    "entry_point": "agent_brreg_expert:BrregExpertPlugin"
+  }
+}
