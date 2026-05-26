@@ -55,50 +55,67 @@ def parse_csv_bytes(data: bytes, delimiter: str = ";") -> list[dict[str, Any]]:
     return [dict(row) for row in reader]
 
 
+async def _stream_download(url: str, label: str) -> bytes:
+    """Stream-download a large file with progress logging."""
+    logger.info("Streaming download: {} from {}", label, url)
+    chunks: list[bytes] = []
+    total = 0
+    async with httpx.AsyncClient(
+        timeout=httpx.Timeout(DOWNLOAD_TIMEOUT, connect=30.0)
+    ) as client:
+        async with client.stream("GET", url) as resp:
+            resp.raise_for_status()
+            expected = resp.headers.get("content-length", "?")
+            async for chunk in resp.aiter_bytes(chunk_size=1024 * 256):
+                chunks.append(chunk)
+                total += len(chunk)
+                if total % (50 * 1024 * 1024) < len(chunk):
+                    logger.info(
+                        "{}: downloaded {} MB / {} bytes expected",
+                        label,
+                        total // (1024 * 1024),
+                        expected,
+                    )
+    logger.info("{}: download complete ({} MB)", label, total // (1024 * 1024))
+    return b"".join(chunks)
+
+
 async def download_entities() -> list[dict[str, Any]]:
     """Download all entities from Enhetsregisteret."""
-    logger.info("Downloading entities from {}", ENHETER_URL)
-    async with httpx.AsyncClient(timeout=DOWNLOAD_TIMEOUT) as client:
-        resp = await client.get(ENHETER_URL)
-        resp.raise_for_status()
-        result = parse_json_stream(resp.content)
-        logger.info("Downloaded {} entities", len(result))
-        return result
+    data = await _stream_download(ENHETER_URL, "entities")
+    result = parse_json_stream(data)
+    logger.info("Downloaded {} entities", len(result))
+    return result
 
 
 async def download_sub_entities() -> list[dict[str, Any]]:
     """Download all sub-entities from Enhetsregisteret."""
-    logger.info("Downloading sub-entities from {}", UNDERENHETER_URL)
-    async with httpx.AsyncClient(timeout=DOWNLOAD_TIMEOUT) as client:
-        resp = await client.get(UNDERENHETER_URL)
-        resp.raise_for_status()
-        result = parse_json_stream(resp.content)
-        logger.info("Downloaded {} sub-entities", len(result))
-        return result
+    data = await _stream_download(UNDERENHETER_URL, "sub-entities")
+    result = parse_json_stream(data)
+    logger.info("Downloaded {} sub-entities", len(result))
+    return result
 
 
 async def download_roles() -> list[dict[str, Any]]:
     """Download all roles (zipped JSON)."""
     logger.info("Downloading roles from {}", ROLLER_URL)
-    async with httpx.AsyncClient(timeout=DOWNLOAD_TIMEOUT) as client:
-        resp = await client.get(ROLLER_URL)
-        resp.raise_for_status()
+    data = await _stream_download(ROLLER_URL, "roles")
 
-        # Roles come as a zip file containing JSON
-        try:
-            zf = zipfile.ZipFile(io.BytesIO(resp.content))
-            names = zf.namelist()
-            if not names:
-                return []
-            data = zf.read(names[0])
-            result = parse_json_stream(data)
-            logger.info("Downloaded {} role records", len(result))
-            return result
-        except zipfile.BadZipFile:
-            # Maybe it's raw JSON
-            result = parse_json_stream(resp.content)
-            logger.info("Downloaded {} role records (unzipped)", len(result))
-            return result
+    # Roles come as a zip file containing JSON
+    try:
+        zf = zipfile.ZipFile(io.BytesIO(data))
+        names = zf.namelist()
+        if not names:
+            return []
+        inner = zf.read(names[0])
+        result = parse_json_stream(inner)
+        logger.info("Downloaded {} role records", len(result))
+        return result
+    except zipfile.BadZipFile:
+        # Maybe it's raw JSON or gzip
+        result = parse_json_stream(data)
+        logger.info("Downloaded {} role records (unzipped)", len(result))
+        return result
 
 
 async def download_frivillig() -> list[dict[str, Any]]:
