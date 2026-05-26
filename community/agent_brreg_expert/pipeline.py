@@ -131,7 +131,9 @@ class BrregPipeline:
         total_docs = len(merged_docs)
 
         # Batch settings
-        EMBED_BATCH_SIZE = 128  # Embed N texts in one call
+        EMBED_BATCH_SIZE = (
+            32  # Embed N texts in one call (limited by Ollama throughput)
+        )
 
         try:
             from tqdm import tqdm

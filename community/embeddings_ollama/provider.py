@@ -11,7 +11,9 @@ from embeddings.schemas import EmbeddingRequest, EmbeddingResult
 
 class OllamaEmbeddingProvider:
     def __init__(
-        self, base_url: str = "http://localhost:11434", model: str = "qwen3-embedding:8b"
+        self,
+        base_url: str = "http://localhost:11434",
+        model: str = "qwen3-embedding:8b",
     ):
         self.base_url = base_url
         self.model = model
@@ -24,7 +26,7 @@ class OllamaEmbeddingProvider:
     async def embed(self, request: EmbeddingRequest) -> EmbeddingResult:
         start = time.monotonic()
         texts = [request.input] if isinstance(request.input, str) else request.input
-        async with httpx.AsyncClient(base_url=self.base_url, timeout=60.0) as client:
+        async with httpx.AsyncClient(base_url=self.base_url, timeout=300.0) as client:
             resp = await client.post(
                 "/v1/embeddings",
                 json={"model": request.model_ref or self.model, "input": texts},
