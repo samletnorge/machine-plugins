@@ -18,13 +18,12 @@ class EmbeddingsSentenceTransformersPlugin:
         self._model = None
         self._model_name: str = "all-MiniLM-L6-v2"
 
-    async def initialize(self, **kwargs):
-        pass
+    async def initialize(self, config=None, **kwargs):
+        config = config or {}
+        self._model_name = config.get("model", self._model_name)
 
     async def setup(self, ctx: PluginContext):
-        config = ctx.config or {}
-        self._model_name = config.get("model", self._model_name)
-        ctx.register_implementation("embedding", "sentence_transformers", self)
+        ctx.register("embedding", "sentence_transformers", self)
 
     async def shutdown(self, **kwargs):
         self._model = None
