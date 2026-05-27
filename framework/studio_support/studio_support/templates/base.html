@@ -46,6 +46,10 @@
         <div class="studio-main">
             <header class="studio-topbar">
                 <div>
+                    <button type="button" class="sidebar-toggle" id="sidebar-toggle">
+                        <span class="nav-icon">{{ icon('blocks') }}</span>
+                        <span>Navigation</span>
+                    </button>
                     <div class="eyebrow">Active runtime</div>
                     <h1>{{ page_title }}</h1>
                     <p>{{ machine_name }} · {{ environment }} · {{ entry }}</p>
@@ -96,9 +100,11 @@
     <script>
     (() => {
         const root = document.documentElement;
+        const body = document.body;
         const themePicker = document.getElementById('theme-picker');
         const modeToggle = document.getElementById('mode-toggle');
         const modeLabel = document.getElementById('mode-label');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
         const storageTheme = localStorage.getItem('machine-studio-theme') || 'atlas';
         const storageMode = localStorage.getItem('machine-studio-mode') || 'dark';
 
@@ -119,6 +125,21 @@
             const nextMode = (root.dataset.mode || storageMode) === 'dark' ? 'light' : 'dark';
             localStorage.setItem('machine-studio-mode', nextMode);
             applyTheme(root.dataset.theme || storageTheme, nextMode);
+        });
+
+        sidebarToggle.addEventListener('click', () => {
+            body.classList.toggle('sidebar-open');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (window.innerWidth > 1100) {
+                return;
+            }
+            const withinSidebar = event.target.closest('.studio-sidebar');
+            const withinToggle = event.target.closest('#sidebar-toggle');
+            if (!withinSidebar && !withinToggle) {
+                body.classList.remove('sidebar-open');
+            }
         });
 
         applyTheme(storageTheme, storageMode);

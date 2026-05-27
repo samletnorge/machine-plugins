@@ -321,6 +321,7 @@ code, pre, .mono {
 
 .theme-select,
 .mode-toggle,
+.sidebar-toggle,
 .control-input,
 .control-select,
 .control-textarea,
@@ -346,6 +347,7 @@ code, pre, .mono {
 }
 
 .mode-toggle,
+.sidebar-toggle,
 .primary-button {
     background: color-mix(in oklab, var(--primary) 20%, var(--card));
     color: var(--foreground);
@@ -354,6 +356,11 @@ code, pre, .mono {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
+}
+
+.sidebar-toggle {
+    display: none;
+    margin-bottom: 0.85rem;
 }
 
 .primary-button {
@@ -597,8 +604,22 @@ code, pre, .mono {
     }
 
     .studio-sidebar {
-        position: static;
-        height: auto;
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(22rem, 88vw);
+        height: 100vh;
+        z-index: 30;
+        transform: translateX(-102%);
+        transition: transform 180ms ease;
+    }
+
+    body.sidebar-open .studio-sidebar {
+        transform: translateX(0);
+    }
+
+    .sidebar-toggle {
+        display: inline-flex;
+        width: fit-content;
     }
 
     .status-card {
@@ -608,6 +629,14 @@ code, pre, .mono {
 
     .status-card:last-child {
         border-bottom: 0;
+    }
+
+    body.sidebar-open::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgb(0 0 0 / 0.45);
+        z-index: 20;
     }
 }
 
