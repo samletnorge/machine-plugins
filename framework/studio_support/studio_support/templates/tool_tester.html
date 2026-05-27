@@ -1,22 +1,37 @@
 {% extends "base.html" %}
-{% block title %}{{ tool.name }} — Tool Tester{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">Tool: {{ tool.name }}</h1>
-<p class="text-gray-400 mb-4">{{ tool.description }}</p>
-<div class="max-w-2xl">
-    <div id="tool-result" class="mb-4 p-4 bg-gray-900 rounded min-h-[100px]"></div>
-    <form id="tool-form" class="flex gap-2">
-        <input type="text" id="tool-input" placeholder='{"input": "value"}' class="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2">
-        <button type="submit" class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded">Execute</button>
-    </form>
-</div>
+<section class="content-grid two-up">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Tool</span>
+                <h3>{{ tool_name }}</h3>
+            </div>
+        </div>
+        <p>{{ tool.description or tool.__doc__ or "No tool description available." }}</p>
+        <form id="tool-form" class="tool-form">
+            <textarea id="tool-input" class="control-textarea" placeholder='{"input": "value"}'></textarea>
+            <button type="submit" class="primary-button">Execute</button>
+        </form>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Result</span>
+                <h3>Output</h3>
+            </div>
+        </div>
+        <pre id="tool-result" class="code-panel min"></pre>
+    </article>
+</section>
 <script>
     document.getElementById('tool-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const input = document.getElementById('tool-input').value;
         let body;
         try { body = JSON.parse(input); } catch { body = {input: input}; }
-        const resp = await fetch('/tools/{{ tool.name }}/execute', {
+        const resp = await fetch('{{ request.scope.root_path }}/tools/{{ tool_name }}/execute', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(body),

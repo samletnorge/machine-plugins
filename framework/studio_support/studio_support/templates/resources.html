@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <span class="eyebrow">Runtime catalog</span>
+            <h3>{{ resource_title }}</h3>
+        </div>
+        <span class="panel-count">{{ resources|length }}</span>
+    </div>
+
+    <div class="stack-list">
+        {% for resource in resources %}
+        <article class="list-card">
+            <div class="list-card-main">
+                <strong>{{ resource.name }}</strong>
+                <p>{{ resource.description }}</p>
+                {% if resource.operations %}
+                <div class="pill-list">
+                    {% for operation in resource.operations %}
+                    <span class="pill">{{ operation }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="list-card-meta right">
+                <span>{{ resource.owner or "runtime" }}</span>
+                {% if resource_category == 'tool' %}
+                <a class="panel-link" href="{{ request.scope.root_path }}/tools/{{ resource.name }}">Test</a>
+                {% elif resource_category == 'agent' %}
+                <a class="panel-link" href="{{ request.scope.root_path }}/chat?agent={{ resource.name }}">Chat</a>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+        {% if not resources %}
+        <p class="muted">{{ empty_copy }}</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

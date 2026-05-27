@@ -1,25 +1,128 @@
+{% from "components/icons.html" import icon %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="atlas" data-mode="dark" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Machine Studio{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{% block title %}{{ page_title }} · Machine Studio{% endblock %}</title>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-    <link rel="stylesheet" href="/static/studio.css">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='studio.css') }}">
 </head>
-<body class="bg-gray-950 text-white min-h-screen">
-    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-3">
-        <div class="flex items-center justify-between">
-            <a href="/" class="text-xl font-bold">⚡ Machine Studio</a>
-            <div class="flex gap-4">
-                <a href="/" class="hover:text-blue-400">Home</a>
-                <a href="/chat" class="hover:text-blue-400">Chat</a>
+<body>
+    <div class="studio-shell">
+        <aside class="studio-sidebar">
+            <div class="brand-block">
+                <a class="brand-link" href="{{ request.scope.root_path }}/">
+                    <span class="brand-mark">{{ icon('spark') }}</span>
+                    <span>
+                        <strong>Machine Studio</strong>
+                        <small>Mission Control</small>
+                    </span>
+                </a>
+                <div class="context-chip">
+                    <span class="context-label">Project</span>
+                    <strong>{{ project_name }}</strong>
+                </div>
             </div>
+
+            <nav class="nav-groups" aria-label="Studio Navigation">
+                {% for section in nav_sections %}
+                <section class="nav-group">
+                    <header>{{ section.section }}</header>
+                    {% for item in section.items %}
+                    <a href="{{ item.href }}" class="nav-item {% if active_nav == item.key %}active{% endif %}">
+                        <span class="nav-icon">{{ icon(item.icon) }}</span>
+                        <span class="nav-label">{{ item.label }}</span>
+                        {% if item.status %}
+                        <span class="nav-status">{{ item.status }}</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </section>
+                {% endfor %}
+            </nav>
+        </aside>
+
+        <div class="studio-main">
+            <header class="studio-topbar">
+                <div>
+                    <div class="eyebrow">Active runtime</div>
+                    <h1>{{ page_title }}</h1>
+                    <p>{{ machine_name }} · {{ environment }} · {{ entry }}</p>
+                </div>
+
+                <div class="topbar-actions">
+                    <label class="theme-select">
+                        <span>Theme</span>
+                        <select id="theme-picker">
+                            {% for key, theme in themes.items() %}
+                            <option value="{{ key }}">{{ theme.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <button type="button" class="mode-toggle" id="mode-toggle">
+                        <span class="mode-toggle-icon">{{ icon('moon') }}</span>
+                        <span id="mode-label">Dark</span>
+                    </button>
+                </div>
+            </header>
+
+            <section class="status-strip">
+                <article class="status-card">
+                    <span class="status-label">Categories</span>
+                    <strong>{{ categories|length }}</strong>
+                </article>
+                <article class="status-card">
+                    <span class="status-label">Loaded plugins</span>
+                    <strong>{{ loaded_plugins|length }}</strong>
+                </article>
+                <article class="status-card">
+                    <span class="status-label">Declared plugins</span>
+                    <strong>{{ plugins_declared|length }}</strong>
+                </article>
+                <article class="status-card wide">
+                    <span class="status-label">Hub model</span>
+                    <strong>Single project runtime with multi-project shell semantics</strong>
+                </article>
+            </section>
+
+            <main class="page-frame">
+                {% block content %}{% endblock %}
+            </main>
         </div>
-    </nav>
-    <main class="p-6">
-        {% block content %}{% endblock %}
-    </main>
+    </div>
+
+    <script>
+    (() => {
+        const root = document.documentElement;
+        const themePicker = document.getElementById('theme-picker');
+        const modeToggle = document.getElementById('mode-toggle');
+        const modeLabel = document.getElementById('mode-label');
+        const storageTheme = localStorage.getItem('machine-studio-theme') || 'atlas';
+        const storageMode = localStorage.getItem('machine-studio-mode') || 'dark';
+
+        function applyTheme(theme, mode) {
+            root.dataset.theme = theme;
+            root.dataset.mode = mode;
+            root.classList.toggle('dark', mode === 'dark');
+            themePicker.value = theme;
+            modeLabel.textContent = mode === 'dark' ? 'Dark' : 'Light';
+        }
+
+        themePicker.addEventListener('change', () => {
+            localStorage.setItem('machine-studio-theme', themePicker.value);
+            applyTheme(themePicker.value, root.dataset.mode || storageMode);
+        });
+
+        modeToggle.addEventListener('click', () => {
+            const nextMode = (root.dataset.mode || storageMode) === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('machine-studio-mode', nextMode);
+            applyTheme(root.dataset.theme || storageTheme, nextMode);
+        });
+
+        applyTheme(storageTheme, storageMode);
+    })();
+    </script>
 </body>
 </html>

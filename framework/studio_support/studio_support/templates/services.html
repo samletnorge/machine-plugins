@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="content-grid two-up">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Status</span>
+                <h3>Lifecycle</h3>
+            </div>
+        </div>
+        <div class="detail-list">
+            <div><span>Studio mount</span><strong>/_studio</strong></div>
+            <div><span>Runtime API</span><strong>/api/*</strong></div>
+            <div><span>Health endpoint</span><strong>/health</strong></div>
+            <div><span>OpenAPI docs</span><strong>/docs</strong></div>
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Current limits</span>
+                <h3>Operational notes</h3>
+            </div>
+        </div>
+        <ul class="simple-list">
+            <li>Studio is mounted from the CLI capability and attached to one active project runtime.</li>
+            <li>Runtime API docs remain at the server root while control-plane pages live under `/_studio`.</li>
+            <li>Log streaming, deploy control, and service actions are reserved for the next control-plane pass.</li>
+        </ul>
+    </article>
+</section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="content-grid two-up">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Reference</span>
+                <h3>Live documentation</h3>
+            </div>
+        </div>
+        <div class="stack-links">
+            <a class="panel-link block" href="/docs" target="_blank" rel="noreferrer">Open FastAPI docs</a>
+            <a class="panel-link block" href="/openapi.json" target="_blank" rel="noreferrer">Open OpenAPI JSON</a>
+            <a class="panel-link block" href="/health" target="_blank" rel="noreferrer">Open health payload</a>
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Architecture</span>
+                <h3>Contract split</h3>
+            </div>
+        </div>
+        <ul class="simple-list">
+            <li>`/api/*` stays the stable runtime data plane generated from the Machine registry.</li>
+            <li>`/_studio/*` is the operator-facing control plane and shell.</li>
+            <li>The current UI is designed for a future hub model without assuming tenancy yet.</li>
+        </ul>
+    </article>
+</section>
+{% endblock %}

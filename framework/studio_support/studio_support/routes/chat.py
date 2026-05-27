@@ -1,14 +1,13 @@
 """Chat interface routes for Studio."""
 
 from __future__ import annotations
-from pathlib import Path
-from fastapi import APIRouter, Request, Form, HTTPException
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from studio_support.dependencies import get_machine
 
-TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+from fastapi import APIRouter, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse
+
+from studio_support.dependencies import get_machine
+from studio_support.ui import render_template
+
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
@@ -21,14 +20,14 @@ async def chat_page(request: Request, agent: str = ""):
         else list(getattr(m, "agents", {}).keys())
     )
     selected = agent if agent in agents else (agents[0] if agents else "")
-    return templates.TemplateResponse(
+    return render_template(
         request,
         "chat.html",
-        context={
-            "agents": agents,
-            "selected_agent": selected,
-            "messages": [],
-        },
+        page_title="Chat",
+        active_nav="chat",
+        agents=agents,
+        selected_agent=selected,
+        messages=[],
     )
 
 
@@ -47,13 +46,15 @@ async def chat_send(request: Request, agent: str = Form(...), message: str = For
     result = await agent_instance.run(message)
     response_text = getattr(result, "output", getattr(result, "data", str(result)))
 
-    return HTMLResponse(f"""
-    <div class="chat-message bg-gray-800 p-3 rounded mb-2">
-        <p class="text-gray-400 text-sm">You</p>
-        <p>{message}</p>
-    </div>
-    <div class="chat-message bg-gray-900 p-3 rounded mb-2">
-        <p class="text-gray-400 text-sm">{agent}</p>
-        <p>{response_text}</p>
-    </div>
-    """)
+    return HTMLResponse(
+        f"""
+        <article class=\"chat-bubble user\">
+            <div class=\"chat-meta\">Operator</div>
+            <div class=\"chat-body\">{message}</div>
+        </article>
+        <article class=\"chat-bubble assistant\">
+            <div class=\"chat-meta\">{agent}</div>
+            <div class=\"chat-body\">{response_text}</div>
+        </article>
+        """
+    )

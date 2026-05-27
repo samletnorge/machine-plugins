@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="content-grid two-up">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Data plane</span>
+                <h3>Machine runtime API</h3>
+            </div>
+        </div>
+        <div class="stack-list compact">
+            {% for category in categories %}
+            <div class="metric-row">
+                <span>/api/{{ category }}</span>
+                <strong>{{ category_counts.get(category, 0) }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Control plane</span>
+                <h3>Studio surfaces</h3>
+            </div>
+        </div>
+        <ul class="simple-list mono">
+            <li>/_studio/</li>
+            <li>/_studio/registry</li>
+            <li>/_studio/config</li>
+            <li>/_studio/services</li>
+            <li>/_studio/agents</li>
+            <li>/_studio/tools</li>
+            <li>/_studio/chat</li>
+        </ul>
+    </article>
+</section>
+{% endblock %}

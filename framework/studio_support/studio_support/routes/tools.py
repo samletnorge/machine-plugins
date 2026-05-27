@@ -1,13 +1,12 @@
 """Tool tester routes for Studio."""
 
 from __future__ import annotations
-from pathlib import Path
-from fastapi import APIRouter, Request, HTTPException
-from fastapi.templating import Jinja2Templates
-from studio_support.dependencies import get_machine
 
-TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+from fastapi import APIRouter, HTTPException, Request
+
+from studio_support.dependencies import get_machine
+from studio_support.ui import render_template
+
 router = APIRouter(prefix="/tools", tags=["tools"])
 
 
@@ -21,12 +20,13 @@ async def tool_page(request: Request, tool_name: str):
     )
     if tool is None:
         raise HTTPException(status_code=404, detail=f"Tool '{tool_name}' not found")
-    return templates.TemplateResponse(
+    return render_template(
         request,
         "tool_tester.html",
-        context={
-            "tool": tool,
-        },
+        page_title=f"Tool: {tool_name}",
+        active_nav="tools",
+        tool=tool,
+        tool_name=tool_name,
     )
 
 

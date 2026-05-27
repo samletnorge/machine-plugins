@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="content-grid two-up">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Installed manifests</span>
+                <h3>Plugin catalog</h3>
+            </div>
+        </div>
+        <div class="stack-list">
+            {% for manifest in manifests %}
+            <article class="list-card">
+                <div class="list-card-main">
+                    <strong>{{ manifest.name }}</strong>
+                    <p>{{ manifest.description or "No manifest description available." }}</p>
+                </div>
+                <div class="list-card-meta">
+                    <span>{{ manifest.version or "?" }}</span>
+                    <span>{{ manifest.language or "python" }}</span>
+                </div>
+            </article>
+            {% endfor %}
+            {% if not manifests %}
+            <p class="muted">No synced manifests were found in the local plugin catalog.</p>
+            {% endif %}
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Project declarations</span>
+                <h3>Enabled in this runtime</h3>
+            </div>
+        </div>
+        <div class="pill-list">
+            {% for plugin in plugins_declared %}
+            <span class="pill">{{ plugin }}</span>
+            {% endfor %}
+            {% if not plugins_declared %}
+            <span class="muted">No plugins declared in `[tool.machine-core]`.</span>
+            {% endif %}
+        </div>
+
+        <div class="panel-subsection">
+            <span class="eyebrow">Loaded now</span>
+            <div class="pill-list">
+                {% for plugin in loaded_plugins %}
+                <span class="pill strong">{{ plugin }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </article>
+</section>
+{% endblock %}

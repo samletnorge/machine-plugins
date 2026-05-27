@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero-grid">
+    <article class="hero-card hero-primary">
+        <span class="eyebrow">Studio posture</span>
+        <h2>Built as a control plane, not a page wrapper</h2>
+        <p>Studio now carries a multi-project-ready shell, typed runtime inventory, and a first-class theme system while still attaching to one active Machine instance today.</p>
+    </article>
+    <article class="hero-card">
+        <span class="eyebrow">Active target</span>
+        <h2>{{ project_name }}</h2>
+        <p>{{ project_root or "No project root resolved" }}</p>
+    </article>
+</section>
+
+<section class="content-grid two-up">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Runtime inventory</span>
+                <h3>Categories</h3>
+            </div>
+        </div>
+        <div class="metric-list">
+            {% for category in categories %}
+            <div class="metric-row">
+                <span>{{ category }}</span>
+                <strong>{{ category_counts.get(category, 0) }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Project contract</span>
+                <h3>Execution model</h3>
+            </div>
+        </div>
+        <div class="detail-list">
+            <div><span>Entry</span><strong>{{ entry }}</strong></div>
+            <div><span>Environment</span><strong>{{ environment }}</strong></div>
+            <div><span>Declared plugins</span><strong>{{ plugins_declared|length }}</strong></div>
+            <div><span>Manifest catalog</span><strong>{{ manifests|length }}</strong></div>
+        </div>
+    </article>
+</section>
+
+<section class="content-grid three-up">
+    <article class="panel">
+        <div class="panel-header compact">
+            <div>
+                <span class="eyebrow">Agents</span>
+                <h3>{{ runtime_agents|length }}</h3>
+            </div>
+            <a href="{{ request.scope.root_path }}/agents" class="panel-link">Open</a>
+        </div>
+        <ul class="simple-list">
+            {% for agent in runtime_agents[:5] %}
+            <li>{{ agent.name }}</li>
+            {% endfor %}
+            {% if not runtime_agents %}
+            <li class="muted">No agents registered.</li>
+            {% endif %}
+        </ul>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header compact">
+            <div>
+                <span class="eyebrow">Tools</span>
+                <h3>{{ runtime_tools|length }}</h3>
+            </div>
+            <a href="{{ request.scope.root_path }}/tools" class="panel-link">Open</a>
+        </div>
+        <ul class="simple-list">
+            {% for tool in runtime_tools[:5] %}
+            <li>{{ tool.name }}</li>
+            {% endfor %}
+            {% if not runtime_tools %}
+            <li class="muted">No tools registered.</li>
+            {% endif %}
+        </ul>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header compact">
+            <div>
+                <span class="eyebrow">Workflows</span>
+                <h3>{{ runtime_workflows|length }}</h3>
+            </div>
+            <a href="{{ request.scope.root_path }}/workflows" class="panel-link">Open</a>
+        </div>
+        <ul class="simple-list">
+            {% for workflow in runtime_workflows[:5] %}
+            <li>{{ workflow.name }}</li>
+            {% endfor %}
+            {% if not runtime_workflows %}
+            <li class="muted">No workflows registered.</li>
+            {% endif %}
+        </ul>
+    </article>
+</section>
+
+<section class="content-grid two-up">
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Loaded plugins</span>
+                <h3>Runtime ownership</h3>
+            </div>
+        </div>
+        <div class="pill-list">
+            {% for plugin in loaded_plugins %}
+            <span class="pill">{{ plugin }}</span>
+            {% endfor %}
+            {% if not loaded_plugins %}
+            <span class="muted">No plugin ownership information available.</span>
+            {% endif %}
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">Future seams</span>
+                <h3>Hub-first information model</h3>
+            </div>
+        </div>
+        <div class="detail-list">
+            <div><span>Organization</span><strong>Reserved in shell</strong></div>
+            <div><span>Workspace</span><strong>Reserved in shell</strong></div>
+            <div><span>Project</span><strong>{{ project_name }}</strong></div>
+            <div><span>Environment</span><strong>{{ environment }}</strong></div>
+        </div>
+    </article>
+</section>
+{% endblock %}
