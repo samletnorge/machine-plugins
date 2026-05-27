@@ -28,8 +28,8 @@
             <nav class="nav-groups" aria-label="Studio Navigation">
                 {% for section in nav_sections %}
                 <section class="nav-group">
-                    <header>{{ section.section }}</header>
-                    {% for item in section.items %}
+                    <header>{{ section["section"] }}</header>
+                    {% for item in section["items"] %}
                     <a href="{{ item.href }}" class="nav-item {% if active_nav == item.key %}active{% endif %}">
                         <span class="nav-icon">{{ icon(item.icon) }}</span>
                         <span class="nav-label">{{ item.label }}</span>
