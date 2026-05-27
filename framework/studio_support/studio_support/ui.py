@@ -284,7 +284,16 @@ def machine_snapshot() -> dict[str, Any]:
 
     return {
         "machine_name": machine_name,
+        "organization_name": "Reserved",
+        "workspace_name": "Local Workspace",
         "project_name": root.name if root else "No Project",
+        "project_targets": [
+            {
+                "project_name": root.name if root else "No Project",
+                "environment": project_config.get("environment", "local"),
+                "active": True,
+            }
+        ],
         "project_root": str(root) if root else None,
         "entry": project_config.get("entry", "src.main:machine"),
         "environment": project_config.get("environment", "local"),

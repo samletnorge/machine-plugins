@@ -42,6 +42,11 @@ async def tools_page(request: Request):
 @router.get("/workflows")
 async def workflows_page(request: Request):
     snapshot = machine_snapshot()
+    primary_workflow = (
+        snapshot["runtime_workflows"][0]["name"]
+        if snapshot["runtime_workflows"]
+        else None
+    )
     return render_template(
         request,
         "resources.html",
@@ -50,5 +55,6 @@ async def workflows_page(request: Request):
         resource_title="Workflows",
         resource_category="workflow",
         resources=snapshot["runtime_workflows"],
+        workflow_name=primary_workflow,
         empty_copy="No workflows are currently registered in this runtime.",
     )

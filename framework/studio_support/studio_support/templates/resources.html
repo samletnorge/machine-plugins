@@ -38,4 +38,15 @@
         {% endif %}
     </div>
 </section>
+{% if resource_category == 'workflow' and workflow_name %}
+<section class="panel">
+    <div
+        id="workflow-island"
+        data-title="Workflow graph"
+        data-graph-endpoint="{{ request.scope.root_path }}/api/workflows/{{ workflow_name }}"
+        data-runs-endpoint="{{ request.scope.root_path }}/api/workflows/{{ workflow_name }}/runs"
+    ></div>
+</section>
+<script type="module" src="{{ request.scope.root_path }}/static/workflows.js"></script>
+{% endif %}
 {% endblock %}

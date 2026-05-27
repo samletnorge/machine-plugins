@@ -23,11 +23,21 @@
                 <h3>Operational notes</h3>
             </div>
         </div>
+        <div class="pill-list service-actions">
+            <button
+                type="button"
+                class="secondary-button"
+                hx-post="{{ request.scope.root_path }}/api/services/restart"
+                hx-target="#service-action-result"
+                hx-swap="innerHTML"
+            >Restart runtime</button>
+        </div>
         <ul class="simple-list">
             <li>Studio is mounted from the CLI capability and attached to one active project runtime.</li>
             <li>Runtime API docs remain at the server root while control-plane pages live under `/_studio`.</li>
             <li>Log streaming, deploy control, and service actions are reserved for the next control-plane pass.</li>
         </ul>
+        <pre id="service-action-result" class="code-panel min"></pre>
     </article>
 </section>
 {% endblock %}

@@ -57,6 +57,50 @@ class TestToolFilterRAG:
         mock_store.upsert.assert_called_once()
 
     @pytest.mark.asyncio
+    async def test_index_tools_includes_rich_openapi_context(
+        self, filter_manager, mock_embedder, mock_store
+    ):
+        mock_embedder.embed.return_value = EmbeddingResult(
+            vectors=[[0.1, 0.2, 0.3]],
+            model_ref="test-model",
+            dimensions=3,
+        )
+        tools = [
+            ToolDefinition(
+                name="hentEnheter",
+                description="Hent enheter som matcher søke filtere",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "navn": {"type": "string", "description": "Enhetens navn"},
+                        "organisasjonsnummer": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Liste med organisasjonsnummer",
+                        },
+                    },
+                    "required": ["navn"],
+                },
+                metadata={
+                    "source": "openapi",
+                    "method": "get",
+                    "path": "/enhetsregisteret/api/enheter",
+                    "operation_summary": "Hent enheter som matcher søke filtere",
+                },
+                handler=lambda: None,
+            )
+        ]
+
+        await filter_manager.index_tools(tools)
+
+        records = mock_store.upsert.call_args.args[0]
+        assert len(records) == 1
+        assert "navn" in records[0].text
+        assert "organisasjonsnummer" in records[0].text
+        assert "/enhetsregisteret/api/enheter" in records[0].text
+        assert "get" in records[0].text.lower()
+
+    @pytest.mark.asyncio
     async def test_filter_returns_relevant_tools(self, filter_manager):
         result = await filter_manager.filter("What is 2+2?", top_k=2)
         assert len(result) <= 2

@@ -18,6 +18,19 @@ from cli_support.utils import (
 console = Console()
 
 
+def _resolve_studio_source_path(installed_module_file: str) -> Path:
+    pythonpath = os.environ.get("PYTHONPATH", "")
+    for entry in pythonpath.split(os.pathsep):
+        if not entry:
+            continue
+        candidate = (
+            Path(entry).expanduser().resolve() / "studio_support" / "__init__.py"
+        )
+        if candidate.exists():
+            return candidate.parent.parent
+    return Path(installed_module_file).resolve().parent.parent
+
+
 def studio_command(
     port: int = typer.Option(3177, "--port", "-p", help="Port to run the Studio on."),
     host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to."),
@@ -50,7 +63,7 @@ def studio_command(
         "MACHINE_CORE_ROOT": str(root),
         "MACHINE_STUDIO_ENABLED": "1",
     }
-    studio_site_packages = Path(studio_support.__file__).resolve().parent.parent
+    studio_site_packages = _resolve_studio_source_path(studio_support.__file__)
 
     studio_server_code = f'''\
 """Auto-generated studio server for machine studio. Do not edit."""

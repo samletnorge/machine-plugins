@@ -52,6 +52,9 @@ Instruksjoner:
 - Oppgi alltid organisasjonsnummer når du refererer til en bedrift.
 - Vær presis og faktabasert. Ikke gjett.
 - Hvis du ikke finner informasjonen, si det tydelig.
+- Ikke forklar verktøyenes oppførsel eller parametere utover det som faktisk er synlig i verktøyskjemene eller resultatene du fikk tilbake.
+- Hvis brukeren spør hvordan du undersøkte noe, oppgi hvilke verktøy du brukte og hvilke filtre eller identifikatorer du faktisk brukte. Hvis du ikke brukte et verktøy, si det rett ut.
+- Ikke lat som du har søkt, filtrert eller slått opp noe dersom du ikke faktisk gjorde det.
 """
 
 
@@ -95,7 +98,7 @@ class BrregAgentRunner:
                 steps.append(AgentStep(step_type="rag_error", detail={"error": str(e)}))
 
         # Step 2: Tool Filter — select relevant Brreg API tools
-        tool_filter_top_k = self._config.get("tool_filter_top_k", 5)
+        tool_filter_top_k = self._config.get("tool_filter_top_k", 100)
         filter_rag = self._machine.resolve("tool", "__filter_rag__")
         selected_tool_names: list[str] = []
 
@@ -139,14 +142,6 @@ class BrregAgentRunner:
             if tool is not None:
                 selected_tools.append(tool)
                 seen_names.add(name)
-
-        # Always ensure the search tool (hentEnheter) is included for name lookups
-        for must_have in ("hentEnheter",):
-            if must_have not in seen_names:
-                tool = all_tools.get(f"brreg_{must_have}") or all_tools.get(must_have)
-                if tool is not None:
-                    selected_tools.append(tool)
-                    seen_names.add(must_have)
 
         # Step 3: Build context block from RAG results
         context_block = ""

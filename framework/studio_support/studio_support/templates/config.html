@@ -17,8 +17,15 @@
                 <span class="eyebrow">Environment surface</span>
                 <h3>Known variable names</h3>
             </div>
+            <button
+                type="button"
+                class="secondary-button"
+                hx-get="{{ request.scope.root_path }}/api/config/env"
+                hx-target="#config-env-list"
+                hx-swap="innerHTML"
+            >Refresh env</button>
         </div>
-        <ul class="simple-list mono">
+        <ul id="config-env-list" class="simple-list mono">
             {% for name in env_names %}
             <li>{{ name }}</li>
             {% endfor %}

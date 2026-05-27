@@ -13,13 +13,15 @@ def test_plugin_class_exists():
 
 
 def test_manifest_loads():
-    import json, importlib.resources
     from pathlib import Path
 
-    # Find the manifest relative to the installed package
     import studio_support as pkg
 
-    manifest_path = Path(pkg.__file__).parent / "manifest.json"
+    package_dir = Path(pkg.__file__).parent
+    manifest_path = package_dir / "manifest.json"
+    if not manifest_path.exists():
+        manifest_path = package_dir.parent / "manifest.json"
+
     manifest = json.loads(manifest_path.read_text())
     assert "studio" in manifest["name"]
 

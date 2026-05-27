@@ -54,7 +54,17 @@ def generate_tools(
                     description=description,
                     parameters=simplify_schema(params_schema, components),
                     handler=handler,
-                    metadata={"source": "openapi", "path": path, "method": method},
+                    metadata={
+                        "source": "openapi",
+                        "path": path,
+                        "method": method,
+                        "operation_id": op_id,
+                        "operation_summary": operation.get("summary", ""),
+                        "operation_description": operation.get("description", ""),
+                        "parameter_details": _extract_parameter_details(
+                            operation, components
+                        ),
+                    },
                 )
             )
 
@@ -159,6 +169,24 @@ def _extract_params_schema(
     if required:
         schema["required"] = required
     return schema
+
+
+def _extract_parameter_details(
+    operation: dict[str, Any], components: dict[str, Any]
+) -> list[dict[str, Any]]:
+    details: list[dict[str, Any]] = []
+    for param in operation.get("parameters", []):
+        schema = param.get("schema", {})
+        details.append(
+            {
+                "name": param.get("name", ""),
+                "in": param.get("in", "query"),
+                "required": bool(param.get("required", False)),
+                "description": param.get("description", ""),
+                "schema": simplify_schema(schema, components),
+            }
+        )
+    return details
 
 
 def _make_handler(

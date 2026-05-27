@@ -22,6 +22,15 @@ def test_tool_execute_returns_result(studio_client):
     assert "result" in data
 
 
+def test_tool_execute_supports_handler_based_tools(studio_client):
+    resp = studio_client.post(
+        "/tools/handler-tool/execute",
+        json={"input": "search for a company"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["result"] == {"handled": "search for a company"}
+
+
 def test_tool_execute_unknown_404(studio_client):
     resp = studio_client.post(
         "/tools/nonexistent/execute",

@@ -78,6 +78,16 @@ class BasicAgentRunner:
             messages: list[dict[str, Any]] = []
             if definition.instruction:
                 messages.append(build_system_message(definition.instruction))
+            prior_messages = (context or {}).get("messages", [])
+            if prior_messages:
+                messages.extend(
+                    {
+                        "role": message.get("role", "user"),
+                        "content": message.get("content", ""),
+                    }
+                    for message in prior_messages
+                    if message.get("role") in {"user", "assistant"}
+                )
             messages.append(build_user_message(input))
 
             max_steps = definition.max_steps or 10

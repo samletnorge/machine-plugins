@@ -1,52 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="content-grid two-up chat-layout">
-    <article class="panel">
-        <div class="panel-header">
+<section class="content-grid chat-layout">
+    <article class="panel chat-panel">
+        <header class="chat-page-header">
             <div>
-                <span class="eyebrow">Agent session</span>
-                <h3>Conversation surface</h3>
+                <span class="eyebrow">Runtime console</span>
+                <h3>Operator workbench</h3>
             </div>
-        </div>
-        <select id="agent-select" class="control-select">
-            {% for a in agents %}
-            <option value="{{ a }}" {% if a == selected_agent %}selected{% endif %}>{{ a }}</option>
-            {% endfor %}
-        </select>
-
-        <div id="chat-messages" class="chat-stream">
-            {% for msg in messages %}
-            <article class="chat-bubble assistant">
-                <div class="chat-meta">{{ selected_agent }}</div>
-                <div class="chat-body">{{ msg }}</div>
-            </article>
-            {% endfor %}
-        </div>
-
-        <form hx-post="{{ request.scope.root_path }}/chat/send" hx-target="#chat-messages" hx-swap="beforeend" class="chat-form">
-            <input type="hidden" name="agent" id="agent-input" value="{{ selected_agent }}">
-            <input type="text" name="message" placeholder="Ask the selected agent a concrete question" class="control-input" required>
-            <button type="submit" class="primary-button">Send</button>
-        </form>
-    </article>
-
-    <article class="panel">
-        <div class="panel-header">
-            <div>
+            <p class="muted">One place to pick a target, manage session branches, and keep the conversation readable.</p>
+        </header>
+        <details class="operator-notes">
+            <summary>
                 <span class="eyebrow">Mode</span>
-                <h3>Operator notes</h3>
-            </div>
-        </div>
-        <ul class="simple-list">
-            <li>Chat is still server-driven and request-response today.</li>
-            <li>The shell already reserves room for streaming and thread history later.</li>
-            <li>Use the agent inventory page to inspect owners and exposed operations.</li>
-        </ul>
+                <strong>Operator notes</strong>
+            </summary>
+            <ul class="simple-list">
+                <li>Agents are the directly chat-invokable targets in this project.</li>
+                <li>Runtimes stay visible so Studio can grow into a fuller orchestration surface.</li>
+                <li>Use Tools and Agents pages when you need schemas, ownership, and operation details.</li>
+            </ul>
+        </details>
+        <div
+            id="chat-island"
+            data-threads-endpoint="{{ request.scope.root_path }}/api/chat/threads"
+            data-messages-endpoint="{{ request.scope.root_path }}/api/chat/threads/default/messages"
+            data-sessions-endpoint="{{ request.scope.root_path }}/api/chat/sessions"
+            data-render-markdown="true"
+            data-chat-tabs="agents,runtimes"
+        ></div>
     </article>
 </section>
-<script>
-    document.getElementById('agent-select').addEventListener('change', function() {
-        document.getElementById('agent-input').value = this.value;
-    });
-</script>
+<script type="module" src="{{ request.scope.root_path }}/static/chat.js"></script>
 {% endblock %}

@@ -7,8 +7,28 @@
                 <span class="eyebrow">Installed manifests</span>
                 <h3>Plugin catalog</h3>
             </div>
+            <button
+                type="button"
+                class="secondary-button"
+                hx-get="{{ request.scope.root_path }}/api/registry/plugins"
+                hx-target="#registry-json"
+                hx-swap="innerHTML"
+            >Refresh JSON</button>
+        </div>
+        <div class="panel-subsection inline-form">
+            <input
+                type="search"
+                name="q"
+                class="control-input"
+                placeholder="Search plugin manifests"
+                hx-get="{{ request.scope.root_path }}/api/registry/search"
+                hx-trigger="input changed delay:200ms, search"
+                hx-target="#registry-results"
+                hx-swap="innerHTML"
+            >
         </div>
         <div class="stack-list">
+            <div id="registry-results" class="stack-list">
             {% for manifest in manifests %}
             <article class="list-card">
                 <div class="list-card-main">
@@ -24,7 +44,9 @@
             {% if not manifests %}
             <p class="muted">No synced manifests were found in the local plugin catalog.</p>
             {% endif %}
+            </div>
         </div>
+        <pre id="registry-json" class="code-panel min">{{ manifests | tojson(indent=2) }}</pre>
     </article>
 
     <article class="panel">

@@ -23,8 +23,14 @@
             </div>
         </div>
         <pre id="tool-result" class="code-panel min"></pre>
+        <div
+            id="tool-island"
+            data-detail-endpoint="{{ request.scope.root_path }}/api/tools/{{ tool_name }}"
+            data-execute-endpoint="{{ request.scope.root_path }}/tools/{{ tool_name }}/execute"
+        ></div>
     </article>
 </section>
+<script type="module" src="{{ request.scope.root_path }}/static/tools.js"></script>
 <script>
     document.getElementById('tool-form').addEventListener('submit', async (e) => {
         e.preventDefault();
