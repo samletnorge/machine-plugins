@@ -54,6 +54,8 @@
   });
 
   const chevronIcon = `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7 5 6 5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const sendIcon = `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="m10 4 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const spinnerIcon = `<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.8" opacity="0.28"/><path d="M17 10a7 7 0 0 0-7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 
   function applyQuickAction(prompt: string) {
     draft = prompt;
@@ -219,10 +221,13 @@
         </div>
 
         <div class="chat-composer">
-          <input bind:value={draft} class="control-input" placeholder="Ask the active target something specific" onkeydown={onDraftKeydown} />
-          <button type="button" class="secondary-button composer-send" onclick={sendMessage}>
-            {sending ? 'Sending…' : 'Send'}
-          </button>
+          <div class="chat-composer-shell">
+            <textarea bind:value={draft} class="control-input chat-composer-input" rows="3" placeholder="Ask the active target something specific" onkeydown={onDraftKeydown}></textarea>
+            <button type="button" class="composer-send chat-composer-action" onclick={sendMessage} aria-label={sending ? 'Sending message' : 'Send message'}>
+              <span class="chat-composer-action-icon">{@html sending ? spinnerIcon : sendIcon}</span>
+              <span>{sending ? 'Sending…' : 'Send'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

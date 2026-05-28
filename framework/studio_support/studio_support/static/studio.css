@@ -669,6 +669,16 @@ code, pre, .mono {
     padding: 0.85rem 1rem;
 }
 
+.operator-notes-label {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.operator-notes summary p {
+    margin: 0;
+    max-width: 40rem;
+}
+
 .operator-notes summary::-webkit-details-marker {
     display: none;
 }
@@ -690,8 +700,23 @@ code, pre, .mono {
     opacity: 1;
 }
 
-.operator-notes ul {
+.operator-notes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
     padding: 0 1rem 1rem;
+}
+
+.operator-notes-grid article {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.95rem 1rem;
+    border-radius: calc(var(--radius) + 0.1rem);
+    border: 1px solid color-mix(in oklab, var(--border) 92%, transparent);
+    background: color-mix(in oklab, var(--card) 82%, transparent);
+}
+
+.operator-notes-grid p {
     margin: 0;
 }
 
@@ -813,9 +838,44 @@ code, pre, .mono {
 }
 
 .chat-composer {
-    display: flex;
-    gap: 0.85rem;
+    padding-top: 0.35rem;
+}
+
+.chat-composer-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
     align-items: center;
+    padding: 0.55rem;
+    border: 1px solid color-mix(in oklab, var(--border) 92%, transparent);
+    border-radius: calc(var(--radius) + 0.5rem);
+    background: color-mix(in oklab, var(--card) 94%, transparent);
+    box-shadow: 0 10px 30px color-mix(in oklab, var(--background) 88%, transparent);
+}
+
+.chat-composer-shell:focus-within {
+    border-color: color-mix(in oklab, var(--primary) 34%, var(--border));
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 18%, transparent), 0 16px 34px color-mix(in oklab, var(--background) 82%, transparent);
+}
+
+.chat-composer-input {
+    min-height: 5.5rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0.85rem 0.95rem;
+    font-size: 1rem;
+    resize: none;
+    line-height: 1.45;
+    align-self: stretch;
+}
+
+.chat-composer-input:focus {
+    box-shadow: none;
+}
+
+.chat-composer-input::placeholder {
+    color: color-mix(in oklab, var(--muted-foreground) 86%, transparent);
 }
 
 .chat-toolbar {
@@ -873,6 +933,41 @@ code, pre, .mono {
     white-space: nowrap;
 }
 
+.chat-composer-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.7rem;
+    padding: 0 1rem;
+    border-radius: calc(var(--radius) + 0.6rem);
+    border: 1px solid color-mix(in oklab, var(--primary) 26%, var(--border));
+    background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 76%, var(--card)), color-mix(in oklab, var(--primary) 52%, var(--card)));
+    color: var(--primary-foreground);
+    transition: transform 140ms ease, filter 140ms ease, border-color 140ms ease;
+}
+
+.chat-composer-action:hover,
+.chat-composer-action:focus {
+    transform: translateY(-1px);
+    filter: brightness(1.03);
+    border-color: color-mix(in oklab, var(--primary) 42%, var(--border));
+}
+
+.chat-composer-action:disabled {
+    cursor: progress;
+    opacity: 0.9;
+}
+
+.chat-composer-action-icon {
+    display: inline-flex;
+    width: 1rem;
+    height: 1rem;
+}
+
+.chat-composer-action[aria-label="Sending message"] .chat-composer-action-icon {
+    animation: studio-spin 900ms linear infinite;
+}
+
 .chat-prompt-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -916,10 +1011,6 @@ code, pre, .mono {
     padding: 1.3rem 0.2rem;
     border-top: 1px dashed color-mix(in oklab, var(--border) 90%, transparent);
     border-bottom: 1px dashed color-mix(in oklab, var(--border) 90%, transparent);
-}
-
-.chat-composer {
-    padding-top: 0.35rem;
 }
 
 .chat-form,
@@ -1009,6 +1100,11 @@ code, pre, .mono {
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes studio-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 @media (min-width: 1101px) {
     .sidebar-toggle {
         display: none;
@@ -1055,12 +1151,13 @@ code, pre, .mono {
 
     .chat-page-header,
     .chat-toolbar,
-    .chat-composer {
+    .chat-composer-shell {
         flex-direction: column;
         align-items: stretch;
     }
 
     .chat-workbench,
+    .operator-notes-grid,
     .chat-prompt-grid {
         grid-template-columns: 1fr;
     }

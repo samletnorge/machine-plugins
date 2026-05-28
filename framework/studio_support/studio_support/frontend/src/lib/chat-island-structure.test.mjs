@@ -13,6 +13,10 @@ assert.match(source, /messages\.length === 0/);
 assert.match(source, /class="[^"]*chat-prompt-grid/);
 assert.match(source, /class="[^"]*chat-prompt-chip/);
 assert.match(source, /class="[^"]*chat-composer/);
+assert.match(source, /class="[^"]*chat-composer-shell/);
+assert.match(source, /class="[^"]*chat-composer-input/);
+assert.match(source, /class="[^"]*chat-composer-action/);
+assert.match(source, /<textarea[^>]*class="[^"]*chat-composer-input/);
 assert.match(source, /class="[^"]*select-shell/);
 assert.match(source, /class="[^"]*select-icon/);
 

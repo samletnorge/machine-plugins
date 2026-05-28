@@ -11,14 +11,26 @@
         </header>
         <details class="operator-notes">
             <summary>
-                <span class="eyebrow">Mode</span>
-                <strong>Operator notes</strong>
+                <div class="operator-notes-label">
+                    <span class="eyebrow">Context</span>
+                    <strong>How this console works</strong>
+                </div>
+                <p class="muted">Which targets can respond directly here, and when to leave this page for deeper inspection.</p>
             </summary>
-            <ul class="simple-list">
-                <li>Agents are the directly chat-invokable targets in this project.</li>
-                <li>Runtimes stay visible so Studio can grow into a fuller orchestration surface.</li>
-                <li>Use Tools and Agents pages when you need schemas, ownership, and operation details.</li>
-            </ul>
+            <div class="operator-notes-grid">
+                <article>
+                    <span class="eyebrow">Agents</span>
+                    <p>These are the targets you can talk to directly in this console. Pick one when you want an answer, a lookup, or a multi-step response.</p>
+                </article>
+                <article>
+                    <span class="eyebrow">Runtimes</span>
+                    <p>These stay visible because Studio is also becoming an orchestration surface. They represent execution backends and system capabilities, even when they are not ideal direct chat targets yet.</p>
+                </article>
+                <article>
+                    <span class="eyebrow">Other pages</span>
+                    <p>Open Tools or Agents when you need raw schemas, ownership, or implementation details. This page is for operating the conversation, not for browsing the full registry.</p>
+                </article>
+            </div>
         </details>
         <div
             id="chat-island"
