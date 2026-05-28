@@ -8,6 +8,15 @@
   "dependencies": [],
   "hooks_subscribed": {},
   "events_subscribed": [],
+  "config_schema": {
+    "embedding_provider": {
+      "type": "string",
+      "required": true
+    },
+    "vector_store": {
+      "type": "string"
+    }
+  },
   "transport": {
     "type": "in-process",
     "entry_point": "tool_filter_rag:ToolFilterRAGPlugin"

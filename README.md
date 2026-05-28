@@ -4,6 +4,7 @@ Plugin collection for `machine-core`: framework plugins that define categories a
 
 ## Overview
 
+
 `machine-core` stays intentionally small. It provides the registry, lifecycle, hook system, event bus, and plugin transport layer. `machine-plugins` is where most real behavior lives.
 
 In practice, a project is assembled by selecting plugins in `pyproject.toml`:

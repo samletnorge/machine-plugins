@@ -27,7 +27,7 @@
     },
     "tool_filter_top_k": {
       "type": "integer",
-      "default": 5
+      "default": 100
     },
     "embed_batch_size": {
       "type": "integer",

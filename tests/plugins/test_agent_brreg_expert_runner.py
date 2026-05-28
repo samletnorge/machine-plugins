@@ -82,3 +82,18 @@ async def test_brreg_runner_defaults_tool_filter_top_k_to_100():
     )
 
     assert filter_rag.filter.await_args.kwargs["top_k"] == 100
+
+
+def test_brreg_manifest_defaults_tool_filter_top_k_to_100():
+    import json
+    from pathlib import Path
+
+    manifest_path = (
+        Path(__file__).resolve().parents[2]
+        / "community"
+        / "agent_brreg_expert"
+        / "manifest.json"
+    )
+    manifest = json.loads(manifest_path.read_text())
+
+    assert manifest["config_schema"]["tool_filter_top_k"]["default"] == 100

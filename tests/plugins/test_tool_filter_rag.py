@@ -2,6 +2,7 @@
 
 import pytest
 from unittest.mock import AsyncMock
+from types import SimpleNamespace
 
 from tool_support.schemas import ToolDefinition
 from embeddings.schemas import EmbeddingResult
@@ -111,3 +112,34 @@ class TestToolFilterRAG:
         result = await filter_manager.filter("", top_k=5)
         assert isinstance(result, list)
         assert len(result) == 0
+
+
+@pytest.mark.asyncio
+async def test_plugin_resolves_configured_embedding_provider():
+    from tool_filter_rag import _LazyToolFilterManager
+
+    configured_embedder = AsyncMock()
+    store = AsyncMock()
+    machine = SimpleNamespace(
+        resolve=lambda category, name: {
+            ("embedding", "sentence_transformers"): configured_embedder,
+            ("vector_store", "default"): store,
+        }.get((category, name)),
+        list_category=lambda category: (
+            {"default": store} if category == "vector_store" else {}
+        ),
+    )
+
+    manager = _LazyToolFilterManager(
+        machine=machine,
+        config={
+            "embedding_provider": "sentence_transformers",
+            "vector_store": "default",
+        },
+    )
+
+    resolved = manager._resolve()
+
+    assert resolved is not None
+    assert resolved._embedder is configured_embedder
+    assert resolved._store is store
