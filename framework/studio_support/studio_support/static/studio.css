@@ -300,10 +300,16 @@ code, pre, .mono {
 }
 
 .context-chip {
+    display: grid;
+    gap: 0.2rem;
     padding: 0.9rem 1rem;
     border: 1px solid var(--sidebar-border);
     border-radius: calc(var(--radius) + 0.2rem);
     background: color-mix(in oklab, var(--sidebar-accent) 92%, transparent);
+}
+
+.context-chip span:last-child {
+    color: var(--muted-foreground);
 }
 
 .nav-groups {
@@ -387,6 +393,58 @@ code, pre, .mono {
 .panel p,
 .muted {
     color: var(--muted-foreground);
+}
+
+.context-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    align-items: center;
+}
+
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in oklab, var(--accent) 74%, transparent);
+    color: var(--foreground);
+    font-size: 0.78rem;
+    text-transform: lowercase;
+}
+
+.status-attached {
+    border-color: color-mix(in oklab, var(--primary) 35%, var(--border));
+    background: color-mix(in oklab, var(--primary) 18%, var(--accent));
+}
+
+.status-note {
+    margin-top: 0.55rem;
+}
+
+.runtime-banner {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 0.85rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border);
+    background: color-mix(in oklab, var(--card) 82%, transparent);
+}
+
+.runtime-banner strong {
+    font-size: 0.95rem;
+}
+
+.runtime-banner span {
+    color: var(--muted-foreground);
+    font-size: 0.9rem;
+}
+
+.runtime-banner-error {
+    border-color: color-mix(in oklab, oklch(0.65 0.16 25) 42%, var(--border));
+    background: color-mix(in oklab, oklch(0.65 0.16 25) 16%, var(--card));
 }
 
 .topbar-actions {
@@ -534,6 +592,41 @@ code, pre, .mono {
     padding: 0.7rem 0;
 }
 
+.context-switcher-shell {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.context-switcher-shell label,
+.chat-context-status {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.chat-context-status {
+    padding: 0.85rem 0.95rem;
+    border: 1px solid color-mix(in oklab, var(--border) 92%, transparent);
+    border-radius: calc(var(--radius) + 0.1rem);
+    background: color-mix(in oklab, var(--accent) 74%, transparent);
+}
+
+.chat-context-status strong {
+    margin: 0;
+}
+
+.chat-context-status p {
+    margin: 0;
+}
+
+.preview-shell select:disabled {
+    cursor: not-allowed;
+    opacity: 0.78;
+}
+
+.context-switcher-note {
+    margin: 0;
+}
+
 .panel-count {
     font-size: 1.7rem;
     font-weight: 700;
@@ -570,6 +663,41 @@ code, pre, .mono {
 
 .pill-list {
     grid-template-columns: repeat(auto-fit, minmax(10rem, max-content));
+}
+
+.target-list {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.target-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 0.1rem);
+    background: color-mix(in oklab, var(--card) 90%, transparent);
+}
+
+.target-card.active {
+    border-color: color-mix(in oklab, var(--primary) 32%, var(--border));
+    background: color-mix(in oklab, var(--primary) 8%, var(--card));
+}
+
+.target-card strong {
+    display: block;
+    margin-top: 0.2rem;
+}
+
+.target-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    align-items: center;
+    justify-content: flex-end;
+    color: var(--muted-foreground);
 }
 
 .pill {
@@ -1149,16 +1277,21 @@ code, pre, .mono {
         border-bottom: 0;
     }
 
-    .chat-page-header,
+    .chat-page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     .chat-toolbar,
     .chat-composer-shell {
-        flex-direction: column;
+        grid-template-columns: 1fr;
         align-items: stretch;
     }
 
     .chat-workbench,
     .operator-notes-grid,
-    .chat-prompt-grid {
+    .chat-prompt-grid,
+    .context-switcher-shell {
         grid-template-columns: 1fr;
     }
 

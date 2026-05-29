@@ -11,7 +11,7 @@ from typing import Any
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from studio_support.dependencies import get_machine
+from studio_support.dependencies import get_machine, get_studio_state
 
 STUDIO_DIR = Path(__file__).parent
 TEMPLATES_DIR = STUDIO_DIR / "templates"
@@ -241,7 +241,10 @@ def _describe_item(item: Any) -> str:
 
 
 def _runtime_items(category: str) -> list[dict[str, Any]]:
-    machine = get_machine()
+    try:
+        machine = get_machine()
+    except RuntimeError:
+        machine = None
     if machine is None or not hasattr(machine, "list_category"):
         return []
 
@@ -262,8 +265,80 @@ def _runtime_items(category: str) -> list[dict[str, Any]]:
     return items
 
 
+def _context_snapshot() -> dict[str, Any]:
+    try:
+        state = get_studio_state()
+    except RuntimeError:
+        return {
+            "tenant_name": None,
+            "project_name": None,
+            "environment": None,
+            "environment_status": None,
+            "entry": None,
+            "attachment_status": "detached",
+            "attachment_error": None,
+            "attachment_machine_name": None,
+            "project_targets": [],
+        }
+
+    catalog = state.catalog
+    active_context = catalog.active_context
+    attachment = state.attachment_manager.attachment()
+
+    tenants_by_id = {tenant.id: tenant for tenant in catalog.tenants}
+    projects_by_id = {project.id: project for project in catalog.projects}
+    environments_by_id = {
+        environment.id: environment for environment in catalog.environments
+    }
+
+    tenant = tenants_by_id.get(active_context.tenant_id)
+    project = projects_by_id.get(active_context.project_id)
+    environment = environments_by_id.get(active_context.environment_id)
+
+    project_targets = []
+    for listed_project in catalog.projects:
+        listed_tenant = tenants_by_id.get(listed_project.tenant_id)
+        for listed_environment in catalog.environments:
+            if listed_environment.project_id != listed_project.id:
+                continue
+            project_targets.append(
+                {
+                    "tenant_slug": listed_tenant.slug if listed_tenant else None,
+                    "tenant_name": listed_tenant.name
+                    if listed_tenant
+                    else listed_project.tenant_id,
+                    "project_slug": listed_project.slug,
+                    "project_name": listed_project.name,
+                    "environment": listed_environment.name,
+                    "environment_status": listed_environment.status,
+                    "entry": listed_project.entry,
+                    "active": (
+                        listed_project.id == active_context.project_id
+                        and listed_environment.id == active_context.environment_id
+                    ),
+                }
+            )
+
+    return {
+        "tenant_slug": tenant.slug if tenant else None,
+        "tenant_name": tenant.name if tenant else None,
+        "project_slug": project.slug if project else None,
+        "project_name": project.name if project else None,
+        "environment": environment.name if environment else None,
+        "environment_status": environment.status if environment else None,
+        "entry": project.entry if project else None,
+        "attachment_status": attachment.status,
+        "attachment_error": attachment.error,
+        "attachment_machine_name": attachment.machine_name,
+        "project_targets": project_targets,
+    }
+
+
 def machine_snapshot() -> dict[str, Any]:
-    machine = get_machine()
+    try:
+        machine = get_machine()
+    except RuntimeError:
+        machine = None
     categories = []
     category_counts: dict[str, int] = {}
     if machine is not None and hasattr(machine, "list_categories"):
@@ -273,6 +348,7 @@ def machine_snapshot() -> dict[str, Any]:
         }
 
     project_config = _project_config()
+    context = _context_snapshot()
     manifests = _plugin_manifests()
     loaded_plugins = (
         sorted(getattr(getattr(machine, "plugins", None), "loaded_plugins", []))
@@ -280,23 +356,29 @@ def machine_snapshot() -> dict[str, Any]:
         else []
     )
     root = _project_root()
-    machine_name = getattr(machine, "name", None) or (root.name if root else "Machine")
+    project_name = context["project_name"] or "Unknown project"
+    environment = context["environment"] or "No environment"
+    entry = context["entry"] or "No entry"
+    machine_name = context["attachment_machine_name"] or getattr(machine, "name", None)
+    if machine_name is None:
+        machine_name = "No runtime attached"
+    project_targets = context["project_targets"]
 
     return {
         "machine_name": machine_name,
-        "organization_name": "Reserved",
+        "tenant_slug": context["tenant_slug"],
+        "tenant_name": context["tenant_name"] or "Unknown tenant",
+        "organization_name": context["tenant_name"] or "Unknown tenant",
         "workspace_name": "Local Workspace",
-        "project_name": root.name if root else "No Project",
-        "project_targets": [
-            {
-                "project_name": root.name if root else "No Project",
-                "environment": project_config.get("environment", "local"),
-                "active": True,
-            }
-        ],
+        "project_slug": context["project_slug"],
+        "project_name": project_name,
+        "project_targets": project_targets,
         "project_root": str(root) if root else None,
-        "entry": project_config.get("entry", "src.main:machine"),
-        "environment": project_config.get("environment", "local"),
+        "entry": entry,
+        "environment": environment,
+        "environment_status": context["environment_status"],
+        "attachment_status": context["attachment_status"],
+        "attachment_error": context["attachment_error"],
         "project_config": project_config,
         "plugins_declared": project_config.get("plugins", []),
         "plugin_configs": project_config.get("plugin_configs", {}),

@@ -3,6 +3,7 @@
 from . import (
     auth,
     browser,
+    context,
     config,
     deploy,
     evals,
@@ -21,6 +22,7 @@ from . import (
 __all__ = [
     "auth",
     "browser",
+    "context",
     "config",
     "deploy",
     "evals",

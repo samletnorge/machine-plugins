@@ -8,7 +8,10 @@
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <link rel="stylesheet" href="{{ request.url_for('static', path='studio.css') }}">
 </head>
-<body>
+<body
+    data-active-context="{{ tenant_name }} / {{ project_name }} / {{ environment }}"
+    data-attachment="{{ attachment_status }}{% if attachment_error %} · {{ attachment_error }}{% endif %}"
+>
     <div class="studio-shell">
         <aside class="studio-sidebar">
             <div class="brand-block">
@@ -20,8 +23,9 @@
                     </span>
                 </a>
                 <div class="context-chip">
-                    <span class="context-label">Project</span>
-                    <strong>{{ project_name }}</strong>
+                    <span class="context-label">Active Context</span>
+                    <strong>{{ tenant_name }}</strong>
+                    <span>{{ project_name }} / {{ environment }}</span>
                 </div>
             </div>
 
@@ -52,7 +56,48 @@
                     </button>
                     <div class="eyebrow">Active runtime</div>
                     <h1>{{ page_title }}</h1>
-                    <p>{{ machine_name }} · {{ environment }} · {{ entry }}</p>
+                    <p>{{ tenant_name }} · {{ project_name }} · {{ environment }}</p>
+                    <form class="context-switcher-shell" aria-label="Context switcher" data-context-switcher-endpoint="{{ request.scope.root_path }}/api/context">
+                        <label>
+                            <span class="eyebrow">Context Target</span>
+                            <div class="select-shell target-switcher">
+                                <select class="control-select" name="target" aria-label="Context target">
+                                    {% for target in project_targets %}
+                                    {% set target_label = target.tenant_name ~ ' / ' ~ target.project_name ~ ' / ' ~ target.environment %}
+                                    <option
+                                        value="{{ target_label }}"
+                                        data-tenant-slug="{{ target.tenant_slug }}"
+                                        data-project-slug="{{ target.project_slug }}"
+                                        data-environment-name="{{ target.environment }}"
+                                        {% if target.active %}selected{% endif %}
+                                    >{{ target_label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </label>
+                        <input type="hidden" name="tenant_slug" value="{{ tenant_slug }}">
+                        <input type="hidden" name="project_slug" value="{{ project_slug }}">
+                        <input type="hidden" name="environment_name" value="{{ environment }}">
+                        <button type="submit" class="primary-button">Switch</button>
+                        <p class="context-switcher-note muted">Switching targets re-attaches the active runtime for this Studio session.</p>
+                    </form>
+                    <div class="context-meta-row">
+                        <span class="status-chip status-{{ attachment_status }}">{{ attachment_status }}</span>
+                        {% if environment_status %}
+                        <span class="status-chip">{{ environment_status }}</span>
+                        {% endif %}
+                        <span class="mono">{{ machine_name }}</span>
+                        <span class="mono">{{ entry }}</span>
+                    </div>
+                    {% if attachment_error %}
+                    <p class="status-note">{{ attachment_error }}</p>
+                    {% endif %}
+                    {% if attachment_status == "failed" %}
+                    <div class="runtime-banner runtime-banner-error">
+                        <strong>Context attach failed</strong>
+                        <span>{{ attachment_error or "The selected context could not attach to a runtime." }}</span>
+                    </div>
+                    {% endif %}
                 </div>
 
                 <div class="topbar-actions">
@@ -86,8 +131,8 @@
                     <strong>{{ plugins_declared|length }}</strong>
                 </article>
                 <article class="status-card wide">
-                    <span class="status-label">Hub model</span>
-                    <strong>Single project runtime with multi-project shell semantics</strong>
+                    <span class="status-label">Attachment</span>
+                    <strong>{{ attachment_status }}{% if attachment_error %} · {{ attachment_error }}{% endif %}</strong>
                 </article>
             </section>
 
@@ -141,6 +186,51 @@
                 body.classList.remove('sidebar-open');
             }
         });
+
+        const contextSwitcher = document.querySelector('[data-context-switcher-endpoint]');
+        if (contextSwitcher) {
+            const targetSelect = contextSwitcher.querySelector('select[name="target"]');
+            const tenantField = contextSwitcher.querySelector('input[name="tenant_slug"]');
+            const projectField = contextSwitcher.querySelector('input[name="project_slug"]');
+            const environmentField = contextSwitcher.querySelector('input[name="environment_name"]');
+            const endpoint = contextSwitcher.dataset.contextSwitcherEndpoint;
+
+            function syncTargetFields() {
+                const selectedOption = targetSelect?.selectedOptions?.[0];
+                if (!selectedOption) return;
+                tenantField.value = selectedOption.dataset.tenantSlug || '';
+                projectField.value = selectedOption.dataset.projectSlug || '';
+                environmentField.value = selectedOption.dataset.environmentName || '';
+            }
+
+            targetSelect?.addEventListener('change', syncTargetFields);
+            syncTargetFields();
+
+            contextSwitcher.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                syncTargetFields();
+                const submitButton = contextSwitcher.querySelector('button[type="submit"]');
+                submitButton?.setAttribute('disabled', 'disabled');
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            tenant_slug: tenantField.value,
+                            project_slug: projectField.value,
+                            environment_name: environmentField.value,
+                        }),
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Context switch failed: ${response.status}`);
+                    }
+                    window.location.reload();
+                } catch (error) {
+                    console.error(error);
+                    submitButton?.removeAttribute('disabled');
+                }
+            });
+        }
 
         applyTheme(storageTheme, storageMode);
     })();

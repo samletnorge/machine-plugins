@@ -2,14 +2,14 @@
 {% block content %}
 <section class="hero-grid">
     <article class="hero-card hero-primary">
-        <span class="eyebrow">Studio posture</span>
-        <h2>Built as a control plane, not a page wrapper</h2>
-        <p>Studio now carries a multi-project-ready shell, typed runtime inventory, and a first-class theme system while still attaching to one active Machine instance today.</p>
+        <span class="eyebrow">Active context</span>
+        <h2>{{ tenant_name }} / {{ project_name }} / {{ environment }}</h2>
+        <p>Studio is currently rendering the selected tenant, project, and environment while keeping runtime inventory bound to the attached Machine instance.</p>
     </article>
     <article class="hero-card">
-        <span class="eyebrow">Active target</span>
-        <h2>{{ project_name }}</h2>
-        <p>{{ project_root or "No project root resolved" }}</p>
+        <span class="eyebrow">Attachment state</span>
+        <h2>{{ attachment_status }}</h2>
+        <p>{{ machine_name }}{% if attachment_error %} · {{ attachment_error }}{% endif %}</p>
     </article>
 </section>
 
@@ -34,11 +34,13 @@
     <article class="panel">
         <div class="panel-header">
             <div>
-                <span class="eyebrow">Project contract</span>
+                <span class="eyebrow">Context contract</span>
                 <h3>Execution model</h3>
             </div>
         </div>
         <div class="detail-list">
+            <div><span>Tenant</span><strong>{{ tenant_name }}</strong></div>
+            <div><span>Project</span><strong>{{ project_name }}</strong></div>
             <div><span>Entry</span><strong>{{ entry }}</strong></div>
             <div><span>Environment</span><strong>{{ environment }}</strong></div>
             <div><span>Declared plugins</span><strong>{{ plugins_declared|length }}</strong></div>
@@ -124,15 +126,25 @@
     <article class="panel">
         <div class="panel-header">
             <div>
-                <span class="eyebrow">Future seams</span>
-                <h3>Hub-first information model</h3>
+                <span class="eyebrow">Available targets</span>
+                <h3>Project environments</h3>
             </div>
         </div>
-        <div class="detail-list">
-            <div><span>Organization</span><strong>Reserved in shell</strong></div>
-            <div><span>Workspace</span><strong>Reserved in shell</strong></div>
-            <div><span>Project</span><strong>{{ project_name }}</strong></div>
-            <div><span>Environment</span><strong>{{ environment }}</strong></div>
+        <div class="target-list">
+            {% for target in project_targets %}
+            <div class="target-card{% if target.active %} active{% endif %}">
+                <div>
+                    <span class="eyebrow">{{ target.tenant_name }}</span>
+                    <strong>{{ target.project_name }}</strong>
+                </div>
+                <div class="target-meta">
+                    <span>{{ target.environment }}</span>
+                    {% if target.environment_status %}
+                    <span class="status-chip">{{ target.environment_status }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </article>
 </section>

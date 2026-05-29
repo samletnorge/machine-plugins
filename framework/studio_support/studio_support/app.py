@@ -8,14 +8,28 @@ from typing import Any
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from studio_support.dependencies import set_machine
+from studio_support.dependencies import (
+    bind_studio_state,
+    build_studio_state,
+    reset_bound_studio_state,
+)
 
 
 def create_studio_app(machine: Any) -> FastAPI:
     """Create the Studio FastAPI sub-application."""
-    set_machine(machine)
+    studio_state = build_studio_state(machine)
 
     app = FastAPI(title="Machine Studio", docs_url=None, redoc_url=None)
+    app.state.studio_state = studio_state
+
+    @app.middleware("http")
+    async def inject_studio_state(request, call_next):
+        token = bind_studio_state(request.app.state.studio_state)
+        try:
+            return await call_next(request)
+        finally:
+            reset_bound_studio_state(token)
+
     static_dir = Path(__file__).parent / "static"
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
@@ -33,6 +47,7 @@ def create_studio_app(machine: Any) -> FastAPI:
     from studio_support.control import services as control_services
     from studio_support.control import auth as control_auth
     from studio_support.control import browser as control_browser
+    from studio_support.control import context as control_context
     from studio_support.control import deploy as control_deploy
     from studio_support.control import evals as control_evals
     from studio_support.control import memory as control_memory
@@ -54,6 +69,7 @@ def create_studio_app(machine: Any) -> FastAPI:
     app.include_router(control_services.router)
     app.include_router(control_registry.router)
     app.include_router(control_config.router)
+    app.include_router(control_context.router)
     app.include_router(control_runtime.router)
     app.include_router(control_deploy.router)
     app.include_router(control_auth.router)

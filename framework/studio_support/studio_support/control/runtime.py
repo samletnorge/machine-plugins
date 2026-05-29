@@ -15,6 +15,7 @@ from studio_support.dependencies import get_machine
 router = APIRouter(prefix="/api", tags=["studio-runtime"])
 
 _CHAT_THREADS: dict[str, list[dict[str, str]]] = defaultdict(list)
+_CHAT_THREAD_AGENTS: dict[str, str] = {}
 _CHAT_SESSION_IDS = count(1)
 
 
@@ -160,7 +161,9 @@ async def list_chat_threads() -> dict[str, object]:
         threads.append(
             {
                 "thread_id": thread_id,
-                "agent": agents[0] if agents else "",
+                "agent": _CHAT_THREAD_AGENTS.get(
+                    thread_id, agents[0] if agents else ""
+                ),
                 "messages": messages,
             }
         )
@@ -171,6 +174,7 @@ async def list_chat_threads() -> dict[str, object]:
 async def create_chat_session() -> dict[str, str]:
     thread_id = f"session-{next(_CHAT_SESSION_IDS)}"
     _CHAT_THREADS[thread_id] = []
+    _CHAT_THREAD_AGENTS[thread_id] = ""
     return {"thread_id": thread_id}
 
 
@@ -205,6 +209,7 @@ async def send_chat_message(
             detail=f"Agent '{payload.agent}' is not directly chat invokable in Studio",
         )
 
+    _CHAT_THREAD_AGENTS.setdefault(thread_id, payload.agent)
     prior_messages = list(_CHAT_THREADS[thread_id])
     _CHAT_THREADS[thread_id].append({"role": "user", "content": payload.message})
     result = await agent.run(

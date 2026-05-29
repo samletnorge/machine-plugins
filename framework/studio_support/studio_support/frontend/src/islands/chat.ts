@@ -11,7 +11,9 @@ if (target) {
       messagesEndpoint: target.dataset.messagesEndpoint ?? '',
       sessionsEndpoint: target.dataset.sessionsEndpoint ?? '',
       renderMarkdown: target.dataset.renderMarkdown ?? 'false',
-      chatTabs: target.dataset.chatTabs ?? ''
+      chatTabs: target.dataset.chatTabs ?? '',
+      activeContext: document.body.dataset.activeContext ?? '',
+      attachment: document.body.dataset.attachment ?? ''
     }
   });
 }

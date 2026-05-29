@@ -1,5 +1,6 @@
 """Shared fixtures for studio tests."""
 
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
@@ -87,10 +88,18 @@ class FakeWorkflow:
 class FakeMachine:
     name = "TestMachine"
 
-    def __init__(self):
-        self._agents = {"basic": FakeRuntimeRunner(), "greeter": FakeAgent()}
-        self._tools = {"echo": FakeTool()}
-        self._tools["echo"].input_model = EchoInput
+    def __init__(
+        self,
+        *,
+        name: str = "TestMachine",
+        chat_agent_name: str = "greeter",
+        tool_name: str = "echo",
+        workflow_name: str = "sequence",
+    ):
+        self.name = name
+        self._agents = {"basic": FakeRuntimeRunner(), chat_agent_name: FakeAgent()}
+        self._tools = {tool_name: FakeTool()}
+        self._tools[tool_name].input_model = EchoInput
         self._tools["handler-tool"] = ToolDefinition(
             name="handler-tool",
             description="Executes via handler",
@@ -101,7 +110,7 @@ class FakeMachine:
             },
             handler=lambda input: {"handled": input},
         )
-        self._workflows = {"sequence": FakeWorkflow()}
+        self._workflows = {workflow_name: FakeWorkflow()}
 
     def list_category(self, cat):
         if cat == "agent":
@@ -136,7 +145,59 @@ class FakeMachine:
 
     @property
     def greeter(self):
-        return self._agents["greeter"]
+        return self._agents.get("greeter")
+
+
+class FakeMachineRegistry:
+    def __init__(self, machines_by_environment: dict[str, FakeMachine]):
+        self._machines_by_environment = machines_by_environment
+
+    def resolve_for_context(self, context):
+        return self._machines_by_environment[context.environment_id]
+
+
+def _write_studio_pyproject(root: Path) -> None:
+    pyproject = root / "pyproject.toml"
+    pyproject.write_text(
+        """
+[tool.machine-core.studio]
+active_tenant = "tenant-northwind"
+active_project = "project-fuel-ops"
+active_environment = "env-dev"
+
+[[tool.machine-core.studio.tenants]]
+id = "tenant-northwind"
+slug = "northwind"
+name = "Northwind"
+
+[[tool.machine-core.studio.projects]]
+id = "project-fuel-ops"
+tenant_id = "tenant-northwind"
+slug = "fuel-ops"
+name = "Fuel Ops"
+entry = "test.main:machine"
+
+[tool.machine-core.studio.projects.capability_summary]
+agents = 2
+tools = 2
+
+[[tool.machine-core.studio.environments]]
+id = "env-dev"
+project_id = "project-fuel-ops"
+name = "dev"
+connection_kind = "local"
+connection_ref = "fake-machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-staging"
+project_id = "project-fuel-ops"
+name = "staging"
+connection_kind = "local"
+connection_ref = "fake-machine"
+status = "healthy"
+""".strip()
+    )
 
 
 @pytest.fixture
@@ -145,8 +206,45 @@ def fake_machine():
 
 
 @pytest.fixture
-def studio_client(fake_machine):
+def context_aware_fake_machine():
+    return FakeMachineRegistry(
+        {
+            "env-dev": FakeMachine(
+                name="DevMachine",
+                chat_agent_name="greeter",
+                tool_name="echo",
+                workflow_name="sequence",
+            ),
+            "env-staging": FakeMachine(
+                name="StagingMachine",
+                chat_agent_name="designer-agent",
+                tool_name="staging-echo",
+                workflow_name="staging-sequence",
+            ),
+        }
+    )
+
+
+@pytest.fixture(autouse=True)
+def studio_root(tmp_path, monkeypatch):
+    _write_studio_pyproject(tmp_path)
+    monkeypatch.setenv("MACHINE_CORE_ROOT", str(tmp_path))
+    return tmp_path
+
+
+@pytest.fixture
+def studio_client(fake_machine, studio_root):
     runtime._CHAT_THREADS.clear()
+    runtime._CHAT_THREAD_AGENTS.clear()
     runtime._CHAT_SESSION_IDS = iter(range(1, 10_000))
     app = create_studio_app(fake_machine)
+    return TestClient(app)
+
+
+@pytest.fixture
+def context_aware_studio_client(context_aware_fake_machine, studio_root):
+    runtime._CHAT_THREADS.clear()
+    runtime._CHAT_THREAD_AGENTS.clear()
+    runtime._CHAT_SESSION_IDS = iter(range(1, 10_000))
+    app = create_studio_app(context_aware_fake_machine)
     return TestClient(app)

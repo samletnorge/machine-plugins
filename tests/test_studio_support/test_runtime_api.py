@@ -42,6 +42,116 @@ def test_chat_threads_endpoint_returns_full_message_history(studio_client):
     assert messages[1]["role"] == "assistant"
 
 
+def test_runtime_routes_reflect_active_attachment_after_switch(
+    context_aware_studio_client,
+):
+    initial = context_aware_studio_client.get("/api/chat/threads")
+
+    assert initial.status_code == 200
+    assert "greeter" in initial.json()["catalog"]["agents"]
+
+    switched = context_aware_studio_client.put(
+        "/api/context",
+        json={
+            "tenant_slug": "northwind",
+            "project_slug": "fuel-ops",
+            "environment_name": "staging",
+        },
+    )
+
+    assert switched.status_code == 200
+
+    after = context_aware_studio_client.get("/api/chat/threads")
+
+    assert after.status_code == 200
+    assert "designer-agent" in after.json()["catalog"]["agents"]
+    assert "greeter" not in after.json()["catalog"]["agents"]
+
+
+def test_tool_detail_route_reflects_active_attachment_after_switch(
+    context_aware_studio_client,
+):
+    initial = context_aware_studio_client.get("/api/tools/echo")
+
+    assert initial.status_code == 200
+    assert initial.json()["name"] == "echo"
+
+    switched = context_aware_studio_client.put(
+        "/api/context",
+        json={
+            "tenant_slug": "northwind",
+            "project_slug": "fuel-ops",
+            "environment_name": "staging",
+        },
+    )
+
+    assert switched.status_code == 200
+
+    missing_old_tool = context_aware_studio_client.get("/api/tools/echo")
+    active_tool = context_aware_studio_client.get("/api/tools/staging-echo")
+
+    assert missing_old_tool.status_code == 404
+    assert active_tool.status_code == 200
+    assert active_tool.json()["name"] == "staging-echo"
+
+
+def test_workflow_detail_route_reflects_active_attachment_after_switch(
+    context_aware_studio_client,
+):
+    initial = context_aware_studio_client.get("/api/workflows/sequence")
+
+    assert initial.status_code == 200
+    assert initial.json()["name"] == "sequence"
+
+    switched = context_aware_studio_client.put(
+        "/api/context",
+        json={
+            "tenant_slug": "northwind",
+            "project_slug": "fuel-ops",
+            "environment_name": "staging",
+        },
+    )
+
+    assert switched.status_code == 200
+
+    missing_old_workflow = context_aware_studio_client.get("/api/workflows/sequence")
+    active_workflow = context_aware_studio_client.get("/api/workflows/staging-sequence")
+
+    assert missing_old_workflow.status_code == 404
+    assert active_workflow.status_code == 200
+    assert active_workflow.json()["name"] == "staging-sequence"
+
+
+def test_chat_threads_endpoint_keeps_existing_thread_agent_after_context_switch(
+    context_aware_studio_client,
+):
+    sent = context_aware_studio_client.post(
+        "/api/chat/threads/default/messages",
+        json={"agent": "greeter", "message": "world"},
+    )
+
+    assert sent.status_code == 200
+
+    switched = context_aware_studio_client.put(
+        "/api/context",
+        json={
+            "tenant_slug": "northwind",
+            "project_slug": "fuel-ops",
+            "environment_name": "staging",
+        },
+    )
+
+    assert switched.status_code == 200
+
+    after = context_aware_studio_client.get("/api/chat/threads")
+
+    assert after.status_code == 200
+    default_thread = next(
+        thread for thread in after.json()["threads"] if thread["thread_id"] == "default"
+    )
+    assert default_thread["agent"] == "greeter"
+
+
 def test_chat_messages_endpoint_forwards_prior_session_messages_in_context(
     studio_client, fake_machine
 ):

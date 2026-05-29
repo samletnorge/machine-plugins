@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getJson, postJson } from '../lib/api';
+  import { deriveChatInteractionState, deriveChatViewState, deriveInitialTab, deriveTabSelection, deriveTargetChange } from '../lib/chat-state';
   import { renderMarkdown as renderMarkdownContent } from '../lib/markdown';
   import type { ChatMessage, ChatThreadsPayload } from '../lib/types';
 
@@ -9,15 +10,28 @@
     sessionsEndpoint?: string;
     renderMarkdown?: string;
     chatTabs?: string;
+    activeContext?: string;
+    attachment?: string;
   }
 
-  let { threadsEndpoint, messagesEndpoint, sessionsEndpoint = '', renderMarkdown = 'false', chatTabs = '' }: Props = $props();
+  let {
+    threadsEndpoint,
+    messagesEndpoint,
+    sessionsEndpoint = '',
+    renderMarkdown = 'false',
+    chatTabs = '',
+    activeContext = '',
+    attachment = ''
+  }: Props = $props();
 
   let threads = $state<ChatThreadsPayload['threads']>([]);
   let catalog = $state<ChatThreadsPayload['catalog']>({ agents: [], runtimes: [] });
   let selectedThread = $state('default');
   let selectedAgent = $state('');
-  let activeTab = $state<'agents' | 'runtimes'>('agents');
+  let selectedAgentTarget = $state('');
+  let selectedRuntimeTarget = $state('');
+  let tabs = $derived(chatTabs.split(',').filter(Boolean) as Array<'agents' | 'runtimes'>);
+  let activeTab = $state<'agents' | 'runtimes'>(deriveInitialTab([]));
   let messages = $state<ChatMessage[]>([]);
   let draft = $state('');
   let sending = $state(false);
@@ -34,7 +48,10 @@
   }
 
   let markdownEnabled = $derived(renderMarkdown === 'true');
-  let tabs = $derived(chatTabs.split(',').filter(Boolean) as Array<'agents' | 'runtimes'>);
+  let runtimesPlanningOnly = $derived(activeTab === 'runtimes');
+  let interactionState = $derived(
+    deriveChatInteractionState(activeTab, sending, selectedAgent, catalog, draft, Boolean(sessionsEndpoint))
+  );
 
   let activeCatalog = $derived.by(() => catalog[activeTab] ?? []);
   let quickActions = $derived.by(() => {
@@ -61,15 +78,55 @@
     draft = prompt;
   }
 
+  function applyViewState(nextActiveTab = activeTab) {
+    const viewState = deriveChatViewState({
+      activeTab: nextActiveTab,
+      selectedThread,
+      selectedAgent,
+      threads,
+      catalog
+    });
+    selectedThread = viewState.selectedThread;
+    selectedAgent = viewState.selectedAgent;
+    messages = viewState.messages;
+    if (nextActiveTab === 'agents') {
+      selectedAgentTarget = viewState.selectedAgent;
+    } else {
+      selectedRuntimeTarget = viewState.selectedAgent;
+    }
+  }
+
+  function switchTab(tab: 'agents' | 'runtimes') {
+    activeTab = tab;
+    const currentSelection = tab === 'agents' ? selectedAgentTarget : selectedRuntimeTarget;
+    selectedAgent = deriveTabSelection(tab, catalog, currentSelection);
+    if (tab === 'agents') {
+      selectedAgentTarget = selectedAgent;
+    } else {
+      selectedRuntimeTarget = selectedAgent;
+    }
+    applyViewState(tab);
+  }
+
+  function handleTargetChange(event: Event) {
+    const nextTarget = (event.currentTarget as HTMLSelectElement).value;
+    const nextViewState = deriveTargetChange(activeTab, nextTarget, selectedThread, messages);
+    selectedThread = nextViewState.selectedThread;
+    selectedAgent = nextViewState.selectedAgent;
+    messages = nextViewState.messages;
+    if (activeTab === 'agents') {
+      selectedAgentTarget = nextTarget;
+    } else {
+      selectedRuntimeTarget = nextTarget;
+    }
+  }
+
   async function loadThreads() {
     try {
       const payload = await getJson<ChatThreadsPayload>(threadsEndpoint);
       catalog = payload.catalog;
       threads = payload.threads;
-      const activeThread = payload.threads.find((thread) => thread.thread_id === selectedThread) ?? payload.threads[0];
-      selectedThread = activeThread?.thread_id ?? 'default';
-      selectedAgent = activeThread?.agent ?? payload.catalog.agents[0] ?? payload.catalog.runtimes[0] ?? '';
-      messages = activeThread?.messages ?? [];
+      applyViewState(activeTab);
       loadError = '';
     } catch (error) {
       loadError = error instanceof Error ? error.message : 'Failed to load threads';
@@ -77,12 +134,12 @@
   }
 
   async function createSession() {
+    if (!interactionState.canCreateSession) return;
     if (!sessionsEndpoint) return;
     try {
       const payload = await postJson<{ thread_id: string }>(sessionsEndpoint, {});
       selectedThread = payload.thread_id;
       await loadThreads();
-      messages = [];
       loadError = '';
     } catch (error) {
       loadError = error instanceof Error ? error.message : 'Failed to create session';
@@ -96,27 +153,31 @@
       messages = [];
       return;
     }
-    selectedAgent = thread.agent || selectedAgent;
-    messages = thread.messages;
+    applyViewState(activeTab);
   }
 
   async function sendMessage() {
+    if (sending) return;
+    const sendTarget = selectedAgent;
+    if (activeTab === 'runtimes') return;
+    if (!catalog.agents.includes(sendTarget)) return;
     if (!draft.trim()) return;
     const message = draft.trim();
     draft = '';
     sending = true;
     try {
       const payload = await postJson<{ thread_id: string; messages: ChatMessage[] }>(sessionMessagesEndpoint, {
-        agent: selectedAgent,
+        agent: sendTarget,
         message
       });
-      const updatedThread = { thread_id: payload.thread_id, agent: selectedAgent, messages: payload.messages };
+      const updatedThread = { thread_id: payload.thread_id, agent: sendTarget, messages: payload.messages };
       const existingIndex = threads.findIndex((thread) => thread.thread_id === payload.thread_id);
       if (existingIndex >= 0) {
         threads = threads.map((thread) => (thread.thread_id === payload.thread_id ? updatedThread : thread));
       } else {
         threads = [updatedThread, ...threads];
       }
+      selectedThread = payload.thread_id;
       messages = payload.messages;
       loadError = '';
     } catch (error) {
@@ -126,6 +187,13 @@
       sending = false;
     }
   }
+
+  $effect(() => {
+    const initialTab = deriveInitialTab(tabs);
+    if (!tabs.includes(activeTab)) {
+      activeTab = initialTab;
+    }
+  });
 
   $effect(() => {
     void loadThreads();
@@ -143,7 +211,7 @@
         <span class="eyebrow">Mode</span>
         <div class="tab-strip chat-tabs">
           {#each tabs as tab (tab)}
-            <button type="button" class:active={activeTab === tab} class="tab-button" onclick={() => { activeTab = tab; selectedAgent = catalog[tab][0] ?? ''; }}>
+            <button type="button" class:active={activeTab === tab} class="tab-button" onclick={() => switchTab(tab)}>
               {tab}
             </button>
           {/each}
@@ -156,7 +224,7 @@
             <span class="eyebrow">Sessions</span>
             <strong>{selectedThread}</strong>
           </div>
-          <button type="button" class="secondary-button session-create" onclick={createSession}>New</button>
+          <button type="button" class="secondary-button session-create" onclick={createSession} disabled={!interactionState.canCreateSession}>New</button>
         </div>
         <div class="chat-session-list">
           {#each threads as thread (thread.thread_id)}
@@ -171,7 +239,7 @@
       <div class="chat-sidebar-block chat-target-picker">
         <span class="eyebrow">Target</span>
         <label class="select-shell">
-          <select bind:value={selectedAgent} class="control-input">
+          <select bind:value={selectedAgent} class="control-input" onchange={handleTargetChange}>
             {#each activeCatalog as agentName (agentName)}
               <option value={agentName}>{agentName}</option>
             {/each}
@@ -192,6 +260,15 @@
           <strong>{messages.length} messages</strong>
         </div>
       </header>
+
+      <div class="chat-context-status">
+        <span class="eyebrow">Context</span>
+        <strong>{activeContext || 'Unknown context'}</strong>
+        <p class="muted">Attachment: {attachment || 'detached'}</p>
+        {#if activeTab === 'runtimes'}
+          <p class="muted">Runtime planning only. Direct sends stay disabled in this first pass.</p>
+        {/if}
+      </div>
 
       <div class="chat-transcript-shell">
         <div class="chat-stream compact chat-transcript">
@@ -222,10 +299,10 @@
 
         <div class="chat-composer">
           <div class="chat-composer-shell">
-            <textarea bind:value={draft} class="control-input chat-composer-input" rows="3" placeholder="Ask the active target something specific" onkeydown={onDraftKeydown}></textarea>
-            <button type="button" class="composer-send chat-composer-action" onclick={sendMessage} aria-label={sending ? 'Sending message' : 'Send message'}>
+            <textarea bind:value={draft} class="control-input chat-composer-input" rows="3" placeholder={activeTab === 'runtimes' ? 'Runtime planning only. Switch to Agents to send a live message.' : 'Ask the active target something specific'} onkeydown={onDraftKeydown} disabled={interactionState.composerDisabled}></textarea>
+            <button type="button" class="composer-send chat-composer-action" onclick={sendMessage} aria-label={sending ? 'Sending message' : 'Send message'} disabled={!interactionState.canSend}>
               <span class="chat-composer-action-icon">{@html sending ? spinnerIcon : sendIcon}</span>
-              <span>{sending ? 'Sending…' : 'Send'}</span>
+              <span>{activeTab === 'runtimes' ? 'Runtime planning only' : sending ? 'Sending…' : 'Send'}</span>
             </button>
           </div>
         </div>
