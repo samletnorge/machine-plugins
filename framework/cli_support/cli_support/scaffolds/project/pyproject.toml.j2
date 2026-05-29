@@ -37,6 +37,35 @@ plugins = [
     "agent_brreg_expert",
 ]
 
+[tool.machine-core.studio]
+active_tenant = "tenant-local"
+active_project = "project-{{ project_name }}"
+active_environment = "env-dev"
+
+[[tool.machine-core.studio.tenants]]
+id = "tenant-local"
+slug = "local"
+name = "Local"
+
+[[tool.machine-core.studio.projects]]
+id = "project-{{ project_name }}"
+tenant_id = "tenant-local"
+slug = "{{ project_name }}"
+name = "{{ project_name }}"
+entry = "src.main:machine"
+
+[tool.machine-core.studio.projects.capability_summary]
+agents = 0
+tools = 0
+
+[[tool.machine-core.studio.environments]]
+id = "env-dev"
+project_id = "project-{{ project_name }}"
+name = "dev"
+connection_kind = "local"
+connection_ref = "src.main:machine"
+status = "healthy"
+
 # Per-plugin configuration (overrides manifest defaults & env vars)
 [tool.machine-core.plugin_configs.provider_ollama]
 base_url = "http://localhost:9012"

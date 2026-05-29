@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import typer
 from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
+from typer.models import OptionInfo
 
 console = Console()
 
@@ -30,7 +32,10 @@ def init_command(
         console.print(f"[red]Error: {target} already exists and is not empty.[/red]")
         raise typer.Exit(code=1)
 
-    project_name = name or target.name
+    resolved_name: Any = name
+    if isinstance(resolved_name, OptionInfo) or not resolved_name:
+        resolved_name = target.name
+    project_name = str(resolved_name)
 
     target.mkdir(parents=True, exist_ok=True)
     (target / "src").mkdir(exist_ok=True)
