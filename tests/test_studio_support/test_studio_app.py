@@ -60,7 +60,7 @@ def test_index_shows_active_tenant_project_and_environment(studio_client):
     response = studio_client.get("/")
 
     assert response.status_code == 200
-    assert "Active Context" in response.text
+    assert 'data-active-context="Northwind / Fuel Ops / dev"' in response.text
     assert "Northwind" in response.text
     assert "Fuel Ops / dev" in response.text
     assert "Northwind / Fuel Ops / dev" in response.text
@@ -76,36 +76,67 @@ def test_index_shows_attachment_state(studio_client):
     assert ">attached</strong>" in response.text
 
 
-def test_dashboard_renders_context_switcher_shell(studio_client):
+def test_dashboard_moves_context_switching_to_sidebar_and_removes_topbar_switcher(
+    studio_client,
+):
     response = studio_client.get("/")
 
     assert response.status_code == 200
-    assert '<header class="studio-topbar">' in response.text
-    assert 'class="context-switcher-shell"' in response.text
-    assert 'aria-label="Context switcher"' in response.text
-    assert response.text.index('<header class="studio-topbar">') < response.text.index(
-        '<main class="page-frame">'
-    )
-    assert response.text.index("context-switcher-shell") < response.text.index(
-        '<main class="page-frame">'
-    )
-    assert response.text.count('class="context-switcher-shell"') == 1
-    assert "target-switcher" in response.text
+    assert 'class="sidebar-context-switcher"' in response.text
+    assert 'aria-label="Tenant"' in response.text
+    assert 'aria-label="Project"' in response.text
+    assert 'aria-label="Environment"' in response.text
     assert 'data-context-switcher-endpoint="' in response.text
     assert '/api/context"' in response.text
     assert 'name="tenant_slug"' in response.text
     assert 'name="project_slug"' in response.text
     assert 'name="environment_name"' in response.text
+    assert "Samletnorge" in response.text
+    assert "Mythrantic" in response.text
+    assert "Car Expert" in response.text
+    assert "News Finder" in response.text
+    assert "AI Playground" in response.text
+    assert 'class="context-switcher-shell"' not in response.text
     assert (
-        '<button type="submit" class="primary-button">Switch</button>' in response.text
+        '<button type="submit" class="primary-button">Switch</button>'
+        not in response.text
     )
-    assert 'value="Northwind / Fuel Ops / dev"' in response.text
-    assert 'data-environment-name="dev"' in response.text
-    assert "selected" in response.text
-    assert "Northwind / Fuel Ops / dev" in response.text
-    assert "Northwind / Fuel Ops / staging" in response.text
-    assert response.text.count('data-environment-name="dev"') == 1
-    assert response.text.count('data-environment-name="staging"') == 1
+    assert "Active runtime" not in response.text
+
+
+def test_topbar_only_keeps_mode_toggle_and_moves_theme_picker_to_account_page(
+    studio_client,
+):
+    response = studio_client.get("/")
+
+    assert response.status_code == 200
+    assert 'id="mode-toggle"' in response.text
+    assert 'aria-label="Toggle color mode"' in response.text
+    assert 'id="theme-picker"' not in response.text
+    assert ">Theme</span>" not in response.text
+
+    account_response = studio_client.get("/account")
+
+    assert account_response.status_code == 200
+    assert 'id="theme-picker"' in account_response.text
+    assert ">Theme</span>" in account_response.text
+
+
+def test_sidebar_switcher_seeds_multi_tenant_catalog(studio_client):
+    response = studio_client.get("/")
+
+    assert response.status_code == 200
+    assert 'value="northwind"' in response.text
+    assert 'value="northwind"' in response.text and "selected" in response.text
+    assert 'value="samletnorge"' in response.text
+    assert 'value="mythrantic"' in response.text
+    assert 'value="fuel-ops"' in response.text
+    assert 'value="dev"' in response.text
+    assert 'value="staging"' in response.text
+    assert 'value="prod"' in response.text
+    assert "Car Expert" in response.text
+    assert "News Finder" in response.text
+    assert "AI Playground" in response.text
 
 
 def test_dashboard_shows_requested_failed_context_without_stale_runtime(
@@ -136,12 +167,12 @@ def test_dashboard_shows_requested_failed_context_without_stale_runtime(
 
     assert response.status_code == 200
     assert "Northwind / Fuel Ops / staging" in response.text
-    assert "Context attach failed" in response.text
+    assert "failed" in response.text
     assert "attach failed" in response.text
     assert "StagingMachine" not in response.text
     assert "designer-agent" not in response.text
     assert "staging-echo" not in response.text
-    assert ">No runtime attached</span>" in response.text
+    assert "No runtime attached" in response.text
     assert ">Fuel Ops</span>" not in response.text
 
 

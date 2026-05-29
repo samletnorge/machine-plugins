@@ -9,6 +9,18 @@
         <span class="pill">{{ active_nav }}</span>
     </div>
     <p>{{ section_description }}</p>
+    {% if account_page %}
+    <div class="account-panel">
+        <label class="theme-select account-theme-select">
+            <span>Theme</span>
+            <select id="theme-picker">
+                {% for key, theme in themes.items() %}
+                <option value="{{ key }}">{{ theme.label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+    {% endif %}
     <pre class="code-panel">{{ {"implemented": false, "next": active_nav} | tojson(indent=2) }}</pre>
 </section>
 {% endblock %}

@@ -24,6 +24,19 @@ async def dashboard_alias(request: Request):
     return await dashboard(request)
 
 
+@router.get("/account")
+async def account_page(request: Request):
+    return render_template(
+        request,
+        "section.html",
+        page_title="Account",
+        active_nav="account",
+        section_title="Account",
+        section_description="Personal preferences for Machine Studio live here, including theme selection.",
+        account_page=True,
+    )
+
+
 @router.get("/sections/{section_key}")
 async def planned_section(request: Request, section_key: str):
     title, description = SECTION_COPY.get(

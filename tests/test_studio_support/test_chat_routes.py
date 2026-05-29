@@ -4,7 +4,9 @@
 def test_chat_page_returns_200(studio_client):
     resp = studio_client.get("/chat")
     assert resp.status_code == 200
-    assert "greeter" in resp.text
+    assert 'id="chat-island"' in resp.text
+    assert 'data-threads-endpoint="/api/chat/threads"' in resp.text
+    assert 'data-chat-tabs="agents,runtimes"' in resp.text
 
 
 def test_chat_page_selects_agent(studio_client):

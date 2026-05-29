@@ -451,6 +451,7 @@ code, pre, .mono {
     display: flex;
     gap: 0.75rem;
     align-items: center;
+    justify-content: flex-end;
 }
 
 .theme-select,
@@ -468,6 +469,17 @@ code, pre, .mono {
     display: grid;
     gap: 0.3rem;
     min-width: 10rem;
+}
+
+.sidebar-context-switcher {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1rem;
+}
+
+.sidebar-context-switcher label {
+    display: grid;
+    gap: 0.35rem;
 }
 
 .theme-select select,
@@ -490,6 +502,30 @@ code, pre, .mono {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
+}
+
+.mode-toggle.icon-only {
+    justify-content: center;
+    gap: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+}
+
+.mode-toggle.icon-only #mode-label {
+    display: none;
+}
+
+.mode-toggle-light {
+    display: none;
+}
+
+html[data-mode="light"] .mode-toggle-dark {
+    display: none;
+}
+
+html[data-mode="light"] .mode-toggle-light {
+    display: inline-flex;
 }
 
 .sidebar-toggle {
@@ -592,12 +628,7 @@ code, pre, .mono {
     padding: 0.7rem 0;
 }
 
-.context-switcher-shell {
-    display: grid;
-    gap: 0.85rem;
-}
-
-.context-switcher-shell label,
+.account-panel,
 .chat-context-status {
     display: grid;
     gap: 0.35rem;
@@ -623,8 +654,8 @@ code, pre, .mono {
     opacity: 0.78;
 }
 
-.context-switcher-note {
-    margin: 0;
+.account-theme-select {
+    max-width: 20rem;
 }
 
 .panel-count {

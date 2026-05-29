@@ -29,18 +29,18 @@ def test_chat_page_points_island_to_thread_endpoints(studio_client):
     response = studio_client.get("/chat")
 
     assert response.status_code == 200
-    assert "Conversation surface" in response.text
+    assert "Operator workbench" in response.text
     assert 'class="panel chat-panel"' in response.text
-    assert 'class="chat-hero"' in response.text
-    assert 'class="chat-stage"' in response.text
-    assert "Talk to the runtime" in response.text
-    assert "Operator notes" in response.text
+    assert 'class="chat-page-header"' in response.text
+    assert "Runtime console" in response.text
+    assert "How this console works" in response.text
     assert "<details" in response.text
     assert 'class="operator-notes"' in response.text
     assert 'data-threads-endpoint="/api/chat/threads"' in response.text
     assert (
         'data-messages-endpoint="/api/chat/threads/default/messages"' in response.text
     )
+    assert 'data-sessions-endpoint="/api/chat/sessions"' in response.text
     assert 'data-render-markdown="true"' in response.text
     assert 'data-chat-tabs="agents,runtimes"' in response.text
     assert 'hx-post="/chat/send"' not in response.text

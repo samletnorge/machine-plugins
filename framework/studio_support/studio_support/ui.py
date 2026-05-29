@@ -64,6 +64,12 @@ NAVIGATION = [
                 "href": "/_studio/api",
                 "icon": "brackets",
             },
+            {
+                "key": "account",
+                "label": "Account",
+                "href": "/_studio/account",
+                "icon": "user",
+            },
             {"key": "docs", "label": "Docs", "href": "/_studio/docs", "icon": "book"},
         ],
     },
@@ -270,10 +276,15 @@ def _context_snapshot() -> dict[str, Any]:
         state = get_studio_state()
     except RuntimeError:
         return {
+            "tenant_slug": None,
             "tenant_name": None,
+            "tenant_options": [],
+            "project_slug": None,
             "project_name": None,
+            "project_options": [],
             "environment": None,
             "environment_status": None,
+            "environment_options": [],
             "entry": None,
             "attachment_status": "detached",
             "attachment_error": None,
@@ -296,11 +307,30 @@ def _context_snapshot() -> dict[str, Any]:
     environment = environments_by_id.get(active_context.environment_id)
 
     project_targets = []
+    projects_for_tenant = []
+    environments_for_project = []
     for listed_project in catalog.projects:
         listed_tenant = tenants_by_id.get(listed_project.tenant_id)
+        if listed_project.tenant_id == active_context.tenant_id:
+            projects_for_tenant.append(
+                {
+                    "slug": listed_project.slug,
+                    "name": listed_project.name,
+                    "active": listed_project.id == active_context.project_id,
+                }
+            )
         for listed_environment in catalog.environments:
             if listed_environment.project_id != listed_project.id:
                 continue
+            if listed_project.id == active_context.project_id:
+                environments_for_project.append(
+                    {
+                        "name": listed_environment.name,
+                        "status": listed_environment.status,
+                        "active": listed_environment.id
+                        == active_context.environment_id,
+                    }
+                )
             project_targets.append(
                 {
                     "tenant_slug": listed_tenant.slug if listed_tenant else None,
@@ -322,10 +352,20 @@ def _context_snapshot() -> dict[str, Any]:
     return {
         "tenant_slug": tenant.slug if tenant else None,
         "tenant_name": tenant.name if tenant else None,
+        "tenant_options": [
+            {
+                "slug": listed_tenant.slug,
+                "name": listed_tenant.name,
+                "active": listed_tenant.id == active_context.tenant_id,
+            }
+            for listed_tenant in catalog.tenants
+        ],
         "project_slug": project.slug if project else None,
         "project_name": project.name if project else None,
+        "project_options": projects_for_tenant,
         "environment": environment.name if environment else None,
         "environment_status": environment.status if environment else None,
+        "environment_options": environments_for_project,
         "entry": project.entry if project else None,
         "attachment_status": attachment.status,
         "attachment_error": attachment.error,
@@ -368,15 +408,18 @@ def machine_snapshot() -> dict[str, Any]:
         "machine_name": machine_name,
         "tenant_slug": context["tenant_slug"],
         "tenant_name": context["tenant_name"] or "Unknown tenant",
+        "tenant_options": context["tenant_options"],
         "organization_name": context["tenant_name"] or "Unknown tenant",
         "workspace_name": "Local Workspace",
         "project_slug": context["project_slug"],
         "project_name": project_name,
+        "project_options": context["project_options"],
         "project_targets": project_targets,
         "project_root": str(root) if root else None,
         "entry": entry,
         "environment": environment,
         "environment_status": context["environment_status"],
+        "environment_options": context["environment_options"],
         "attachment_status": context["attachment_status"],
         "attachment_error": context["attachment_error"],
         "project_config": project_config,

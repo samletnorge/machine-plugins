@@ -22,11 +22,32 @@
                         <small>Mission Control</small>
                     </span>
                 </a>
-                <div class="context-chip">
-                    <span class="context-label">Active Context</span>
-                    <strong>{{ tenant_name }}</strong>
-                    <span>{{ project_name }} / {{ environment }}</span>
-                </div>
+                <form class="sidebar-context-switcher" aria-label="Context switcher" data-context-switcher-endpoint="{{ request.scope.root_path }}/api/context">
+                    <label>
+                        <span class="context-label">Tenant</span>
+                        <select class="control-select" name="tenant_slug" aria-label="Tenant">
+                            {% for tenant in tenant_options %}
+                            <option value="{{ tenant.slug }}" {% if tenant.active %}selected{% endif %}>{{ tenant.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        <span class="context-label">Project</span>
+                        <select class="control-select" name="project_slug" aria-label="Project">
+                            {% for project in project_options %}
+                            <option value="{{ project.slug }}" {% if project.active %}selected{% endif %}>{{ project.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        <span class="context-label">Environment</span>
+                        <select class="control-select" name="environment_name" aria-label="Environment">
+                            {% for option in environment_options %}
+                            <option value="{{ option.name }}" {% if option.active %}selected{% endif %}>{{ option.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </form>
             </div>
 
             <nav class="nav-groups" aria-label="Studio Navigation">
@@ -54,64 +75,13 @@
                         <span class="nav-icon">{{ icon('blocks') }}</span>
                         <span>Navigation</span>
                     </button>
-                    <div class="eyebrow">Active runtime</div>
                     <h1>{{ page_title }}</h1>
-                    <p>{{ tenant_name }} · {{ project_name }} · {{ environment }}</p>
-                    <form class="context-switcher-shell" aria-label="Context switcher" data-context-switcher-endpoint="{{ request.scope.root_path }}/api/context">
-                        <label>
-                            <span class="eyebrow">Context Target</span>
-                            <div class="select-shell target-switcher">
-                                <select class="control-select" name="target" aria-label="Context target">
-                                    {% for target in project_targets %}
-                                    {% set target_label = target.tenant_name ~ ' / ' ~ target.project_name ~ ' / ' ~ target.environment %}
-                                    <option
-                                        value="{{ target_label }}"
-                                        data-tenant-slug="{{ target.tenant_slug }}"
-                                        data-project-slug="{{ target.project_slug }}"
-                                        data-environment-name="{{ target.environment }}"
-                                        {% if target.active %}selected{% endif %}
-                                    >{{ target_label }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </label>
-                        <input type="hidden" name="tenant_slug" value="{{ tenant_slug }}">
-                        <input type="hidden" name="project_slug" value="{{ project_slug }}">
-                        <input type="hidden" name="environment_name" value="{{ environment }}">
-                        <button type="submit" class="primary-button">Switch</button>
-                        <p class="context-switcher-note muted">Switching targets re-attaches the active runtime for this Studio session.</p>
-                    </form>
-                    <div class="context-meta-row">
-                        <span class="status-chip status-{{ attachment_status }}">{{ attachment_status }}</span>
-                        {% if environment_status %}
-                        <span class="status-chip">{{ environment_status }}</span>
-                        {% endif %}
-                        <span class="mono">{{ machine_name }}</span>
-                        <span class="mono">{{ entry }}</span>
-                    </div>
-                    {% if attachment_error %}
-                    <p class="status-note">{{ attachment_error }}</p>
-                    {% endif %}
-                    {% if attachment_status == "failed" %}
-                    <div class="runtime-banner runtime-banner-error">
-                        <strong>Context attach failed</strong>
-                        <span>{{ attachment_error or "The selected context could not attach to a runtime." }}</span>
-                    </div>
-                    {% endif %}
                 </div>
 
                 <div class="topbar-actions">
-                    <label class="theme-select">
-                        <span>Theme</span>
-                        <select id="theme-picker">
-                            {% for key, theme in themes.items() %}
-                            <option value="{{ key }}">{{ theme.label }}</option>
-                            {% endfor %}
-                        </select>
-                    </label>
-
-                    <button type="button" class="mode-toggle" id="mode-toggle">
-                        <span class="mode-toggle-icon">{{ icon('moon') }}</span>
+                    <button type="button" class="mode-toggle icon-only" id="mode-toggle" aria-label="Toggle color mode">
+                        <span class="mode-toggle-icon mode-toggle-dark">{{ icon('moon') }}</span>
+                        <span class="mode-toggle-icon mode-toggle-light">{{ icon('sun') }}</span>
                         <span id="mode-label">Dark</span>
                     </button>
                 </div>
@@ -157,11 +127,13 @@
             root.dataset.theme = theme;
             root.dataset.mode = mode;
             root.classList.toggle('dark', mode === 'dark');
-            themePicker.value = theme;
+            if (themePicker) {
+                themePicker.value = theme;
+            }
             modeLabel.textContent = mode === 'dark' ? 'Dark' : 'Light';
         }
 
-        themePicker.addEventListener('change', () => {
+        themePicker?.addEventListener('change', () => {
             localStorage.setItem('machine-studio-theme', themePicker.value);
             applyTheme(themePicker.value, root.dataset.mode || storageMode);
         });
@@ -187,47 +159,117 @@
             }
         });
 
-        const contextSwitcher = document.querySelector('[data-context-switcher-endpoint]');
+        const contextSwitcher = document.querySelector('.sidebar-context-switcher[data-context-switcher-endpoint]');
         if (contextSwitcher) {
-            const targetSelect = contextSwitcher.querySelector('select[name="target"]');
-            const tenantField = contextSwitcher.querySelector('input[name="tenant_slug"]');
-            const projectField = contextSwitcher.querySelector('input[name="project_slug"]');
-            const environmentField = contextSwitcher.querySelector('input[name="environment_name"]');
+            const tenantSelect = contextSwitcher.querySelector('select[name="tenant_slug"]');
+            const projectSelect = contextSwitcher.querySelector('select[name="project_slug"]');
+            const environmentSelect = contextSwitcher.querySelector('select[name="environment_name"]');
             const endpoint = contextSwitcher.dataset.contextSwitcherEndpoint;
+            const targets = {{ project_targets | tojson }};
+            let currentState = {
+                tenantSlug: tenantSelect?.value || '',
+                projectSlug: projectSelect?.value || '',
+                environmentName: environmentSelect?.value || '',
+            };
 
-            function syncTargetFields() {
-                const selectedOption = targetSelect?.selectedOptions?.[0];
-                if (!selectedOption) return;
-                tenantField.value = selectedOption.dataset.tenantSlug || '';
-                projectField.value = selectedOption.dataset.projectSlug || '';
-                environmentField.value = selectedOption.dataset.environmentName || '';
+            function setOptions(select, options, selectedValue, valueKey, labelKey) {
+                if (!select) return;
+                select.innerHTML = '';
+                options.forEach((option) => {
+                    const element = document.createElement('option');
+                    element.value = option[valueKey];
+                    element.textContent = option[labelKey];
+                    if (option[valueKey] === selectedValue) {
+                        element.selected = true;
+                    }
+                    select.appendChild(element);
+                });
             }
 
-            targetSelect?.addEventListener('change', syncTargetFields);
-            syncTargetFields();
-
-            contextSwitcher.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                syncTargetFields();
-                const submitButton = contextSwitcher.querySelector('button[type="submit"]');
-                submitButton?.setAttribute('disabled', 'disabled');
-                try {
-                    const response = await fetch(endpoint, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            tenant_slug: tenantField.value,
-                            project_slug: projectField.value,
-                            environment_name: environmentField.value,
-                        }),
-                    });
-                    if (!response.ok) {
-                        throw new Error(`Context switch failed: ${response.status}`);
+            function projectsForTenant(tenantSlug) {
+                const seen = new Set();
+                return targets.filter((target) => {
+                    if (target.tenant_slug !== tenantSlug || seen.has(target.project_slug)) {
+                        return false;
                     }
-                    window.location.reload();
+                    seen.add(target.project_slug);
+                    return true;
+                });
+            }
+
+            function environmentsForProject(tenantSlug, projectSlug) {
+                return targets.filter((target) => (
+                    target.tenant_slug === tenantSlug && target.project_slug === projectSlug
+                ));
+            }
+
+            function restoreCurrentState() {
+                const projectOptions = projectsForTenant(currentState.tenantSlug);
+                setOptions(projectSelect, projectOptions, currentState.projectSlug, 'project_slug', 'project_name');
+                const environmentOptions = environmentsForProject(currentState.tenantSlug, currentState.projectSlug);
+                setOptions(environmentSelect, environmentOptions, currentState.environmentName, 'environment', 'environment');
+                if (tenantSelect) {
+                    tenantSelect.value = currentState.tenantSlug;
+                }
+            }
+
+            async function switchContext(tenantSlug, projectSlug, environmentName) {
+                const response = await fetch(endpoint, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tenant_slug: tenantSlug,
+                        project_slug: projectSlug,
+                        environment_name: environmentName,
+                    }),
+                });
+                if (!response.ok) {
+                    throw new Error(`Context switch failed: ${response.status}`);
+                }
+                currentState = { tenantSlug, projectSlug, environmentName };
+                window.location.reload();
+            }
+
+            tenantSelect?.addEventListener('change', async () => {
+                const tenantSlug = tenantSelect.value;
+                const projectOptions = projectsForTenant(tenantSlug);
+                const nextProject = projectOptions[0];
+                setOptions(projectSelect, projectOptions, nextProject?.project_slug, 'project_slug', 'project_name');
+                const environmentOptions = environmentsForProject(tenantSlug, nextProject?.project_slug);
+                const nextEnvironment = environmentOptions[0];
+                setOptions(environmentSelect, environmentOptions, nextEnvironment?.environment, 'environment', 'environment');
+                if (nextProject && nextEnvironment) {
+                    try {
+                        await switchContext(tenantSlug, nextProject.project_slug, nextEnvironment.environment);
+                    } catch (error) {
+                        console.error(error);
+                        restoreCurrentState();
+                    }
+                }
+            });
+
+            projectSelect?.addEventListener('change', async () => {
+                const tenantSlug = tenantSelect.value;
+                const projectSlug = projectSelect.value;
+                const environmentOptions = environmentsForProject(tenantSlug, projectSlug);
+                const nextEnvironment = environmentOptions[0];
+                setOptions(environmentSelect, environmentOptions, nextEnvironment?.environment, 'environment', 'environment');
+                if (nextEnvironment) {
+                    try {
+                        await switchContext(tenantSlug, projectSlug, nextEnvironment.environment);
+                    } catch (error) {
+                        console.error(error);
+                        restoreCurrentState();
+                    }
+                }
+            });
+
+            environmentSelect?.addEventListener('change', async () => {
+                try {
+                    await switchContext(tenantSelect.value, projectSelect.value, environmentSelect.value);
                 } catch (error) {
                     console.error(error);
-                    submitButton?.removeAttribute('disabled');
+                    restoreCurrentState();
                 }
             });
         }

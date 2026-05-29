@@ -170,6 +170,16 @@ id = "tenant-northwind"
 slug = "northwind"
 name = "Northwind"
 
+[[tool.machine-core.studio.tenants]]
+id = "tenant-samletnorge"
+slug = "samletnorge"
+name = "Samletnorge"
+
+[[tool.machine-core.studio.tenants]]
+id = "tenant-mythrantic"
+slug = "mythrantic"
+name = "Mythrantic"
+
 [[tool.machine-core.studio.projects]]
 id = "project-fuel-ops"
 tenant_id = "tenant-northwind"
@@ -179,6 +189,39 @@ entry = "test.main:machine"
 
 [tool.machine-core.studio.projects.capability_summary]
 agents = 2
+tools = 2
+
+[[tool.machine-core.studio.projects]]
+id = "project-car-expert"
+tenant_id = "tenant-samletnorge"
+slug = "car-expert"
+name = "Car Expert"
+entry = "test.car:machine"
+
+[tool.machine-core.studio.projects.capability_summary]
+agents = 2
+tools = 2
+
+[[tool.machine-core.studio.projects]]
+id = "project-news-finder"
+tenant_id = "tenant-samletnorge"
+slug = "news-finder"
+name = "News Finder"
+entry = "test.news:machine"
+
+[tool.machine-core.studio.projects.capability_summary]
+agents = 2
+tools = 2
+
+[[tool.machine-core.studio.projects]]
+id = "project-ai-playground"
+tenant_id = "tenant-mythrantic"
+slug = "ai-playground"
+name = "AI Playground"
+entry = "test.playground:machine"
+
+[tool.machine-core.studio.projects.capability_summary]
+agents = 1
 tools = 2
 
 [[tool.machine-core.studio.environments]]
@@ -193,6 +236,62 @@ status = "healthy"
 id = "env-staging"
 project_id = "project-fuel-ops"
 name = "staging"
+connection_kind = "local"
+connection_ref = "fake-machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-prod"
+project_id = "project-fuel-ops"
+name = "prod"
+connection_kind = "local"
+connection_ref = "fake-machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-car-dev"
+project_id = "project-car-expert"
+name = "dev"
+connection_kind = "local"
+connection_ref = "fake-machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-car-staging"
+project_id = "project-car-expert"
+name = "staging"
+connection_kind = "local"
+connection_ref = "fake-machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-news-dev"
+project_id = "project-news-finder"
+name = "dev"
+connection_kind = "local"
+connection_ref = "fake-machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-news-prod"
+project_id = "project-news-finder"
+name = "prod"
+connection_kind = "local"
+connection_ref = "fake-machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-playground-dev"
+project_id = "project-ai-playground"
+name = "dev"
+connection_kind = "local"
+connection_ref = "fake-machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-playground-prod"
+project_id = "project-ai-playground"
+name = "prod"
 connection_kind = "local"
 connection_ref = "fake-machine"
 status = "healthy"
@@ -220,6 +319,48 @@ def context_aware_fake_machine():
                 chat_agent_name="designer-agent",
                 tool_name="staging-echo",
                 workflow_name="staging-sequence",
+            ),
+            "env-prod": FakeMachine(
+                name="ProdMachine",
+                chat_agent_name="prod-agent",
+                tool_name="prod-echo",
+                workflow_name="prod-sequence",
+            ),
+            "env-car-dev": FakeMachine(
+                name="CarExpertDevMachine",
+                chat_agent_name="car-expert",
+                tool_name="lookup-vehicle",
+                workflow_name="car-diagnose",
+            ),
+            "env-car-staging": FakeMachine(
+                name="CarExpertStagingMachine",
+                chat_agent_name="price-advisor",
+                tool_name="estimate-repair",
+                workflow_name="car-pricing",
+            ),
+            "env-news-dev": FakeMachine(
+                name="NewsFinderDevMachine",
+                chat_agent_name="news-finder",
+                tool_name="search-news",
+                workflow_name="news-briefing",
+            ),
+            "env-news-prod": FakeMachine(
+                name="NewsFinderProdMachine",
+                chat_agent_name="topic-summarizer",
+                tool_name="extract-article",
+                workflow_name="news-digest",
+            ),
+            "env-playground-dev": FakeMachine(
+                name="PlaygroundDevMachine",
+                chat_agent_name="playground-assistant",
+                tool_name="run-prompt",
+                workflow_name="prompt-lab",
+            ),
+            "env-playground-prod": FakeMachine(
+                name="PlaygroundProdMachine",
+                chat_agent_name="model-judge",
+                tool_name="compare-models",
+                workflow_name="model-bakeoff",
             ),
         }
     )
