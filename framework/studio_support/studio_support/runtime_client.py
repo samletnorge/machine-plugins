@@ -145,7 +145,12 @@ class RemoteMachineClient:
         return None
 
     def list_category(self, category: str) -> dict[str, RemoteResourceProxy]:
-        items = _http_json("GET", _join_url(self.base_url, f"/api/{category}"))
+        try:
+            items = _http_json("GET", _join_url(self.base_url, f"/api/{category}"))
+        except RemoteRuntimeError as exc:
+            if str(exc).startswith("404 "):
+                return {}
+            raise
         if not isinstance(items, list):
             return {}
         return {
