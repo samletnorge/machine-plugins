@@ -41,6 +41,8 @@ class AttachmentManager:
         )
         try:
             machine = self._resolver(context)
+            if hasattr(machine, "list_categories"):
+                machine.list_categories()
         except Exception as exc:
             self._machine = None
             self._attachment = replace(

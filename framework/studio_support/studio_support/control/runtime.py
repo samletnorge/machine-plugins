@@ -11,40 +11,25 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from studio_support.dependencies import get_machine
+from studio_support.runtime_access import (
+    current_runtime_key,
+    item_operations,
+    item_owner,
+    machine_item,
+)
 
 router = APIRouter(prefix="/api", tags=["studio-runtime"])
 
-_CHAT_THREADS: dict[str, list[dict[str, str]]] = defaultdict(list)
-_CHAT_THREAD_AGENTS: dict[str, str] = {}
+_CHAT_THREADS: dict[str, dict[str, list[dict[str, str]]]] = defaultdict(
+    lambda: defaultdict(list)
+)
+_CHAT_THREAD_AGENTS: dict[str, dict[str, str]] = defaultdict(dict)
 _CHAT_SESSION_IDS = count(1)
 
 
 class ChatMessageRequest(BaseModel):
     agent: str
     message: str
-
-
-def _machine_item(category: str, name: str) -> Any | None:
-    machine = get_machine()
-    if machine is None:
-        return None
-    if hasattr(machine, "resolve"):
-        return machine.resolve(category, name)
-    return getattr(machine, f"{category}s", {}).get(name)
-
-
-def _item_owner(category: str, name: str) -> str | None:
-    machine = get_machine()
-    if machine is not None and hasattr(machine, "get_owner"):
-        return machine.get_owner(category, name)
-    return None
-
-
-def _item_operations(category: str) -> list[str]:
-    machine = get_machine()
-    if machine is not None and hasattr(machine, "get_operations"):
-        return sorted((machine.get_operations(category) or {}).keys())
-    return []
 
 
 def _chat_capable_agents() -> list[str]:
@@ -149,11 +134,12 @@ def _workflow_graph(workflow: Any) -> dict[str, list[dict[str, str]]]:
 
 @router.get("/chat/threads")
 async def list_chat_threads() -> dict[str, object]:
+    runtime_key = current_runtime_key()
     catalog = _chat_catalog()
     agents = catalog["agents"]
     existing = {
-        "default": list(_CHAT_THREADS.get("default", [])),
-        **dict(_CHAT_THREADS),
+        "default": list(_CHAT_THREADS[runtime_key].get("default", [])),
+        **dict(_CHAT_THREADS[runtime_key]),
     }
 
     threads = []
@@ -161,7 +147,7 @@ async def list_chat_threads() -> dict[str, object]:
         threads.append(
             {
                 "thread_id": thread_id,
-                "agent": _CHAT_THREAD_AGENTS.get(
+                "agent": _CHAT_THREAD_AGENTS[runtime_key].get(
                     thread_id, agents[0] if agents else ""
                 ),
                 "messages": messages,
@@ -172,9 +158,10 @@ async def list_chat_threads() -> dict[str, object]:
 
 @router.post("/chat/sessions")
 async def create_chat_session() -> dict[str, str]:
+    runtime_key = current_runtime_key()
     thread_id = f"session-{next(_CHAT_SESSION_IDS)}"
-    _CHAT_THREADS[thread_id] = []
-    _CHAT_THREAD_AGENTS[thread_id] = ""
+    _CHAT_THREADS[runtime_key][thread_id] = []
+    _CHAT_THREAD_AGENTS[runtime_key][thread_id] = ""
     return {"thread_id": thread_id}
 
 
@@ -182,7 +169,8 @@ async def create_chat_session() -> dict[str, str]:
 async def send_chat_message(
     thread_id: str, payload: ChatMessageRequest
 ) -> dict[str, object]:
-    agent = _machine_item("agent", payload.agent)
+    runtime_key = current_runtime_key()
+    agent = machine_item("agent", payload.agent)
     if agent is None:
         raise HTTPException(
             status_code=404, detail=f"Agent '{payload.agent}' not found"
@@ -209,21 +197,28 @@ async def send_chat_message(
             detail=f"Agent '{payload.agent}' is not directly chat invokable in Studio",
         )
 
-    _CHAT_THREAD_AGENTS.setdefault(thread_id, payload.agent)
-    prior_messages = list(_CHAT_THREADS[thread_id])
-    _CHAT_THREADS[thread_id].append({"role": "user", "content": payload.message})
+    _CHAT_THREAD_AGENTS[runtime_key].setdefault(thread_id, payload.agent)
+    prior_messages = list(_CHAT_THREADS[runtime_key][thread_id])
+    _CHAT_THREADS[runtime_key][thread_id].append(
+        {"role": "user", "content": payload.message}
+    )
     result = await agent.run(
         payload.message, context={"thread_id": thread_id, "messages": prior_messages}
     )
     response_text = getattr(result, "output", getattr(result, "data", str(result)))
-    _CHAT_THREADS[thread_id].append({"role": "assistant", "content": response_text})
+    _CHAT_THREADS[runtime_key][thread_id].append(
+        {"role": "assistant", "content": response_text}
+    )
 
-    return {"thread_id": thread_id, "messages": list(_CHAT_THREADS[thread_id])}
+    return {
+        "thread_id": thread_id,
+        "messages": list(_CHAT_THREADS[runtime_key][thread_id]),
+    }
 
 
 @router.get("/tools/{tool_name}")
 async def get_tool_detail(tool_name: str) -> dict[str, object]:
-    tool = _machine_item("tool", tool_name)
+    tool = machine_item("tool", tool_name)
     if tool is None:
         raise HTTPException(status_code=404, detail=f"Tool '{tool_name}' not found")
 
@@ -239,15 +234,15 @@ async def get_tool_detail(tool_name: str) -> dict[str, object]:
         "description": getattr(tool, "description", None)
         or getattr(tool, "__doc__", None)
         or tool.__class__.__name__,
-        "owner": _item_owner("tool", tool_name),
-        "operations": _item_operations("tool"),
+        "owner": item_owner("tool", tool_name),
+        "operations": item_operations("tool"),
         "input_schema": input_schema,
     }
 
 
 @router.get("/workflows/{workflow_name}")
 async def get_workflow_detail(workflow_name: str) -> dict[str, object]:
-    workflow = _machine_item("workflow", workflow_name)
+    workflow = machine_item("workflow", workflow_name)
     if workflow is None:
         raise HTTPException(
             status_code=404, detail=f"Workflow '{workflow_name}' not found"
@@ -257,7 +252,7 @@ async def get_workflow_detail(workflow_name: str) -> dict[str, object]:
 
 @router.get("/workflows/{workflow_name}/runs")
 async def list_workflow_runs(workflow_name: str) -> dict[str, list[dict[str, object]]]:
-    workflow = _machine_item("workflow", workflow_name)
+    workflow = machine_item("workflow", workflow_name)
     if workflow is None:
         raise HTTPException(
             status_code=404, detail=f"Workflow '{workflow_name}' not found"

@@ -20,6 +20,7 @@ from studio_support.context_models import (
     StudioProject,
     StudioTenant,
 )
+from studio_support.runtime_client import RemoteMachineClient
 
 
 @dataclass(slots=True)
@@ -36,7 +37,7 @@ _default_studio_state: ContextVar[StudioState | None] = ContextVar(
 )
 
 
-def _build_machine_resolver(machine: Any) -> Callable[[StudioContext], Any]:
+def _build_local_machine_resolver(machine: Any) -> Callable[[StudioContext], Any]:
     if hasattr(machine, "resolve_for_context"):
         return machine.resolve_for_context
     if callable(machine) and not hasattr(machine, "list_category"):
@@ -44,6 +45,35 @@ def _build_machine_resolver(machine: Any) -> Callable[[StudioContext], Any]:
     if isinstance(machine, Mapping):
         return lambda context: machine[context.environment_id]
     return lambda context: machine
+
+
+def _build_machine_resolver(
+    machine: Any, catalog: StudioContextCatalog
+) -> Callable[[StudioContext], Any]:
+    local_resolver = _build_local_machine_resolver(machine)
+    environments_by_id = {
+        environment.id: environment for environment in catalog.environments
+    }
+
+    def _resolve(context: StudioContext) -> Any:
+        environment = environments_by_id.get(context.environment_id)
+        if environment is None:
+            raise KeyError(
+                f"Studio environment '{context.environment_id}' is not defined"
+            )
+
+        kind = environment.connection_kind.lower()
+        if kind == "local":
+            return local_resolver(context)
+        if kind in {"http", "https"} or environment.connection_ref.startswith(
+            ("http://", "https://")
+        ):
+            return RemoteMachineClient(environment.connection_ref)
+        raise RuntimeError(
+            f"Studio environment '{environment.name}' uses unsupported connection_kind '{environment.connection_kind}'"
+        )
+
+    return _resolve
 
 
 def build_studio_state(machine: Any) -> StudioState:
@@ -69,7 +99,7 @@ def build_studio_state(machine: Any) -> StudioState:
         error=None,
     )
     attachment_manager = AttachmentManager(
-        resolver=_build_machine_resolver(machine),
+        resolver=_build_machine_resolver(machine, catalog),
         initial_attachment=initial_attachment,
     )
     try:

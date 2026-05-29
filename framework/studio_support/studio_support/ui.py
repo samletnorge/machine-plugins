@@ -12,6 +12,7 @@ from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
 from studio_support.dependencies import get_machine, get_studio_state
+from studio_support.runtime_access import item_operations, item_owner
 
 STUDIO_DIR = Path(__file__).parent
 TEMPLATES_DIR = STUDIO_DIR / "templates"
@@ -260,12 +261,8 @@ def _runtime_items(category: str) -> list[dict[str, Any]]:
             {
                 "name": name,
                 "description": _describe_item(item),
-                "owner": machine.get_owner(category, name)
-                if hasattr(machine, "get_owner")
-                else None,
-                "operations": sorted((machine.get_operations(category) or {}).keys())
-                if hasattr(machine, "get_operations")
-                else [],
+                "owner": item_owner(category, name),
+                "operations": item_operations(category),
             }
         )
     return items

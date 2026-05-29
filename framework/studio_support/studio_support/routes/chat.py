@@ -6,6 +6,7 @@ from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 from studio_support.dependencies import get_machine
+from studio_support.runtime_access import machine_item
 from studio_support.ui import render_template
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -33,12 +34,7 @@ async def chat_page(request: Request, agent: str = ""):
 
 @router.post("/send")
 async def chat_send(request: Request, agent: str = Form(...), message: str = Form(...)):
-    m = get_machine()
-    agent_instance = (
-        m.resolve("agent", agent)
-        if hasattr(m, "resolve")
-        else getattr(m, "agents", {}).get(agent)
-    )
+    agent_instance = machine_item("agent", agent)
 
     if agent_instance is None:
         raise HTTPException(status_code=404, detail=f"Agent '{agent}' not found")

@@ -6,7 +6,7 @@ import inspect
 
 from fastapi import APIRouter, HTTPException, Request
 
-from studio_support.dependencies import get_machine
+from studio_support.runtime_access import machine_item
 from studio_support.ui import render_template
 
 router = APIRouter(prefix="/tools", tags=["tools"])
@@ -14,12 +14,7 @@ router = APIRouter(prefix="/tools", tags=["tools"])
 
 @router.get("/{tool_name}")
 async def tool_page(request: Request, tool_name: str):
-    m = get_machine()
-    tool = (
-        m.resolve("tool", tool_name)
-        if hasattr(m, "resolve")
-        else getattr(m, "tools", {}).get(tool_name)
-    )
+    tool = machine_item("tool", tool_name)
     if tool is None:
         raise HTTPException(status_code=404, detail=f"Tool '{tool_name}' not found")
     return render_template(
@@ -34,12 +29,7 @@ async def tool_page(request: Request, tool_name: str):
 
 @router.post("/{tool_name}/execute")
 async def tool_execute(request: Request, tool_name: str):
-    m = get_machine()
-    tool = (
-        m.resolve("tool", tool_name)
-        if hasattr(m, "resolve")
-        else getattr(m, "tools", {}).get(tool_name)
-    )
+    tool = machine_item("tool", tool_name)
     if tool is None:
         raise HTTPException(status_code=404, detail=f"Tool '{tool_name}' not found")
     body = await request.json()
