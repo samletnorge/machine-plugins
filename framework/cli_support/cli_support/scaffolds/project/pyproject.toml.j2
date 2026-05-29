@@ -38,18 +38,23 @@ plugins = [
 ]
 
 [tool.machine-core.studio]
-active_tenant = "tenant-local"
+active_tenant = "tenant-samletnorge"
 active_project = "project-{{ project_name }}"
 active_environment = "env-dev"
 
 [[tool.machine-core.studio.tenants]]
-id = "tenant-local"
-slug = "local"
-name = "Local"
+id = "tenant-samletnorge"
+slug = "samletnorge"
+name = "Samletnorge"
+
+[[tool.machine-core.studio.tenants]]
+id = "tenant-mythrantic"
+slug = "mythrantic"
+name = "Mythrantic"
 
 [[tool.machine-core.studio.projects]]
 id = "project-{{ project_name }}"
-tenant_id = "tenant-local"
+tenant_id = "tenant-samletnorge"
 slug = "{{ project_name }}"
 name = "{{ project_name }}"
 entry = "src.main:machine"
@@ -58,9 +63,82 @@ entry = "src.main:machine"
 agents = 0
 tools = 0
 
+[[tool.machine-core.studio.projects]]
+id = "project-car-expert"
+tenant_id = "tenant-samletnorge"
+slug = "car-expert"
+name = "Car Expert"
+entry = "src.main:machine"
+
+[tool.machine-core.studio.projects.capability_summary]
+agents = 2
+tools = 2
+
+[[tool.machine-core.studio.projects]]
+id = "project-news-finder"
+tenant_id = "tenant-samletnorge"
+slug = "news-finder"
+name = "News Finder"
+entry = "src.main:machine"
+
+[tool.machine-core.studio.projects.capability_summary]
+agents = 2
+tools = 2
+
+[[tool.machine-core.studio.projects]]
+id = "project-ai-playground"
+tenant_id = "tenant-mythrantic"
+slug = "ai-playground"
+name = "AI Playground"
+entry = "src.main:machine"
+
+[tool.machine-core.studio.projects.capability_summary]
+agents = 1
+tools = 2
+
 [[tool.machine-core.studio.environments]]
 id = "env-dev"
 project_id = "project-{{ project_name }}"
+name = "dev"
+connection_kind = "local"
+connection_ref = "src.main:machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-car-dev"
+project_id = "project-car-expert"
+name = "dev"
+connection_kind = "local"
+connection_ref = "src.main:machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-car-staging"
+project_id = "project-car-expert"
+name = "staging"
+connection_kind = "local"
+connection_ref = "src.main:machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-news-dev"
+project_id = "project-news-finder"
+name = "dev"
+connection_kind = "local"
+connection_ref = "src.main:machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-news-prod"
+project_id = "project-news-finder"
+name = "prod"
+connection_kind = "local"
+connection_ref = "src.main:machine"
+status = "healthy"
+
+[[tool.machine-core.studio.environments]]
+id = "env-playground-dev"
+project_id = "project-ai-playground"
 name = "dev"
 connection_kind = "local"
 connection_ref = "src.main:machine"
