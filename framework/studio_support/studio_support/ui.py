@@ -212,7 +212,7 @@ def _project_root() -> Path | None:
     return path if path.exists() else None
 
 
-def _project_config() -> dict[str, Any]:
+def _catalog_project_config() -> dict[str, Any]:
     root = _project_root()
     if root is None:
         return {}
@@ -222,6 +222,22 @@ def _project_config() -> dict[str, Any]:
     with pyproject.open("rb") as f:
         data = tomllib.load(f)
     return data.get("tool", {}).get("machine-core", {})
+
+
+def _entry_project_config(entry: str | None) -> dict[str, Any]:
+    if not entry:
+        return {}
+    root = Path(entry)
+    pyproject = root / "pyproject.toml"
+    if not pyproject.exists():
+        return {}
+    with pyproject.open("rb") as f:
+        data = tomllib.load(f)
+    return data.get("tool", {}).get("machine-core", {})
+
+
+def _project_config() -> dict[str, Any]:
+    return _catalog_project_config()
 
 
 def _plugin_manifests() -> list[dict[str, Any]]:
@@ -281,6 +297,8 @@ def _context_snapshot() -> dict[str, Any]:
             "project_options": [],
             "environment": None,
             "environment_status": None,
+            "environment_connection_kind": None,
+            "environment_connection_ref": None,
             "environment_options": [],
             "entry": None,
             "attachment_status": "detached",
@@ -362,6 +380,12 @@ def _context_snapshot() -> dict[str, Any]:
         "project_options": projects_for_tenant,
         "environment": environment.name if environment else None,
         "environment_status": environment.status if environment else None,
+        "environment_connection_kind": environment.connection_kind
+        if environment
+        else None,
+        "environment_connection_ref": environment.connection_ref
+        if environment
+        else None,
         "environment_options": environments_for_project,
         "entry": project.entry if project else None,
         "attachment_status": attachment.status,
@@ -384,7 +408,6 @@ def machine_snapshot() -> dict[str, Any]:
             category: len(machine.list_category(category)) for category in categories
         }
 
-    project_config = _project_config()
     context = _context_snapshot()
     manifests = _plugin_manifests()
     loaded_plugins = (
@@ -392,7 +415,7 @@ def machine_snapshot() -> dict[str, Any]:
         if machine
         else []
     )
-    root = _project_root()
+    project_root = context["entry"]
     project_name = context["project_name"] or "Unknown project"
     environment = context["environment"] or "No environment"
     entry = context["entry"] or "No entry"
@@ -400,6 +423,11 @@ def machine_snapshot() -> dict[str, Any]:
     if machine_name is None:
         machine_name = "No runtime attached"
     project_targets = context["project_targets"]
+    project_config = _entry_project_config(entry)
+    environment_connection_ref = context["environment_connection_ref"]
+    environment_connection_kind = context["environment_connection_kind"]
+    plugins_declared = project_config.get("plugins", [])
+    plugin_configs = project_config.get("plugin_configs", {})
 
     return {
         "machine_name": machine_name,
@@ -407,21 +435,23 @@ def machine_snapshot() -> dict[str, Any]:
         "tenant_name": context["tenant_name"] or "Unknown tenant",
         "tenant_options": context["tenant_options"],
         "organization_name": context["tenant_name"] or "Unknown tenant",
-        "workspace_name": "Local Workspace",
+        "workspace_name": environment_connection_ref or "No runtime attached",
         "project_slug": context["project_slug"],
         "project_name": project_name,
         "project_options": context["project_options"],
         "project_targets": project_targets,
-        "project_root": str(root) if root else None,
+        "project_root": project_root,
         "entry": entry,
         "environment": environment,
         "environment_status": context["environment_status"],
+        "environment_connection_kind": environment_connection_kind,
+        "environment_connection_ref": environment_connection_ref,
         "environment_options": context["environment_options"],
         "attachment_status": context["attachment_status"],
         "attachment_error": context["attachment_error"],
         "project_config": project_config,
-        "plugins_declared": project_config.get("plugins", []),
-        "plugin_configs": project_config.get("plugin_configs", {}),
+        "plugins_declared": plugins_declared,
+        "plugin_configs": plugin_configs,
         "categories": categories,
         "category_counts": category_counts,
         "loaded_plugins": loaded_plugins,

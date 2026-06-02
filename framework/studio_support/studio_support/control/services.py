@@ -20,8 +20,8 @@ async def service_status() -> dict[str, object]:
         "health_endpoint": "/health",
         "docs_endpoint": "/docs",
         "notes": [
-            "Studio is mounted from the CLI capability and attached to one active project runtime.",
-            "Runtime API docs remain at the server root while control-plane pages live under /_studio.",
+            "Studio is a control plane mounted under /_studio and can attach to different runtime environments.",
+            "Runtime API docs remain at the selected runtime server while control-plane pages live under /_studio.",
             "Log streaming, deploy control, and service actions are reserved for the next control-plane pass.",
         ],
     }

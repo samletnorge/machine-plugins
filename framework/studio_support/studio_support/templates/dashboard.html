@@ -41,8 +41,9 @@
         <div class="detail-list">
             <div><span>Tenant</span><strong>{{ tenant_name }}</strong></div>
             <div><span>Project</span><strong>{{ project_name }}</strong></div>
-            <div><span>Entry</span><strong>{{ entry }}</strong></div>
+            <div><span>Project root</span><strong>{{ entry }}</strong></div>
             <div><span>Environment</span><strong>{{ environment }}</strong></div>
+            <div><span>Runtime endpoint</span><strong>{{ environment_connection_ref or machine_name }}</strong></div>
             <div><span>Declared plugins</span><strong>{{ plugins_declared|length }}</strong></div>
             <div><span>Manifest catalog</span><strong>{{ manifests|length }}</strong></div>
         </div>

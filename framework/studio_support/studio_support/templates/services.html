@@ -10,7 +10,8 @@
         </div>
         <div class="detail-list">
             <div><span>Studio mount</span><strong>/_studio</strong></div>
-            <div><span>Runtime API</span><strong>/api/*</strong></div>
+            <div><span>Selected runtime</span><strong>{{ environment_connection_ref or machine_name }}</strong></div>
+            <div><span>Runtime API</span><strong>{{ (environment_connection_ref or '') ~ '/api/*' if environment_connection_ref else '/api/*' }}</strong></div>
             <div><span>Health endpoint</span><strong>/health</strong></div>
             <div><span>OpenAPI docs</span><strong>/docs</strong></div>
         </div>
@@ -33,8 +34,8 @@
             >Restart runtime</button>
         </div>
         <ul class="simple-list">
-            <li>Studio is mounted from the CLI capability and attached to one active project runtime.</li>
-            <li>Runtime API docs remain at the server root while control-plane pages live under `/_studio`.</li>
+            <li>Studio is a control plane mounted under `/_studio` and can attach to different runtime environments.</li>
+            <li>Runtime API docs remain on the selected runtime server while control-plane pages live under `/_studio`.</li>
             <li>Log streaming, deploy control, and service actions are reserved for the next control-plane pass.</li>
         </ul>
         <pre id="service-action-result" class="code-panel min"></pre>

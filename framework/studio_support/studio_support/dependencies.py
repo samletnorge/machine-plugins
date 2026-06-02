@@ -239,6 +239,8 @@ def normalize_context_payload(state: StudioState) -> dict[str, dict[str, object]
             "project_name": project.name,
             "environment_name": environment.name,
             "environment_status": environment.status,
+            "environment_connection_kind": environment.connection_kind,
+            "environment_connection_ref": environment.connection_ref,
         },
         "attachment": asdict(attachment),
     }

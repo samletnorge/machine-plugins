@@ -53,7 +53,7 @@
         <div class="panel-header">
             <div>
                 <span class="eyebrow">Project declarations</span>
-                <h3>Enabled in this runtime</h3>
+                <h3>Enabled for the selected project</h3>
             </div>
         </div>
         <div class="pill-list">
@@ -61,7 +61,7 @@
             <span class="pill">{{ plugin }}</span>
             {% endfor %}
             {% if not plugins_declared %}
-            <span class="muted">No plugins declared in `[tool.machine-core]`.</span>
+            <span class="muted">No plugins declared for the selected project in `[tool.machine-core]`.</span>
             {% endif %}
         </div>
 
