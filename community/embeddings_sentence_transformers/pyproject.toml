@@ -11,9 +11,6 @@ dependencies = [
 packages = ["."]
 sources = {"." = "embeddings_sentence_transformers"}
 
-[tool.hatch.build.targets.wheel.force-include]
-"manifest.json" = "embeddings_sentence_transformers/manifest.json"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
