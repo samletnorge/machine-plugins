@@ -450,7 +450,7 @@ def _landing_page_html(state: StudioState) -> str:
           </svg>
         </div>
         <div class='brand-copy'>
-          <strong>Machine</strong><br>
+          <strong>Machine Core</strong><br>
           <small>One system to build, run, and manage AI projects</small>
         </div>
       </div>
@@ -460,7 +460,7 @@ def _landing_page_html(state: StudioState) -> str:
     <section class='hero'>
       <div class='hero-copy'>
         <div class='hero-tagline'>From the first project to everything that comes after</div>
-        <div class='eyebrow'>Machine</div>
+        <div class='eyebrow'>Machine Core</div>
         <h1>One system to build, run, and manage AI projects.</h1>
         <p>Start with one project, keep shipping, and grow into bigger setups without changing how the system works underneath you.</p>
         <div class='hero-actions'>
@@ -476,7 +476,7 @@ def _landing_page_html(state: StudioState) -> str:
 
     <section class='section-stack'>
       <section class='section-shell'>
-        <div class='eyebrow'>What Machine is</div>
+        <div class='eyebrow'>What Machine Core is</div>
         <h2>Start simple, then grow without starting over.</h2>
         <p>Machine is built so the way you begin still makes sense when the project gets bigger.</p>
         <div class='hero-card-grid'>
@@ -499,7 +499,7 @@ def _landing_page_html(state: StudioState) -> str:
       </section>
 
       <section class='section-shell'>
-        <div class='eyebrow'>Why Machine feels different</div>
+        <div class='eyebrow'>Why Machine Core feels different</div>
         <h2>It does not force every project into the same shape.</h2>
         <p>The same system already supports small demo apps, scaffolded projects, and larger aggregate setups.</p>
         <div class='triad'>
@@ -539,7 +539,7 @@ def _landing_page_html(state: StudioState) -> str:
     </section>
 
     <footer class='footer-bar'>
-      <div>Machine is the main system. Studio is there when you need a bigger view.</div>
+      <div>Machine Core is the main system. Studio is there when you need a bigger view.</div>
       <div class='footer-links'>
         <a href='/health'>Get started</a>
         <a href='/_studio/'>Open Studio</a>
