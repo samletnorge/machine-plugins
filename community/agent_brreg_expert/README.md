@@ -1,13 +1,24 @@
 # agent_brreg_expert
 
-## TODO
+Domain plugin that composes Brreg data, OpenAPI-generated tools, RAG, and an agent runtime.
 
-1. Convert ingest to a job model for more robust long-running operation handling.
+## Provides
 
-- Request starts a job
-- Job gets an id
-- Worker runs outside the request lifecycle
-- Shutdown can explicitly cancel/reap workers
-- Frontends poll status
+- a Brreg-focused `rag_pipeline`
+- a Brreg-focused `agent`
+- bulk ingest of Brønnøysundregistrene data
+- live OpenAPI-derived Brreg tools
+- semantic tool filtering before agent execution
 
-This is the clean long-term answer for bulk ingest, but it is a larger refactor and not required for the current path.
+## Key Files
+
+- `manifest.json`
+- `__init__.py`
+- `runner.py`
+- `pipeline.py`
+- `ingestor.py`
+- `merger.py`
+
+## Role
+
+This plugin is an example of domain composition on top of the broader Machine plugin graph. It combines data ingest, retrieval, tool generation, tool filtering, and a standard agent runtime into a single domain expert.
