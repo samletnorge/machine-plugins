@@ -99,7 +99,7 @@ html[data-theme="ledger"][data-mode="light"] {
     --radius: 0.45rem;
     --font-sans: 'Inter', sans-serif;
     --font-serif: 'IBM Plex Serif', serif;
-    --font-heading: 'Inter', sans-serif;
+    --font-heading: 'IBM Plex Serif', serif;
 }
 
 html[data-theme="ledger"][data-mode="dark"] {
@@ -125,7 +125,7 @@ html[data-theme="ledger"][data-mode="dark"] {
     --radius: 0.45rem;
     --font-sans: 'Inter', sans-serif;
     --font-serif: 'IBM Plex Serif', serif;
-    --font-heading: 'Inter', sans-serif;
+    --font-heading: 'IBM Plex Serif', serif;
 }
 
 * {
@@ -1407,5 +1407,577 @@ html[data-mode="light"] .mode-toggle-light {
 
     .chat-panel {
         padding: 1rem;
+    }
+}
+
+body {
+    background:
+        radial-gradient(circle at top left, color-mix(in oklab, var(--primary) 14%, transparent) 0, transparent 24%),
+        radial-gradient(circle at 85% 10%, color-mix(in oklab, var(--ring) 14%, transparent) 0, transparent 22%),
+        linear-gradient(180deg, color-mix(in oklab, var(--background) 88%, black 12%), var(--background));
+}
+
+html[data-theme="atlas"] body {
+    background:
+        radial-gradient(circle at top left, color-mix(in oklab, var(--primary) 14%, transparent) 0, transparent 24%),
+        radial-gradient(circle at 85% 10%, color-mix(in oklab, var(--ring) 14%, transparent) 0, transparent 22%),
+        linear-gradient(180deg, color-mix(in oklab, var(--background) 88%, black 12%), var(--background));
+}
+
+html[data-theme="ledger"] body {
+    background:
+        linear-gradient(180deg, color-mix(in oklab, var(--background) 94%, transparent), var(--background)),
+        linear-gradient(90deg, color-mix(in oklab, var(--border) 24%, transparent) 1px, transparent 1px),
+        linear-gradient(180deg, color-mix(in oklab, var(--border) 18%, transparent) 1px, transparent 1px);
+    background-size: auto, 32px 32px, 32px 32px;
+    background-position: 0 0, 0 0, 0 0;
+}
+
+.studio-shell {
+    grid-template-columns: 16.5rem minmax(0, 1fr);
+    background: transparent;
+}
+
+.studio-sidebar {
+    padding: 1.2rem 1rem 1rem;
+    background:
+        linear-gradient(180deg, color-mix(in oklab, var(--sidebar) 92%, black 8%), color-mix(in oklab, var(--sidebar) 98%, black 2%));
+    border-right: 1px solid color-mix(in oklab, var(--sidebar-border) 82%, transparent);
+}
+
+html[data-theme="ledger"] .studio-sidebar {
+    background:
+        linear-gradient(180deg, color-mix(in oklab, var(--sidebar) 96%, transparent), color-mix(in oklab, var(--sidebar) 88%, transparent));
+}
+
+.brand-block-shell {
+    gap: 1rem;
+}
+
+.brand-link {
+    padding: 1rem 1.05rem;
+    border-radius: 1.2rem;
+    background: linear-gradient(180deg, color-mix(in oklab, var(--card) 86%, transparent), color-mix(in oklab, var(--card) 72%, transparent));
+    box-shadow: 0 18px 40px color-mix(in oklab, var(--background) 74%, transparent);
+}
+
+html[data-theme="ledger"] .brand-link {
+    border-radius: 0.85rem;
+    background: color-mix(in oklab, var(--card) 94%, transparent);
+}
+
+.brand-mark {
+    width: 2.65rem;
+    height: 2.65rem;
+    border-radius: 0.9rem;
+    background: color-mix(in oklab, var(--primary) 14%, transparent);
+}
+
+.sidebar-story,
+.sidebar-footer-note {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid color-mix(in oklab, var(--sidebar-border) 88%, transparent);
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--sidebar-accent) 62%, transparent);
+}
+
+html[data-theme="ledger"] .sidebar-story,
+html[data-theme="ledger"] .sidebar-footer-note {
+    border-radius: 0.8rem;
+    background: color-mix(in oklab, var(--card) 88%, transparent);
+}
+
+.sidebar-story p,
+.sidebar-footer-note small {
+    margin: 0;
+    color: var(--muted-foreground);
+    line-height: 1.45;
+}
+
+.sidebar-footer-note {
+    margin-top: 1rem;
+}
+
+.sidebar-context-switcher {
+    gap: 0.8rem;
+    margin-top: 0;
+}
+
+.control-select,
+.control-input,
+.control-textarea {
+    border-radius: 0.9rem;
+    border-color: color-mix(in oklab, var(--border) 88%, transparent);
+    background: color-mix(in oklab, var(--input) 88%, transparent);
+}
+
+.nav-groups {
+    gap: 1.1rem;
+}
+
+.nav-group {
+    gap: 0.3rem;
+}
+
+.nav-group header {
+    padding: 0 0.8rem;
+}
+
+.nav-item {
+    padding: 0.82rem 0.95rem;
+    border-radius: 0.95rem;
+}
+
+html[data-theme="ledger"] .nav-item {
+    border-radius: 0.55rem;
+}
+
+.nav-item.active {
+    background: linear-gradient(135deg, color-mix(in oklab, var(--sidebar-primary) 16%, var(--sidebar-accent)), color-mix(in oklab, var(--sidebar-primary) 8%, var(--sidebar-accent)));
+    box-shadow: inset 0 1px 0 color-mix(in oklab, white 8%, transparent);
+}
+
+.studio-main {
+    padding: 1.4rem;
+    gap: 1.2rem;
+}
+
+.studio-topbar,
+.status-strip,
+.panel,
+.hero-card {
+    border-radius: 1.4rem;
+    border-color: color-mix(in oklab, var(--border) 90%, transparent);
+    background: linear-gradient(180deg, color-mix(in oklab, var(--card) 92%, transparent), color-mix(in oklab, var(--card) 80%, transparent));
+    box-shadow: 0 18px 50px color-mix(in oklab, var(--background) 72%, transparent);
+}
+
+html[data-theme="ledger"] .studio-topbar,
+html[data-theme="ledger"] .status-strip,
+html[data-theme="ledger"] .panel,
+html[data-theme="ledger"] .hero-card {
+    border-radius: 0.9rem;
+    background: color-mix(in oklab, var(--card) 96%, transparent);
+    box-shadow: 0 20px 48px color-mix(in oklab, var(--background) 80%, transparent);
+}
+
+.studio-topbar {
+    padding: 1.35rem 1.45rem;
+    align-items: center;
+}
+
+.topbar-intro {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.topbar-kicker {
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.7rem;
+}
+
+.studio-topbar h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    letter-spacing: -0.04em;
+}
+
+html[data-theme="ledger"] .studio-topbar h1,
+html[data-theme="ledger"] .mission-hero-copy h2,
+html[data-theme="ledger"] .panel h3,
+html[data-theme="ledger"] .brand-link strong {
+    font-family: var(--font-serif);
+    letter-spacing: -0.03em;
+}
+
+.topbar-context-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    color: var(--muted-foreground);
+}
+
+.topbar-context-line span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.topbar-context-line span:not(:last-child)::after {
+    content: "";
+    width: 1.1rem;
+    height: 1px;
+    background: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
+}
+
+.topbar-chip-stack {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.topbar-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+    background: color-mix(in oklab, var(--accent) 78%, transparent);
+    color: var(--muted-foreground);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+html[data-theme="ledger"] .topbar-chip,
+html[data-theme="ledger"] .status-chip,
+html[data-theme="ledger"] .pill {
+    border-radius: 0.5rem;
+}
+
+.mode-toggle,
+.sidebar-toggle,
+.primary-button,
+.panel-link.block,
+.focus-link-card {
+    border-radius: 999px;
+}
+
+html[data-theme="ledger"] .mode-toggle,
+html[data-theme="ledger"] .sidebar-toggle,
+html[data-theme="ledger"] .primary-button,
+html[data-theme="ledger"] .panel-link.block,
+html[data-theme="ledger"] .focus-link-card {
+    border-radius: 0.6rem;
+}
+
+.sidebar-toggle {
+    margin-bottom: 0.35rem;
+}
+
+.status-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    padding: 1px;
+    background: color-mix(in oklab, var(--border) 88%, transparent);
+}
+
+.status-card {
+    min-height: 6.2rem;
+    border-right: 0;
+    background: linear-gradient(180deg, color-mix(in oklab, var(--card) 94%, transparent), color-mix(in oklab, var(--accent) 24%, transparent));
+}
+
+.page-frame {
+    gap: 1.25rem;
+}
+
+.mission-grid,
+.studio-columns {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.mission-grid {
+    grid-template-columns: minmax(0, 1.7fr) minmax(20rem, 1fr);
+}
+
+.mission-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(19rem, 0.95fr);
+    gap: 1.25rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+html[data-theme="ledger"] .mission-hero {
+    background:
+        linear-gradient(180deg, color-mix(in oklab, var(--card) 98%, transparent), color-mix(in oklab, var(--accent) 22%, transparent));
+}
+
+.mission-hero::before {
+    content: "";
+    position: absolute;
+    inset: auto -10% -35% 45%;
+    height: 18rem;
+    background: radial-gradient(circle, color-mix(in oklab, var(--primary) 16%, transparent) 0, transparent 62%);
+    pointer-events: none;
+}
+
+html[data-theme="ledger"] .mission-hero::before {
+    inset: 0;
+    height: auto;
+    background:
+        linear-gradient(90deg, color-mix(in oklab, var(--border) 16%, transparent) 1px, transparent 1px),
+        linear-gradient(180deg, color-mix(in oklab, var(--border) 12%, transparent) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.28;
+}
+
+.mission-hero-copy,
+.mission-hero-side,
+.hero-stat-stack,
+.hero-stat-row,
+.mission-focus,
+.studio-column-main,
+.studio-column-side,
+.side-note-panel {
+    display: grid;
+    gap: 1rem;
+}
+
+.mission-hero-copy {
+    align-content: start;
+    position: relative;
+    z-index: 1;
+}
+
+.mission-hero-copy h2 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    line-height: 0.96;
+    letter-spacing: -0.05em;
+}
+
+.mission-hero-copy p,
+.side-note-panel p,
+.focus-link-card p,
+.hero-stat-card p,
+.target-board-card p {
+    margin: 0;
+    color: var(--muted-foreground);
+    line-height: 1.55;
+}
+
+.mission-actions {
+    margin-top: 0.4rem;
+}
+
+.panel-link.block.subtle {
+    background: color-mix(in oklab, var(--accent) 75%, transparent);
+    border-color: color-mix(in oklab, var(--border) 88%, transparent);
+    color: var(--foreground);
+}
+
+html[data-theme="ledger"] .panel-link.block,
+html[data-theme="ledger"] .panel-link.block.subtle {
+    background: color-mix(in oklab, var(--card) 98%, transparent);
+    border-width: 1px;
+}
+
+.hero-stat-card,
+.focus-link-card,
+.target-board-card,
+.inventory-cell {
+    border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+    background: color-mix(in oklab, var(--card) 92%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in oklab, white 6%, transparent);
+}
+
+.hero-stat-card {
+    padding: 1rem 1.05rem;
+    border-radius: 1.1rem;
+}
+
+html[data-theme="ledger"] .hero-stat-card,
+html[data-theme="ledger"] .target-board-card,
+html[data-theme="ledger"] .inventory-cell,
+html[data-theme="ledger"] .focus-link-card {
+    border-radius: 0.75rem;
+}
+
+.hero-stat-card.emphasis strong {
+    display: block;
+    margin: 0.45rem 0;
+    font-size: 1.18rem;
+    letter-spacing: -0.03em;
+    word-break: break-word;
+}
+
+.hero-stat-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.hero-stat-card.compact strong {
+    font-size: 2rem;
+    line-height: 1;
+    letter-spacing: -0.05em;
+}
+
+.hero-stat-card.compact p {
+    margin-top: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+}
+
+.mission-focus {
+    padding: 1.35rem;
+    align-content: start;
+}
+
+.focus-link-grid {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.focus-link-card {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem 1.05rem;
+    transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+
+.focus-link-card strong {
+    font-size: 2rem;
+    letter-spacing: -0.05em;
+}
+
+.focus-link-card:hover,
+.focus-link-card:focus {
+    transform: translateY(-1px);
+    border-color: color-mix(in oklab, var(--primary) 30%, var(--border));
+    background: color-mix(in oklab, var(--primary) 8%, var(--card));
+}
+
+.studio-columns {
+    grid-template-columns: minmax(0, 1.55fr) minmax(20rem, 0.85fr);
+    align-items: start;
+}
+
+.target-board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.target-board-card {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 1.1rem;
+}
+
+.target-board-card.active {
+    border-color: color-mix(in oklab, var(--primary) 34%, var(--border));
+    background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 12%, var(--card)), color-mix(in oklab, var(--card) 92%, transparent));
+}
+
+html[data-theme="ledger"] .target-board-card.active {
+    background: color-mix(in oklab, var(--card) 98%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 24%, transparent);
+}
+
+.target-board-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.target-board-card strong {
+    font-size: 1.04rem;
+    letter-spacing: -0.02em;
+}
+
+.inventory-panel,
+.side-note-panel {
+    padding: 1.25rem;
+}
+
+.inventory-matrix {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.inventory-cell {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.inventory-cell span {
+    color: var(--muted-foreground);
+}
+
+.inventory-cell strong {
+    font-size: 1.7rem;
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.detail-list.stacked {
+    gap: 0.75rem;
+}
+
+.detail-list.stacked > div {
+    display: grid;
+    gap: 0.3rem;
+}
+
+.pill-list.dense {
+    grid-template-columns: repeat(auto-fit, minmax(8rem, max-content));
+}
+
+@media (max-width: 1280px) {
+    .mission-grid,
+    .studio-columns,
+    .mission-hero,
+    .target-board,
+    .inventory-matrix {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-stat-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1100px) {
+    .mission-grid,
+    .studio-columns,
+    .mission-hero,
+    .hero-stat-row,
+    .target-board,
+    .inventory-matrix,
+    .status-strip {
+        grid-template-columns: 1fr;
+    }
+
+    .status-strip {
+        gap: 1px;
+    }
+}
+
+@media (max-width: 720px) {
+    .studio-main,
+    .studio-sidebar,
+    .panel,
+    .mission-hero,
+    .mission-focus,
+    .side-note-panel,
+    .studio-topbar {
+        padding: 1rem;
+    }
+
+    .topbar-actions,
+    .studio-topbar,
+    .topbar-chip-stack,
+    .topbar-context-line {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .mission-hero-copy h2,
+    .studio-topbar h1 {
+        font-size: 1.9rem;
     }
 }

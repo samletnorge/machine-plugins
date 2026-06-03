@@ -14,7 +14,7 @@
 >
     <div class="studio-shell">
         <aside class="studio-sidebar">
-            <div class="brand-block">
+            <div class="brand-block brand-block-shell">
                 <a class="brand-link" href="{{ request.scope.root_path }}/">
                     <span class="brand-mark">{{ icon('spark') }}</span>
                     <span>
@@ -22,6 +22,11 @@
                         <small>Mission Control</small>
                     </span>
                 </a>
+                <div class="sidebar-story">
+                    <span class="context-label">Studio surface</span>
+                    <strong>{{ tenant_name }}</strong>
+                    <p>Switch across projects and environments without leaving the control plane.</p>
+                </div>
                 <form class="sidebar-context-switcher" aria-label="Context switcher" data-context-switcher-endpoint="{{ request.scope.root_path }}/api/context">
                     <label>
                         <span class="context-label">Tenant</span>
@@ -66,19 +71,35 @@
                 </section>
                 {% endfor %}
             </nav>
+
+            <div class="sidebar-footer-note">
+                <span class="context-label">Attachment</span>
+                <strong>{{ attachment_status }}</strong>
+                <small>{% if attachment_error %}{{ attachment_error }}{% else %}{{ environment_connection_kind or 'local' }} runtime{% endif %}</small>
+            </div>
         </aside>
 
         <div class="studio-main">
             <header class="studio-topbar">
-                <div>
+                <div class="topbar-intro">
                     <button type="button" class="sidebar-toggle" id="sidebar-toggle">
                         <span class="nav-icon">{{ icon('blocks') }}</span>
                         <span>Navigation</span>
                     </button>
+                    <div class="topbar-kicker">Live control surface</div>
                     <h1>{{ page_title }}</h1>
+                    <div class="topbar-context-line">
+                        <span>{{ tenant_name }}</span>
+                        <span>{{ project_name }}</span>
+                        <span>{{ environment }}</span>
+                    </div>
                 </div>
 
                 <div class="topbar-actions">
+                    <div class="topbar-chip-stack">
+                        <span class="status-chip {% if attachment_status == 'attached' %}status-attached{% endif %}">{{ attachment_status }}</span>
+                        <span class="topbar-chip">{{ categories|length }} categories</span>
+                    </div>
                     <button type="button" class="mode-toggle icon-only" id="mode-toggle" aria-label="Toggle color mode">
                         <span class="mode-toggle-icon mode-toggle-dark">{{ icon('moon') }}</span>
                         <span class="mode-toggle-icon mode-toggle-light">{{ icon('sun') }}</span>

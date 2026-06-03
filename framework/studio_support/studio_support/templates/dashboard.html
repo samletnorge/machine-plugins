@@ -1,246 +1,147 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="hero-grid">
-    <article class="hero-card hero-primary">
-        <span class="eyebrow">Machine Studio</span>
-        <h2>One control center for all your Machine runtimes.</h2>
-        <p>Run <code>machine dev</code> inside a project to bring up its API. Run <code>machine studio</code> where you want the control plane, then switch between the tenants, projects, and environments declared in Studio config.</p>
-        <div class="hero-actions">
-            <a href="{{ request.scope.root_path }}/chat" class="panel-link block">Open runtime console</a>
-            <a href="{{ request.scope.root_path }}/registry" class="panel-link block">Inspect registry</a>
-        </div>
-    </article>
-    <article class="hero-card">
-        <span class="eyebrow">Active target</span>
-        <h2>{{ tenant_name }} / {{ project_name }} / {{ environment }}</h2>
-        <p>Attachment state: {{ attachment_status }}{% if attachment_error %} · {{ attachment_error }}{% endif %}</p>
-    </article>
-    <article class="hero-card">
-        <span class="eyebrow">Fleet summary</span>
-        <h2>{{ project_count }} projects · {{ environment_count }} environments</h2>
-        <p>{{ tenant_count }} tenants are configured in this Studio catalog, with {{ target_count }} switchable runtime targets.</p>
-    </article>
-</section>
-
-<section class="content-grid three-up">
-    <article class="panel">
-        <div class="panel-header">
-            <div>
-                <span class="eyebrow">Install</span>
-                <h3>Get Machine</h3>
+<section class="mission-grid">
+    <article class="mission-hero panel">
+        <div class="mission-hero-copy">
+            <span class="eyebrow">Machine Studio</span>
+            <h2>{{ tenant_name }} / {{ project_name }} / {{ environment }}</h2>
+            <p>Use Studio as the control plane for the current runtime now, then widen out to the rest of the fleet when you need to inspect inventory, compare environments, or move into tools and workflows.</p>
+            <div class="hero-actions mission-actions">
+                <a href="{{ request.scope.root_path }}/chat" class="panel-link block">Open runtime console</a>
+                <a href="{{ request.scope.root_path }}/registry" class="panel-link block subtle">Inspect registry</a>
             </div>
         </div>
-        <p>Bootstrap the Machine CLI the usual way, then move between the TUI, per-project runtime server, and Studio control plane.</p>
-        <pre class="command-block"><code>curl -fsSL https://gist.githubusercontent.com/valiantlynx/c3eaf552adf9aecff7c0366a25ff1e99/raw/install.sh | bash</code></pre>
-    </article>
-
-    <article class="panel">
-        <div class="panel-header">
-            <div>
-                <span class="eyebrow">Inside a project</span>
-                <h3>Main commands</h3>
-            </div>
-        </div>
-        <div class="command-list">
-            <div class="command-row">
-                <code>machine</code>
-                <p>Launches the TUI for the current project perspective.</p>
-            </div>
-            <div class="command-row">
-                <code>machine dev</code>
-                <p>Starts the runtime server for the current project.</p>
-            </div>
-            <div class="command-row">
-                <code>machine studio</code>
-                <p>Starts Studio for the current project context and mounts it at <code>/_studio</code>.</p>
+        <div class="mission-hero-side">
+            <div class="hero-stat-stack">
+                <div class="hero-stat-card emphasis">
+                    <span class="status-label">Runtime endpoint</span>
+                    <strong>{{ environment_connection_ref or machine_name }}</strong>
+                    <p>{{ environment_connection_kind or 'local' }} attachment{% if environment_status %} · {{ environment_status }}{% endif %}</p>
+                </div>
+                <div class="hero-stat-row">
+                    <article class="hero-stat-card compact">
+                        <span class="status-label">Fleet</span>
+                        <strong>{{ project_count }}</strong>
+                        <p>projects</p>
+                    </article>
+                    <article class="hero-stat-card compact">
+                        <span class="status-label">Targets</span>
+                        <strong>{{ target_count }}</strong>
+                        <p>environments</p>
+                    </article>
+                    <article class="hero-stat-card compact">
+                        <span class="status-label">Plugins</span>
+                        <strong>{{ plugins_declared|length }}</strong>
+                        <p>declared</p>
+                    </article>
+                </div>
             </div>
         </div>
     </article>
 
-    <article class="panel">
-        <div class="panel-header">
-            <div>
-                <span class="eyebrow">Outside a project</span>
-                <h3>Bootstrap flow</h3>
-            </div>
-        </div>
-        <div class="command-list">
-            <div class="command-row">
-                <code>machine</code>
-                <p>Still opens the TUI, but project-aware surfaces stay offline without a detected Machine project.</p>
-            </div>
-            <div class="command-row">
-                <code>machine init</code>
-                <p>Scaffolds a new Machine project with a default plugin list and Studio config.</p>
-            </div>
-        </div>
-    </article>
-</section>
-
-<section class="content-grid two-up">
-    <article class="panel">
-        <div class="panel-header">
-            <div>
-                <span class="eyebrow">TUI</span>
-                <h3>The <code>machine</code> tabs</h3>
-            </div>
-        </div>
-        <div class="detail-list command-tabs-list">
-            <div><span>Plugins</span><strong>See what is active in the current project.</strong></div>
-            <div><span>Store</span><strong>Browse plugin registry entries and install them.</strong></div>
-            <div><span>Services</span><strong>Check the local server state and logs.</strong></div>
-            <div><span>Config</span><strong>Inspect project and plugin configuration.</strong></div>
-        </div>
-    </article>
-
-    <article class="panel">
-        <div class="panel-header">
-            <div>
-                <span class="eyebrow">Studio model</span>
-                <h3>How this surface is meant to work</h3>
-            </div>
-        </div>
-        <p>Studio is the centerpiece for switching across many Machine targets. The current selection defines which runtime inventory, chat surface, tools, and workflows you are looking at right now.</p>
-        <div class="detail-list">
-            <div><span>Project root</span><strong>{{ entry }}</strong></div>
-            <div><span>Runtime endpoint</span><strong>{{ environment_connection_ref or machine_name }}</strong></div>
-            <div><span>Declared plugins</span><strong>{{ plugins_declared|length }}</strong></div>
-            <div><span>Manifest catalog</span><strong>{{ manifests|length }}</strong></div>
-        </div>
-    </article>
-</section>
-
-<section class="content-grid three-up">
-    <article class="panel">
+    <article class="mission-focus panel">
         <div class="panel-header compact">
             <div>
+                <span class="eyebrow">Current focus</span>
+                <h3>Runtime surfaces</h3>
+            </div>
+        </div>
+        <div class="focus-link-grid">
+            <a href="{{ request.scope.root_path }}/agents" class="focus-link-card">
                 <span class="eyebrow">Agents</span>
-                <h3>{{ runtime_agents|length }}</h3>
-            </div>
-            <a href="{{ request.scope.root_path }}/agents" class="panel-link">Open</a>
-        </div>
-        <ul class="simple-list">
-            {% for agent in runtime_agents[:5] %}
-            <li>{{ agent.name }}</li>
-            {% endfor %}
-            {% if not runtime_agents %}
-            <li class="muted">No agents registered.</li>
-            {% endif %}
-        </ul>
-    </article>
-
-    <article class="panel">
-        <div class="panel-header compact">
-            <div>
+                <strong>{{ runtime_agents|length }}</strong>
+                <p>Inspect registered agents and ownership.</p>
+            </a>
+            <a href="{{ request.scope.root_path }}/tools" class="focus-link-card">
                 <span class="eyebrow">Tools</span>
-                <h3>{{ runtime_tools|length }}</h3>
-            </div>
-            <a href="{{ request.scope.root_path }}/tools" class="panel-link">Open</a>
-        </div>
-        <ul class="simple-list">
-            {% for tool in runtime_tools[:5] %}
-            <li>{{ tool.name }}</li>
-            {% endfor %}
-            {% if not runtime_tools %}
-            <li class="muted">No tools registered.</li>
-            {% endif %}
-        </ul>
-    </article>
-
-    <article class="panel">
-        <div class="panel-header compact">
-            <div>
+                <strong>{{ runtime_tools|length }}</strong>
+                <p>Open the tool surface and test handlers.</p>
+            </a>
+            <a href="{{ request.scope.root_path }}/workflows" class="focus-link-card">
                 <span class="eyebrow">Workflows</span>
-                <h3>{{ runtime_workflows|length }}</h3>
-            </div>
-            <a href="{{ request.scope.root_path }}/workflows" class="panel-link">Open</a>
+                <strong>{{ runtime_workflows|length }}</strong>
+                <p>Review workflow inventory for this target.</p>
+            </a>
         </div>
-        <ul class="simple-list">
-            {% for workflow in runtime_workflows[:5] %}
-            <li>{{ workflow.name }}</li>
-            {% endfor %}
-            {% if not runtime_workflows %}
-            <li class="muted">No workflows registered.</li>
-            {% endif %}
-        </ul>
     </article>
 </section>
 
-<section class="content-grid two-up">
-    <article class="panel">
-        <div class="panel-header">
-            <div>
-                <span class="eyebrow">Runtime inventory</span>
-                <h3>Categories</h3>
-            </div>
-        </div>
-        <div class="metric-list">
-            {% for category in categories %}
-            <div class="metric-row">
-                <span>{{ category }}</span>
-                <strong>{{ category_counts.get(category, 0) }}</strong>
-            </div>
-            {% endfor %}
-        </div>
-    </article>
-
-    <article class="panel">
-        <div class="panel-header">
-            <div>
-                <span class="eyebrow">Available targets</span>
-                <h3>Project environments</h3>
-            </div>
-        </div>
-        <div class="target-list">
-            {% for target in project_targets %}
-            <div class="target-card{% if target.active %} active{% endif %}">
+<section class="studio-columns">
+    <div class="studio-column-main">
+        <article class="panel">
+            <div class="panel-header">
                 <div>
-                    <span class="eyebrow">{{ target.tenant_name }}</span>
+                    <span class="eyebrow">Fleet map</span>
+                    <h3>Project environments</h3>
+                </div>
+            </div>
+            <div class="target-board">
+                {% for target in project_targets %}
+                <div class="target-board-card{% if target.active %} active{% endif %}">
+                    <div class="target-board-topline">
+                        <span class="eyebrow">{{ target.tenant_name }}</span>
+                        {% if target.environment_status %}
+                        <span class="status-chip">{{ target.environment_status }}</span>
+                        {% endif %}
+                    </div>
                     <strong>{{ target.project_name }}</strong>
+                    <p>{{ target.environment }}</p>
                 </div>
-                <div class="target-meta">
-                    <span>{{ target.environment }}</span>
-                    {% if target.environment_status %}
-                    <span class="status-chip">{{ target.environment_status }}</span>
-                    {% endif %}
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="panel inventory-panel">
+            <div class="panel-header">
+                <div>
+                    <span class="eyebrow">Runtime inventory</span>
+                    <h3>Categories and shape</h3>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-    </article>
-</section>
-
-<section class="content-grid two-up">
-    <article class="panel">
-        <div class="panel-header">
-            <div>
-                <span class="eyebrow">Loaded plugins</span>
-                <h3>Runtime ownership</h3>
+            <div class="inventory-matrix">
+                {% for category in categories %}
+                <div class="inventory-cell">
+                    <span>{{ category }}</span>
+                    <strong>{{ category_counts.get(category, 0) }}</strong>
+                </div>
+                {% endfor %}
             </div>
-        </div>
-        <div class="pill-list">
-            {% for plugin in loaded_plugins %}
-            <span class="pill">{{ plugin }}</span>
-            {% endfor %}
-            {% if not loaded_plugins %}
-            <span class="muted">No plugin ownership information available.</span>
-            {% endif %}
-        </div>
-    </article>
+        </article>
+    </div>
 
-    <article class="panel">
-        <div class="panel-header">
-            <div>
-                <span class="eyebrow">Attachment state</span>
-                <h3>{{ attachment_status }}</h3>
+    <aside class="studio-column-side">
+        <article class="panel side-note-panel">
+            <div class="panel-header compact">
+                <div>
+                    <span class="eyebrow">How Studio fits</span>
+                    <h3>Control plane model</h3>
+                </div>
             </div>
-        </div>
-        <div class="detail-list">
-            <div><span>Machine</span><strong>{{ machine_name }}</strong></div>
-            <div><span>Connection kind</span><strong>{{ environment_connection_kind or 'local' }}</strong></div>
-            <div><span>Status</span><strong>{{ environment_status or 'unknown' }}</strong></div>
-            <div><span>Error</span><strong>{{ attachment_error or 'none' }}</strong></div>
-        </div>
-    </article>
+            <p>Studio is where one Machine project grows into a set of runtimes, contexts, and operator views. The active selection decides what you are inspecting right now.</p>
+            <div class="detail-list stacked">
+                <div><span>Project root</span><strong>{{ entry }}</strong></div>
+                <div><span>Machine</span><strong>{{ machine_name }}</strong></div>
+                <div><span>Manifest catalog</span><strong>{{ manifests|length }}</strong></div>
+                <div><span>Loaded plugins</span><strong>{{ loaded_plugins|length }}</strong></div>
+            </div>
+        </article>
+
+        <article class="panel side-note-panel">
+            <div class="panel-header compact">
+                <div>
+                    <span class="eyebrow">Declared plugins</span>
+                    <h3>Project composition</h3>
+                </div>
+            </div>
+            <div class="pill-list dense">
+                {% for plugin in plugins_declared %}
+                <span class="pill">{{ plugin }}</span>
+                {% endfor %}
+                {% if not plugins_declared %}
+                <span class="muted">No project plugins declared.</span>
+                {% endif %}
+            </div>
+        </article>
+    </aside>
 </section>
 {% endblock %}
