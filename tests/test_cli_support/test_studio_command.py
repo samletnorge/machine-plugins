@@ -139,3 +139,34 @@ def test_studio_generated_bootstrap_falls_back_to_loading_entry_from_ancestor_pa
         'module = _load_entry_module("tmp.manual_studio_verify_app")'
         in generated["text"]
     )
+
+
+def test_studio_generated_bootstrap_includes_public_landing_page(tmp_path, monkeypatch):
+    project = tmp_path / "proj"
+    project.mkdir()
+    (project / ".venv" / "bin").mkdir(parents=True)
+    (project / ".venv" / "bin" / "python").write_text("#!/bin/sh\n")
+    (project / "pyproject.toml").write_text(
+        "[tool.machine-core]\nentry='src.main:machine'\n"
+    )
+
+    monkeypatch.chdir(project)
+
+    generated = {}
+
+    def fake_run(cmd, cwd=None, env=None):
+        generated["text"] = (project / "_machine_studio_server.py").read_text()
+        return 0
+
+    fake_module = type("FakeStudioModule", (), {"__file__": __file__})
+
+    with (
+        patch("cli_support.commands.studio_cmd.sync_manifests"),
+        patch("cli_support.commands.studio_cmd.subprocess.run", side_effect=fake_run),
+        patch.dict("sys.modules", {"studio_support": fake_module}),
+    ):
+        result = runner.invoke(app, ["studio"])
+
+    assert result.exit_code == 0
+    assert "from studio_support.app import create_studio_host_app" in generated["text"]
+    assert "app = create_studio_host_app(machine)" in generated["text"]

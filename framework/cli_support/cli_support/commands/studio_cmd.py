@@ -57,7 +57,7 @@ def studio_command(
             "[yellow]No project .venv found. Falling back to the current machine CLI interpreter.[/yellow]"
         )
 
-    console.print(f"[green]Starting Machine Studio...[/green]")
+    console.print("[green]Starting Machine Studio...[/green]")
     console.print(f"  URL: http://{host}:{port}/_studio/")
     console.print(f"  Entry: {entry}")
 
@@ -106,11 +106,9 @@ def _load_entry_module(module_name: str):
 
 module = _load_entry_module("{entry.rpartition(":")[0]}")
 machine = getattr(module, "{entry.rpartition(":")[2]}")
-from server_support.app import create_app
-app = create_app(machine)
-from studio_support.app import create_studio_app
-studio = create_studio_app(machine)
-app.mount("/_studio", studio)
+from studio_support.app import create_studio_host_app
+
+app = create_studio_host_app(machine)
 '''
     studio_server_file = root / "_machine_studio_server.py"
     studio_server_file.write_text(studio_server_code)
