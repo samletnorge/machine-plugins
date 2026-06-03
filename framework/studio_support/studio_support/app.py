@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from studio_support.dependencies import (
@@ -20,7 +20,6 @@ from studio_support.dependencies import (
 
 def _landing_page_html(state: StudioState) -> str:
     catalog = state.catalog
-    attachment = state.attachment_manager.attachment()
     tenants = catalog.tenants
     projects = catalog.projects
     environments = catalog.environments
@@ -33,36 +32,6 @@ def _landing_page_html(state: StudioState) -> str:
     active_tenant = tenants_by_id.get(active_context.tenant_id)
     active_project = projects_by_id.get(active_context.project_id)
     active_environment = environments_by_id.get(active_context.environment_id)
-    status_class = "is-attached" if attachment.status == "attached" else "is-degraded"
-
-    target_cards = "".join(
-        (
-            "<article class='target-card {active_class}'>"
-            "<div class='eyebrow'>{tenant}</div>"
-            "<strong>{project}</strong>"
-            "<div class='target-meta'><span>{environment}</span><span>{kind}</span><span>{status}</span></div>"
-            "</article>"
-        ).format(
-            active_class=(
-                "is-active"
-                if project.id == active_context.project_id
-                and environment.id == active_context.environment_id
-                else ""
-            ),
-            tenant=escape(
-                tenants_by_id.get(project.tenant_id).name
-                if tenants_by_id.get(project.tenant_id)
-                else project.tenant_id
-            ),
-            project=escape(project.name),
-            environment=escape(environment.name),
-            kind=escape(environment.connection_kind),
-            status=escape(environment.status),
-        )
-        for project in projects
-        for environment in environments
-        if environment.project_id == project.id
-    )
 
     install_command = (
         "curl -fsSL https://gist.githubusercontent.com/valiantlynx/"
@@ -102,6 +71,14 @@ def _landing_page_html(state: StudioState) -> str:
       </article>
     """
 
+    studio_note = f"""
+      <article class='studio-note reveal-item'>
+        <span class='card-label'>Current context</span>
+        <strong>{active_target}</strong>
+        <p>Studio stays off to the side until you need to coordinate across projects or environments.</p>
+      </article>
+    """
+
     command_markup = (
         "<div class='command-stage'>"
         "<div class='command-orbit orbit-a'></div>"
@@ -125,7 +102,7 @@ def _landing_page_html(state: StudioState) -> str:
 <head>
   <meta charset='UTF-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-  <title>Machine Studio</title>
+  <title>Machine Core</title>
   <style>
     :root {{
       color-scheme: dark;
@@ -183,7 +160,7 @@ def _landing_page_html(state: StudioState) -> str:
       height: 36px;
     }}
     .brand-copy strong, .hero-copy h1, .panel h2, .metric strong {{ letter-spacing: -0.03em; }}
-    .brand-copy small, .eyebrow, .metric span, .target-meta, .panel p, .command-card p, .footer-note {{ color: var(--muted); }}
+    .brand-copy small, .eyebrow, .metric span, .panel p, .command-card p, .footer-note {{ color: var(--muted); }}
     .studio-link {{
       display: inline-flex;
       align-items: center;
@@ -350,41 +327,71 @@ def _landing_page_html(state: StudioState) -> str:
     }}
     .command-caption {{ margin: 0; font-size: 0.98rem; color: var(--muted); }}
     .hero-grid {{ display: grid; gap: 18px; margin-top: 18px; }}
-    .hero-card-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }}
-    .info-card, .section-card, .studio-preview-card, .example-card {{
+    .feature-rail {{ display: grid; gap: 18px; }}
+    .info-card, .studio-preview-card, .studio-note, .example-card {{
       padding: 20px;
       border: 1px solid var(--line);
       background: rgba(8, 18, 29, 0.56);
       box-shadow: var(--shadow);
     }}
-    .info-card strong, .section-card strong, .studio-preview-card strong, .example-card strong {{
+    .info-card, .studio-preview-card, .studio-note, .ecosystem-pill {{
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 520ms ease, transform 520ms ease;
+    }}
+    .reveal-visible {{
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }}
+    .info-card strong, .studio-preview-card strong, .studio-note strong, .example-card strong {{
       display: block;
       margin: 8px 0 10px;
       font-size: 1.14rem;
       letter-spacing: -0.02em;
     }}
-    .info-card p, .section-card p, .studio-preview-card p, .example-card p {{ margin: 0; color: var(--muted); }}
-    .section-stack {{ display: grid; gap: 18px; padding-bottom: 34px; }}
+    .info-card p, .studio-preview-card p, .studio-note p, .example-card p {{ margin: 0; color: var(--muted); }}
+    .section-stack {{ display: grid; gap: 72px; padding: 56px 0 72px; }}
     .section-shell {{
-      padding: 26px;
+      padding: 40px;
       border: 1px solid var(--line);
       background: var(--panel-strong);
       box-shadow: var(--shadow);
     }}
     .section-shell h2 {{ margin: 8px 0 8px; font-size: 2rem; letter-spacing: -0.03em; }}
     .section-shell > p {{ margin: 0; color: var(--muted); max-width: 62ch; }}
-    .triad {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }}
-    .ecosystem-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }}
+    .section-shell.story-layout,
+    .section-shell.alt-layout {{
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 42px;
+      align-items: start;
+    }}
+    .section-intro {{ display: grid; gap: 10px; }}
+    .capability-row,
+    .ecosystem-grid {{ display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }}
     .ecosystem-pill {{
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      padding: 16px 14px;
+      padding: 20px 14px;
       border: 1px solid rgba(125, 211, 199, 0.2);
       background: rgba(8, 18, 29, 0.5);
       color: var(--text);
       font-weight: 600;
     }}
+    .info-card.spotlight {{
+      background: linear-gradient(180deg, rgba(10, 26, 40, 0.88), rgba(13, 31, 49, 0.96));
+      border-color: rgba(125, 211, 199, 0.22);
+    }}
+    .info-card.spotlight strong {{ font-size: 1.28rem; }}
+    .story-layout .section-intro {{ padding-right: 12px; }}
+    .studio-side {{ display: grid; gap: 18px; align-content: start; }}
+    .studio-note {{ background: rgba(8, 18, 29, 0.42); }}
+    .studio-preview-card {{
+      background: linear-gradient(180deg, rgba(10, 24, 39, 0.72), rgba(14, 31, 49, 0.9));
+      border-color: rgba(125, 211, 199, 0.22);
+    }}
+    .studio-preview-card strong {{ font-size: 1.26rem; }}
     .studio-preview-strip {{
       display: flex;
       align-items: center;
@@ -423,9 +430,11 @@ def _landing_page_html(state: StudioState) -> str:
       to {{ transform: rotate(360deg); }}
     }}
     @media (max-width: 980px) {{
-      .hero-card-grid,
-      .triad,
-      .ecosystem-grid {{ grid-template-columns: 1fr; }}
+      .feature-rail,
+      .capability-row,
+      .ecosystem-grid,
+      .section-shell.story-layout,
+      .section-shell.alt-layout {{ grid-template-columns: 1fr; }}
       .command-shell {{ grid-template-columns: 1fr; }}
       .copy-button.icon-only {{ width: 58px; }}
     }}
@@ -464,33 +473,38 @@ def _landing_page_html(state: StudioState) -> str:
         <h1>One system to build, run, and manage AI projects.</h1>
         <p>Start with one project, keep shipping, and grow into bigger setups without changing how the system works underneath you.</p>
         <div class='hero-actions'>
-          <a class='hero-primary' href='/health'>Get started</a>
+          <a class='hero-primary' href='#install-machine'>Install Machine</a>
           <a class='hero-secondary' href='/_studio/'>Open Studio</a>
         </div>
       </div>
 
-      <div class='hero-subgrid'>
+      <div class='hero-subgrid' id='install-machine'>
         {command_markup}
       </div>
     </section>
 
     <section class='section-stack'>
-      <section class='section-shell'>
-        <div class='eyebrow'>What Machine Core is</div>
-        <h2>Start simple, then grow without starting over.</h2>
-        <p>Machine is built so the way you begin still makes sense when the project gets bigger.</p>
-        <div class='hero-card-grid'>
-          <article class='info-card'>
+      <section class='section-shell story-layout reveal-block'>
+        <div class='section-intro'>
+          <div class='eyebrow'>What Machine Core is</div>
+          <h2>Start simple, then grow without starting over.</h2>
+          <p>Machine Core is built so the way you begin still makes sense when the project gets bigger.</p>
+          <div class='capability-row'>
+            {ecosystem_cards}
+          </div>
+        </div>
+        <div class='feature-rail'>
+          <article class='info-card spotlight reveal-item'>
             <span class='card-label'>Projects</span>
             <strong>Create and work inside projects</strong>
             <p>Work inside real projects.</p>
           </article>
-          <article class='info-card'>
+          <article class='info-card reveal-item'>
             <span class='card-label'>Plugins</span>
             <strong>Compose behavior with plugins</strong>
             <p>Add capabilities without rebuilding everything.</p>
           </article>
-          <article class='info-card'>
+          <article class='info-card reveal-item'>
             <span class='card-label'>Scale</span>
             <strong>Run one project or many</strong>
             <p>Stay small or grow later.</p>
@@ -498,40 +512,26 @@ def _landing_page_html(state: StudioState) -> str:
         </div>
       </section>
 
-      <section class='section-shell'>
-        <div class='eyebrow'>Why Machine Core feels different</div>
-        <h2>It does not force every project into the same shape.</h2>
-        <p>The same system already supports small demo apps, scaffolded projects, and larger aggregate setups.</p>
-        <div class='triad'>
-          <article class='section-card'>
-            <span class='card-label'>One kernel</span>
-            <strong>Small core, bigger system</strong>
-            <p>A small core with room to grow.</p>
-          </article>
-          <article class='section-card'>
-            <span class='card-label'>Many plugins</span>
-            <strong>Framework and community layers</strong>
-            <p>Capabilities expand through plugins.</p>
-          </article>
-          <article class='section-card'>
-            <span class='card-label'>Local to remote</span>
-            <strong>One project or many runtimes</strong>
-            <p>Start local, then stretch further when needed.</p>
-          </article>
+      <section class='section-shell alt-layout reveal-block'>
+        <div class='section-intro'>
+          <div class='eyebrow'>Studio</div>
+          <h2>Studio stays out of the way until you need a wider view.</h2>
+          <p>The same system already supports small demo apps, scaffolded projects, and larger aggregate setups. Studio is the control surface when you need to move across them.</p>
+        </div>
+        <div class='studio-side'>
+          <div class='reveal-item'>
+            {studio_preview}
+          </div>
+          {studio_note}
         </div>
       </section>
 
-      <section class='section-shell'>
-        <div class='eyebrow'>Studio</div>
-        <h2>Studio shows up when one project becomes many.</h2>
-        <p>Use Studio when you want one place to switch between projects and environments.</p>
-        {studio_preview}
-      </section>
-
-      <section class='section-shell'>
-        <div class='eyebrow'>Plugin ecosystem</div>
-        <h2>Capabilities grow through the plugin ecosystem.</h2>
-        <p>Grow by adding capabilities instead of switching products.</p>
+      <section class='section-shell reveal-block'>
+        <div class='section-intro'>
+          <div class='eyebrow'>Plugin ecosystem</div>
+          <h2>Add capabilities instead of changing systems.</h2>
+          <p>Grow by adding capabilities instead of switching products.</p>
+        </div>
         <div class='ecosystem-grid'>
           {ecosystem_cards}
         </div>
@@ -541,7 +541,7 @@ def _landing_page_html(state: StudioState) -> str:
     <footer class='footer-bar'>
       <div>Machine Core is the main system. Studio is there when you need a bigger view.</div>
       <div class='footer-links'>
-        <a href='/health'>Get started</a>
+        <a href='#install-machine'>Install Machine</a>
         <a href='/_studio/'>Open Studio</a>
       </div>
     </footer>
@@ -569,6 +569,20 @@ def _landing_page_html(state: StudioState) -> str:
             }}, 1400);
           }}
         }});
+
+        const revealables = document.querySelectorAll('.reveal-item, .ecosystem-pill');
+        const observer = new IntersectionObserver((entries) => {{
+          for (const entry of entries) {{
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add('reveal-visible');
+            observer.unobserve(entry.target);
+          }}
+        }}, {{ threshold: 0.18, rootMargin: '0px 0px -40px 0px' }});
+
+        revealables.forEach((node, index) => {{
+          node.style.transitionDelay = `${{Math.min(index * 45, 260)}}ms`;
+          observer.observe(node);
+        }});
       }})();
     </script>
   </div>
@@ -580,7 +594,7 @@ def _landing_page_html(state: StudioState) -> str:
 def create_studio_host_app(machine: Any) -> FastAPI:
     """Create the top-level Studio host app with a landing page at /."""
     studio_state = build_studio_state(machine)
-    app = FastAPI(title="Machine Studio")
+    app = FastAPI(title="Machine Core")
     app.state.studio_state = studio_state
 
     studio = create_studio_app(machine, studio_state=studio_state)
@@ -593,6 +607,10 @@ def create_studio_host_app(machine: Any) -> FastAPI:
     @app.get("/health")
     async def health():
         return {"status": "healthy", "studio_mount": "/_studio"}
+
+    @app.get("/favicon.ico")
+    async def favicon() -> Response:
+        return Response(status_code=204)
 
     return app
 
