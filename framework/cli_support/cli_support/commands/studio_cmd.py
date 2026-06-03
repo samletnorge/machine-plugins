@@ -80,7 +80,31 @@ import os, sys
 sys.path.insert(0, os.environ.get("MACHINE_CORE_ROOT", "."))
 sys.path.insert(0, {str(studio_site_packages)!r})
 import importlib
-module = importlib.import_module("{entry.rpartition(":")[0]}")
+import importlib.util
+from pathlib import Path
+
+def _load_entry_module(module_name: str):
+    try:
+        return importlib.import_module(module_name)
+    except ModuleNotFoundError as exc:
+        root = Path(os.environ.get("MACHINE_CORE_ROOT", ".")).resolve()
+        module_path = Path(*module_name.split("."))
+        file_candidates = [module_path.with_suffix(".py"), module_path / "__init__.py"]
+        for base in [root, *root.parents]:
+            for relative_path in file_candidates:
+                candidate = base / relative_path
+                if not candidate.exists():
+                    continue
+                spec = importlib.util.spec_from_file_location(module_name, candidate)
+                if spec is None or spec.loader is None:
+                    continue
+                module = importlib.util.module_from_spec(spec)
+                sys.modules[module_name] = module
+                spec.loader.exec_module(module)
+                return module
+        raise exc
+
+module = _load_entry_module("{entry.rpartition(":")[0]}")
 machine = getattr(module, "{entry.rpartition(":")[2]}")
 from server_support.app import create_app
 app = create_app(machine)

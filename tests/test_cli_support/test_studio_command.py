@@ -2,7 +2,6 @@
 
 import os
 import sys
-from pathlib import Path
 from unittest.mock import patch
 
 from typer.testing import CliRunner
@@ -104,7 +103,7 @@ def test_studio_falls_back_to_current_interpreter_when_project_has_no_venv(
     assert calls[0][0][0] == sys.executable
 
 
-def test_studio_adds_parent_root_to_pythonpath_for_workspace_entries(
+def test_studio_generated_bootstrap_falls_back_to_loading_entry_from_ancestor_paths(
     tmp_path, monkeypatch
 ):
     workspace = tmp_path / "workspace"
@@ -118,10 +117,10 @@ def test_studio_adds_parent_root_to_pythonpath_for_workspace_entries(
 
     monkeypatch.chdir(project)
 
-    calls = []
+    generated = {}
 
     def fake_run(cmd, cwd=None, env=None):
-        calls.append((cmd, cwd, env))
+        generated["text"] = (project / "_machine_studio_server.py").read_text()
         return 0
 
     fake_module = type("FakeStudioModule", (), {"__file__": __file__})
@@ -134,5 +133,9 @@ def test_studio_adds_parent_root_to_pythonpath_for_workspace_entries(
         result = runner.invoke(app, ["studio"])
 
     assert result.exit_code == 0
-    assert calls[0][2]["PYTHONPATH"].split(os.pathsep)[0] == str(workspace / "tmp")
-    assert calls[0][2]["PYTHONPATH"].split(os.pathsep)[1] == str(project)
+    assert "def _load_entry_module(module_name: str):" in generated["text"]
+    assert "for base in [root, *root.parents]:" in generated["text"]
+    assert (
+        'module = _load_entry_module("tmp.manual_studio_verify_app")'
+        in generated["text"]
+    )
