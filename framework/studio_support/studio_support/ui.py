@@ -423,6 +423,10 @@ def machine_snapshot() -> dict[str, Any]:
     if machine_name is None:
         machine_name = "No runtime attached"
     project_targets = context["project_targets"]
+    project_keys = {
+        (target.get("tenant_slug"), target.get("project_slug"))
+        for target in project_targets
+    }
     project_config = _entry_project_config(entry)
     environment_connection_ref = context["environment_connection_ref"]
     environment_connection_kind = context["environment_connection_kind"]
@@ -440,6 +444,10 @@ def machine_snapshot() -> dict[str, Any]:
         "project_name": project_name,
         "project_options": context["project_options"],
         "project_targets": project_targets,
+        "target_count": len(project_targets),
+        "project_count": len(project_keys),
+        "tenant_count": len(context["tenant_options"]),
+        "environment_count": len(project_targets),
         "project_root": project_root,
         "entry": entry,
         "environment": environment,

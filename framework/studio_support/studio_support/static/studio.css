@@ -624,8 +624,56 @@ html[data-mode="light"] .mode-toggle-light {
 }
 
 .panel-link.block {
-    display: block;
-    padding: 0.7rem 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1rem;
+    border: 1px solid color-mix(in oklab, var(--primary) 24%, var(--border));
+    border-radius: calc(var(--radius) + 0.1rem);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.command-block {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 0.15rem);
+    background: color-mix(in oklab, var(--accent) 82%, transparent);
+    color: var(--foreground);
+    overflow-x: auto;
+}
+
+.command-list {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.command-row {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 0.15rem);
+    background: color-mix(in oklab, var(--accent) 72%, transparent);
+}
+
+.command-row code {
+    width: fit-content;
+    font-size: 0.95rem;
+}
+
+.command-row p {
+    margin: 0;
+}
+
+.command-tabs-list strong {
+    font-weight: 600;
 }
 
 .account-panel,

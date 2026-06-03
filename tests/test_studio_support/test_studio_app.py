@@ -71,9 +71,23 @@ def test_index_shows_attachment_state(studio_client):
 
     assert response.status_code == 200
     assert "Attachment state" in response.text
-    assert "<h2>attached</h2>" in response.text
+    assert "<h3>attached</h3>" in response.text
     assert '<span class="status-label">Attachment</span>' in response.text
     assert ">attached</strong>" in response.text
+
+
+def test_dashboard_frames_studio_as_control_center_for_machine_commands(studio_client):
+    response = studio_client.get("/")
+
+    assert response.status_code == 200
+    assert "One control center for all your Machine runtimes." in response.text
+    assert "machine dev" in response.text
+    assert "machine studio" in response.text
+    assert "machine init" in response.text
+    assert "Plugins" in response.text
+    assert "Store" in response.text
+    assert "Services" in response.text
+    assert "Config" in response.text
 
 
 def test_dashboard_moves_context_switching_to_sidebar_and_removes_topbar_switcher(
