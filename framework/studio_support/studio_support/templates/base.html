@@ -15,44 +15,77 @@
     <div class="studio-shell">
         <aside class="studio-sidebar">
             <div class="brand-block brand-block-shell">
-                <a class="brand-link" href="{{ request.scope.root_path }}/">
-                    <span class="brand-mark">{{ icon('spark') }}</span>
-                    <span>
-                        <strong>Machine Studio</strong>
-                        <small>Mission Control</small>
-                    </span>
-                </a>
-                <div class="sidebar-story">
-                    <span class="context-label">Studio surface</span>
-                    <strong>{{ tenant_name }}</strong>
-                    <p>Switch across projects and environments without leaving the control plane.</p>
+                <div class="brand-row">
+                    <a class="brand-link" href="{{ request.scope.root_path }}/">
+                        <span class="brand-mark" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="studio-machine-mark-gradient" x1="6" y1="6" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#7DD3C7"/>
+                                        <stop offset="1" stop-color="#67E8F9"/>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M9 38V10L24 27L39 10V38" stroke="url(#studio-machine-mark-gradient)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="9" cy="10" r="3.2" fill="currentColor" stroke="url(#studio-machine-mark-gradient)" stroke-width="2"/>
+                                <circle cx="24" cy="27" r="3.2" fill="currentColor" stroke="url(#studio-machine-mark-gradient)" stroke-width="2"/>
+                                <circle cx="39" cy="10" r="3.2" fill="currentColor" stroke="url(#studio-machine-mark-gradient)" stroke-width="2"/>
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>Machine Studio</strong>
+                            <small>Mission Control</small>
+                        </span>
+                        <button type="button" class="mode-toggle icon-only brand-mode-toggle" id="mode-toggle" aria-label="Toggle color mode">
+                            <span class="mode-toggle-icon mode-toggle-dark">{{ icon('moon') }}</span>
+                            <span class="mode-toggle-icon mode-toggle-light">{{ icon('sun') }}</span>
+                            <span id="mode-label">Dark</span>
+                        </button>
+                    </a>
                 </div>
-                <form class="sidebar-context-switcher" aria-label="Context switcher" data-context-switcher-endpoint="{{ request.scope.root_path }}/api/context">
-                    <label>
-                        <span class="context-label">Tenant</span>
-                        <select class="control-select" name="tenant_slug" aria-label="Tenant">
-                            {% for tenant in tenant_options %}
-                            <option value="{{ tenant.slug }}" {% if tenant.active %}selected{% endif %}>{{ tenant.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </label>
-                    <label>
-                        <span class="context-label">Project</span>
-                        <select class="control-select" name="project_slug" aria-label="Project">
-                            {% for project in project_options %}
-                            <option value="{{ project.slug }}" {% if project.active %}selected{% endif %}>{{ project.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </label>
-                    <label>
-                        <span class="context-label">Environment</span>
-                        <select class="control-select" name="environment_name" aria-label="Environment">
-                            {% for option in environment_options %}
-                            <option value="{{ option.name }}" {% if option.active %}selected{% endif %}>{{ option.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </label>
-                </form>
+                <details class="sidebar-context-disclosure">
+                    <summary class="context-switcher-header">
+                        <span>
+                            <span class="context-label">Context</span>
+                            <strong>{{ tenant_name }} / {{ project_name }} / {{ environment }}</strong>
+                        </span>
+                        <span class="context-disclosure-icon">{{ icon('chevron') }}</span>
+                    </summary>
+                    <form class="sidebar-context-switcher" aria-label="Context switcher" data-context-switcher-endpoint="{{ request.scope.root_path }}/api/context">
+                        <label class="context-field">
+                            <span class="context-label">Tenant</span>
+                            <span class="select-shell context-select-shell">
+                                <select class="control-select" name="tenant_slug" aria-label="Tenant">
+                                    {% for tenant in tenant_options %}
+                                    <option value="{{ tenant.slug }}" {% if tenant.active %}selected{% endif %}>{{ tenant.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="select-icon">{{ icon('chevron') }}</span>
+                            </span>
+                        </label>
+                        <label class="context-field">
+                            <span class="context-label">Project</span>
+                            <span class="select-shell context-select-shell">
+                                <select class="control-select" name="project_slug" aria-label="Project">
+                                    {% for project in project_options %}
+                                    <option value="{{ project.slug }}" {% if project.active %}selected{% endif %}>{{ project.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="select-icon">{{ icon('chevron') }}</span>
+                            </span>
+                        </label>
+                        <label class="context-field">
+                            <span class="context-label">Environment</span>
+                            <span class="select-shell context-select-shell">
+                                <select class="control-select" name="environment_name" aria-label="Environment">
+                                    {% for option in environment_options %}
+                                    <option value="{{ option.name }}" {% if option.active %}selected{% endif %}>{{ option.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="select-icon">{{ icon('chevron') }}</span>
+                            </span>
+                        </label>
+                    </form>
+                </details>
             </div>
 
             <nav class="nav-groups" aria-label="Studio Navigation">
@@ -86,28 +119,28 @@
                         <span class="nav-icon">{{ icon('blocks') }}</span>
                         <span>Navigation</span>
                     </button>
-                    <div class="topbar-kicker">Live control surface</div>
                     <h1>{{ page_title }}</h1>
+                    {% if active_nav == 'dashboard' %}
+                    <div class="topbar-kicker">Live control surface</div>
                     <div class="topbar-context-line">
                         <span>{{ tenant_name }}</span>
                         <span>{{ project_name }}</span>
                         <span>{{ environment }}</span>
                     </div>
+                    {% endif %}
                 </div>
 
+                {% if active_nav == 'dashboard' %}
                 <div class="topbar-actions">
                     <div class="topbar-chip-stack">
                         <span class="status-chip {% if attachment_status == 'attached' %}status-attached{% endif %}">{{ attachment_status }}</span>
                         <span class="topbar-chip">{{ categories|length }} categories</span>
                     </div>
-                    <button type="button" class="mode-toggle icon-only" id="mode-toggle" aria-label="Toggle color mode">
-                        <span class="mode-toggle-icon mode-toggle-dark">{{ icon('moon') }}</span>
-                        <span class="mode-toggle-icon mode-toggle-light">{{ icon('sun') }}</span>
-                        <span id="mode-label">Dark</span>
-                    </button>
                 </div>
+                {% endif %}
             </header>
 
+            {% if active_nav == 'dashboard' %}
             <section class="status-strip">
                 <article class="status-card">
                     <span class="status-label">Categories</span>
@@ -126,6 +159,7 @@
                     <strong>{{ attachment_status }}{% if attachment_error %} · {{ attachment_error }}{% endif %}</strong>
                 </article>
             </section>
+            {% endif %}
 
             <main class="page-frame">
                 {% block content %}{% endblock %}
