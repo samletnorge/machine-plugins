@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import typer
@@ -50,9 +51,11 @@ def studio_command(
     sync_manifests(project_root=root)
 
     venv_python = root / ".venv" / "bin" / "python"
+    python_executable = str(venv_python) if venv_python.exists() else sys.executable
     if not venv_python.exists():
-        console.print("[red]Error: No .venv found. Run 'uv sync' first.[/red]")
-        raise typer.Exit(code=1)
+        console.print(
+            "[yellow]No project .venv found. Falling back to the current machine CLI interpreter.[/yellow]"
+        )
 
     console.print(f"[green]Starting Machine Studio...[/green]")
     console.print(f"  URL: http://{host}:{port}/_studio/")
@@ -63,6 +66,12 @@ def studio_command(
         "MACHINE_CORE_ROOT": str(root),
         "MACHINE_STUDIO_ENABLED": "1",
     }
+    parent_root = root.parent
+    pythonpath_entries = [str(parent_root), str(root)]
+    existing_pythonpath = os.environ.get("PYTHONPATH")
+    if existing_pythonpath:
+        pythonpath_entries.append(existing_pythonpath)
+    env_vars["PYTHONPATH"] = os.pathsep.join(pythonpath_entries)
     studio_site_packages = _resolve_studio_source_path(studio_support.__file__)
 
     studio_server_code = f'''\
@@ -83,7 +92,7 @@ app.mount("/_studio", studio)
     studio_server_file.write_text(studio_server_code)
 
     cmd = [
-        str(venv_python),
+        python_executable,
         "-m",
         "uvicorn",
         "_machine_studio_server:app",
