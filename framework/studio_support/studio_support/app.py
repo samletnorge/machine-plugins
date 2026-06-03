@@ -64,6 +64,10 @@ def _landing_page_html(state: StudioState) -> str:
         if environment.project_id == project.id
     )
 
+    install_command = (
+        "curl -fsSL https://gist.githubusercontent.com/valiantlynx/"
+        "c3eaf552adf9aecff7c0366a25ff1e99/raw/install.sh | bash"
+    )
     active_target = " / ".join(
         [
             escape(active_tenant.name if active_tenant else "Unknown tenant"),
@@ -71,9 +75,49 @@ def _landing_page_html(state: StudioState) -> str:
             escape(active_environment.name if active_environment else "No environment"),
         ]
     )
-    attachment_text = escape(attachment.machine_name or "No runtime attached")
-    if attachment.error:
-        attachment_text += f" · {escape(attachment.error)}"
+
+    ecosystem_cards = "".join(
+        [
+            "<span class='ecosystem-pill'>Agents</span>",
+            "<span class='ecosystem-pill'>Tools</span>",
+            "<span class='ecosystem-pill'>Model providers</span>",
+            "<span class='ecosystem-pill'>Workflows</span>",
+            "<span class='ecosystem-pill'>RAG</span>",
+            "<span class='ecosystem-pill'>Browser</span>",
+            "<span class='ecosystem-pill'>Workspace</span>",
+            "<span class='ecosystem-pill'>Deploy</span>",
+        ]
+    )
+
+    studio_preview = f"""
+      <article class='studio-preview-card'>
+        <span class='card-label'>Studio</span>
+        <strong>{len(projects)} projects across {len(environments)} environments</strong>
+        <p>When one project becomes many, Studio gives you one place to switch between them.</p>
+        <div class='studio-preview-strip'>
+          <span>{active_target}</span>
+          <span class='studio-preview-sep'></span>
+          <span>/_studio/</span>
+        </div>
+      </article>
+    """
+
+    command_markup = (
+        "<div class='command-stage'>"
+        "<div class='command-orbit orbit-a'></div>"
+        "<div class='command-orbit orbit-b'></div>"
+        "<div class='command-core'>"
+        "<span class='command-kicker'>Install Machine</span>"
+        "<div class='command-shell'>"
+        f"<code id='install-command'>{escape(install_command)}</code>"
+        "<button type='button' class='copy-button icon-only' id='copy-install' aria-label='Copy install command' title='Copy install command'>"
+        "<span class='copy-icon' aria-hidden='true'>⧉</span>"
+        "</button>"
+        "</div>"
+        "<p class='command-caption'>Paste this once. Then start building.</p>"
+        "</div>"
+        "</div>"
+    )
 
     return f"""
 <!DOCTYPE html>
@@ -86,12 +130,14 @@ def _landing_page_html(state: StudioState) -> str:
     :root {{
       color-scheme: dark;
       --bg: #07111b;
-      --panel: rgba(10, 24, 39, 0.78);
+      --panel: rgba(10, 24, 39, 0.82);
+      --panel-strong: rgba(8, 19, 31, 0.94);
       --text: #eff6ff;
       --muted: #9db2c8;
       --line: rgba(157, 178, 200, 0.2);
       --teal: #7dd3c7;
       --cyan: #67e8f9;
+      --violet: #a78bfa;
       --amber: #fbbf24;
       --shadow: 0 30px 100px rgba(2, 8, 23, 0.45);
     }}
@@ -107,7 +153,7 @@ def _landing_page_html(state: StudioState) -> str:
         linear-gradient(180deg, #08121d 0%, #07111b 45%, #050c13 100%);
     }}
     a {{ color: inherit; text-decoration: none; }}
-    .shell {{ max-width: 1260px; margin: 0 auto; padding: 24px; }}
+    .shell {{ max-width: 1280px; margin: 0 auto; padding: 24px; }}
     .topbar {{
       display: flex;
       justify-content: space-between;
@@ -121,16 +167,20 @@ def _landing_page_html(state: StudioState) -> str:
     }}
     .brand {{ display: flex; align-items: center; gap: 14px; }}
     .brand-mark {{
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, rgba(125, 211, 199, 0.24), rgba(103, 232, 249, 0.16));
-      border: 1px solid rgba(125, 211, 199, 0.28);
-      color: var(--teal);
-      font-weight: 700;
-      letter-spacing: 0.08em;
+      width: 52px;
+      height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(8, 18, 29, 0.96), rgba(12, 24, 37, 0.92));
+      border: 1px solid rgba(125, 211, 199, 0.18);
+      box-shadow: 0 18px 36px rgba(3, 10, 18, 0.28);
+    }}
+    .brand-mark svg {{
+      display: block;
+      width: 36px;
+      height: 36px;
     }}
     .brand-copy strong, .hero-copy h1, .panel h2, .metric strong {{ letter-spacing: -0.03em; }}
     .brand-copy small, .eyebrow, .metric span, .target-meta, .panel p, .command-card p, .footer-note {{ color: var(--muted); }}
@@ -144,33 +194,20 @@ def _landing_page_html(state: StudioState) -> str:
       color: var(--text);
       font-weight: 600;
     }}
-    .hero {{
-      display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.9fr);
-      gap: 24px;
-      padding: 28px 0 22px;
-      align-items: stretch;
-    }}
+    .hero {{ display: grid; gap: 26px; padding: 46px 0 22px; justify-items: center; text-align: center; }}
     .hero-copy {{
-      padding: 34px;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(8, 18, 29, 0.76), rgba(11, 26, 41, 0.88));
-      box-shadow: var(--shadow);
+      width: min(980px, 100%);
+      padding: 24px 0 0;
+      background: none;
+      border: 0;
+      box-shadow: none;
       position: relative;
       overflow: hidden;
     }}
-    .hero-copy::after {{
-      content: "";
-      position: absolute;
-      inset: auto -6% -38% 45%;
-      height: 280px;
-      background: radial-gradient(circle, rgba(125, 211, 199, 0.2), transparent 62%);
-      pointer-events: none;
-    }}
     .eyebrow {{ text-transform: uppercase; letter-spacing: 0.16em; font-size: 12px; }}
-    .hero-copy h1 {{ font-size: clamp(2.9rem, 7vw, 5.8rem); line-height: 0.94; margin: 12px 0 18px; max-width: 10ch; }}
-    .hero-copy p {{ font-size: 1.05rem; max-width: 58ch; margin: 0 0 22px; }}
-    .hero-actions {{ display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 26px; }}
+    .hero-copy h1 {{ font-size: clamp(3.6rem, 8vw, 7rem); line-height: 0.88; margin: 16px auto 18px; max-width: 11ch; }}
+    .hero-copy p {{ font-size: 1.08rem; max-width: 56ch; margin: 0 auto 18px; }}
+    .hero-actions {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 14px 0 0; }}
     .hero-primary {{
       display: inline-flex;
       align-items: center;
@@ -189,15 +226,185 @@ def _landing_page_html(state: StudioState) -> str:
       background: rgba(8, 18, 29, 0.58);
       font-weight: 600;
     }}
-    .hero-footnote {{ display: flex; flex-wrap: wrap; gap: 10px; }}
-    .hero-footnote span {{
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      background: rgba(8, 18, 29, 0.48);
+    .hero-tagline {{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid rgba(125, 211, 199, 0.22);
+      background: rgba(8, 18, 29, 0.56);
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.92rem;
+      margin-bottom: 10px;
     }}
-    .hero-side {{ display: grid; gap: 18px; }}
+    .hero-tagline::before {{
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--teal), var(--cyan));
+      box-shadow: 0 0 18px rgba(125, 211, 199, 0.9);
+    }}
+    .hero-subgrid {{ width: min(920px, 100%); margin-top: 6px; }}
+    .command-stage {{
+      position: relative;
+      min-height: 332px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(125, 211, 199, 0.14);
+      background:
+        radial-gradient(circle at 18% 24%, rgba(125, 211, 199, 0.14), transparent 26%),
+        radial-gradient(circle at 80% 18%, rgba(167, 139, 250, 0.14), transparent 24%),
+        linear-gradient(180deg, rgba(9, 20, 31, 0.9), rgba(5, 12, 20, 0.94));
+      box-shadow: var(--shadow);
+    }}
+    .command-orbit {{
+      position: absolute;
+      border: 1px solid rgba(125, 211, 199, 0.14);
+      border-radius: 999px;
+      animation: drift 14s linear infinite;
+    }}
+    .orbit-a {{ width: 560px; height: 560px; opacity: 0.6; }}
+    .orbit-b {{ width: 380px; height: 380px; animation-direction: reverse; animation-duration: 11s; opacity: 0.45; }}
+    .command-core {{
+      position: relative;
+      z-index: 1;
+      width: min(820px, calc(100% - 44px));
+      padding: 34px 28px;
+      background: linear-gradient(180deg, rgba(12, 25, 39, 0.88), rgba(8, 17, 27, 0.95));
+      border: 1px solid rgba(125, 211, 199, 0.18);
+      box-shadow: 0 28px 90px rgba(3, 10, 18, 0.48);
+    }}
+    .command-kicker {{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      color: var(--cyan);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }}
+    .command-kicker::before {{
+      content: "";
+      width: 28px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan));
+    }}
+    .command-shell {{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 20px 22px;
+      border: 1px solid rgba(125, 211, 199, 0.16);
+      background: rgba(5, 12, 20, 0.9);
+      margin-bottom: 18px;
+    }}
+    .command-shell code {{
+      display: block;
+      text-align: left;
+      color: var(--text);
+      font-size: clamp(0.92rem, 1.3vw, 1.08rem);
+      line-height: 1.8;
+      word-break: break-word;
+    }}
+    .copy-button {{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border: 1px solid rgba(125, 211, 199, 0.22);
+      background: linear-gradient(135deg, rgba(125, 211, 199, 0.18), rgba(103, 232, 249, 0.12));
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }}
+    .copy-button.icon-only {{
+      justify-content: center;
+      width: 58px;
+      height: 58px;
+      padding: 0;
+      border-radius: 999px;
+    }}
+    .copy-button:hover {{
+      transform: translateY(-1px);
+      border-color: rgba(125, 211, 199, 0.42);
+      background: linear-gradient(135deg, rgba(125, 211, 199, 0.26), rgba(103, 232, 249, 0.18));
+    }}
+    .copy-button.copied {{
+      border-color: rgba(125, 211, 199, 0.5);
+      box-shadow: 0 0 0 10px rgba(125, 211, 199, 0.08);
+    }}
+    .copy-icon {{
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: rgba(125, 211, 199, 0.14);
+      animation: pulse 2.6s ease-in-out infinite;
+      font-size: 1rem;
+    }}
+    .command-caption {{ margin: 0; font-size: 0.98rem; color: var(--muted); }}
+    .hero-grid {{ display: grid; gap: 18px; margin-top: 18px; }}
+    .hero-card-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }}
+    .info-card, .section-card, .studio-preview-card, .example-card {{
+      padding: 20px;
+      border: 1px solid var(--line);
+      background: rgba(8, 18, 29, 0.56);
+      box-shadow: var(--shadow);
+    }}
+    .info-card strong, .section-card strong, .studio-preview-card strong, .example-card strong {{
+      display: block;
+      margin: 8px 0 10px;
+      font-size: 1.14rem;
+      letter-spacing: -0.02em;
+    }}
+    .info-card p, .section-card p, .studio-preview-card p, .example-card p {{ margin: 0; color: var(--muted); }}
+    .section-stack {{ display: grid; gap: 18px; padding-bottom: 34px; }}
+    .section-shell {{
+      padding: 26px;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      box-shadow: var(--shadow);
+    }}
+    .section-shell h2 {{ margin: 8px 0 8px; font-size: 2rem; letter-spacing: -0.03em; }}
+    .section-shell > p {{ margin: 0; color: var(--muted); max-width: 62ch; }}
+    .triad {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }}
+    .ecosystem-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }}
+    .ecosystem-pill {{
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px 14px;
+      border: 1px solid rgba(125, 211, 199, 0.2);
+      background: rgba(8, 18, 29, 0.5);
+      color: var(--text);
+      font-weight: 600;
+    }}
+    .studio-preview-strip {{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      color: var(--text);
+    }}
+    .studio-preview-sep {{ width: 18px; height: 1px; background: linear-gradient(90deg, rgba(125, 211, 199, 0.4), transparent); }}
+    .footer-bar {{
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 20px 0 40px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }}
+    .footer-links {{ display: flex; gap: 16px; flex-wrap: wrap; }}
+    .footer-links a {{ color: var(--text); }}
     .panel {{
       padding: 22px;
       border: 1px solid var(--line);
@@ -205,35 +412,22 @@ def _landing_page_html(state: StudioState) -> str:
       box-shadow: var(--shadow);
       backdrop-filter: blur(14px);
     }}
-    .panel h2 {{ margin: 10px 0 10px; font-size: 1.6rem; }}
-    .status-pill {{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-size: 0.72rem;
-    }}
-    .status-pill::before {{ content: ""; width: 9px; height: 9px; border-radius: 999px; background: var(--amber); }}
-    .status-pill.is-attached::before {{ background: var(--teal); }}
-    .metric-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 8px 0 24px; }}
-    .metric {{ padding: 18px; border: 1px solid var(--line); background: rgba(6, 15, 23, 0.45); }}
-    .metric span {{ display: block; margin-bottom: 8px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; }}
-    .metric strong {{ font-size: 2rem; display: block; margin-bottom: 6px; }}
-    .section-grid {{ display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr); gap: 24px; padding-bottom: 28px; }}
-    .command-grid, .target-grid {{ display: grid; gap: 14px; }}
-    .command-card, .target-card {{ padding: 18px; border: 1px solid var(--line); background: rgba(8, 18, 29, 0.52); }}
-    .command-card code {{ display: inline-block; margin-bottom: 10px; font-size: 1rem; color: var(--cyan); }}
-    .target-card strong {{ display: block; margin: 6px 0; font-size: 1.05rem; }}
-    .target-meta {{ display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.9rem; }}
-    .target-card.is-active {{ border-color: rgba(125, 211, 199, 0.32); background: rgba(10, 28, 37, 0.72); }}
+    .card-label {{ color: var(--cyan); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.75rem; }}
     .footer-note {{ padding-top: 8px; font-size: 0.92rem; }}
+    @keyframes pulse {{
+      0%, 100% {{ transform: scale(1); box-shadow: 0 0 0 0 rgba(125, 211, 199, 0.18); }}
+      50% {{ transform: scale(1.08); box-shadow: 0 0 0 14px rgba(125, 211, 199, 0); }}
+    }}
+    @keyframes drift {{
+      from {{ transform: rotate(0deg); }}
+      to {{ transform: rotate(360deg); }}
+    }}
     @media (max-width: 980px) {{
-      .hero, .section-grid {{ grid-template-columns: 1fr; }}
-      .metric-grid {{ grid-template-columns: 1fr; }}
+      .hero-card-grid,
+      .triad,
+      .ecosystem-grid {{ grid-template-columns: 1fr; }}
+      .command-shell {{ grid-template-columns: 1fr; }}
+      .copy-button.icon-only {{ width: 58px; }}
     }}
   </style>
 </head>
@@ -241,92 +435,142 @@ def _landing_page_html(state: StudioState) -> str:
   <div class='shell'>
     <header class='topbar'>
       <div class='brand'>
-        <div class='brand-mark'>MS</div>
+        <div class='brand-mark' aria-hidden='true'>
+          <svg viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+            <defs>
+              <linearGradient id='machine-mark-gradient' x1='6' y1='6' x2='42' y2='42' gradientUnits='userSpaceOnUse'>
+                <stop stop-color='#7DD3C7'/>
+                <stop offset='1' stop-color='#67E8F9'/>
+              </linearGradient>
+            </defs>
+            <path d='M9 38V10L24 27L39 10V38' stroke='url(#machine-mark-gradient)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/>
+            <circle cx='9' cy='10' r='3.2' fill='#07111B' stroke='url(#machine-mark-gradient)' stroke-width='2'/>
+            <circle cx='24' cy='27' r='3.2' fill='#07111B' stroke='url(#machine-mark-gradient)' stroke-width='2'/>
+            <circle cx='39' cy='10' r='3.2' fill='#07111B' stroke='url(#machine-mark-gradient)' stroke-width='2'/>
+          </svg>
+        </div>
         <div class='brand-copy'>
-          <strong>Machine Studio</strong><br>
-          <small>Aggregated control plane for Machine runtimes</small>
+          <strong>Machine</strong><br>
+          <small>One system to build, run, and manage AI projects</small>
         </div>
       </div>
-      <a class='studio-link' href='/_studio/'>Enter Studio</a>
+      <a class='studio-link' href='/_studio/'>Open Studio</a>
     </header>
 
     <section class='hero'>
       <div class='hero-copy'>
-        <div class='eyebrow'>Mission Control</div>
-        <h1>Switch the whole fleet from one surface.</h1>
-        <p>Machine Studio is the operator layer for all the runtimes you have declared across projects and environments. Keep each project running where it belongs, then use Studio to move between them, inspect live runtime surfaces, and operate the system from a single place.</p>
+        <div class='hero-tagline'>From the first project to everything that comes after</div>
+        <div class='eyebrow'>Machine</div>
+        <h1>One system to build, run, and manage AI projects.</h1>
+        <p>Start with one project, keep shipping, and grow into bigger setups without changing how the system works underneath you.</p>
         <div class='hero-actions'>
-          <a class='hero-primary' href='/_studio/'>Open Studio</a>
-          <a class='hero-secondary' href='/health'>Check health</a>
-        </div>
-        <div class='hero-footnote'>
-          <span>Run <code>machine dev --port ...</code> per project</span>
-          <span>Run <code>machine studio --port ...</code> for the control plane</span>
+          <a class='hero-primary' href='/health'>Get started</a>
+          <a class='hero-secondary' href='/_studio/'>Open Studio</a>
         </div>
       </div>
 
-      <div class='hero-side'>
-        <section class='panel'>
-          <div class='eyebrow'>Active target</div>
-          <h2>{active_target}</h2>
-          <div class='status-pill {status_class}'>{escape(attachment.status)}</div>
-          <p>{attachment_text}</p>
-        </section>
-
-        <section class='panel'>
-          <div class='eyebrow'>Studio shape</div>
-          <h2>{len(projects)} projects across {len(tenants)} tenants.</h2>
-          <p>{len(environments)} environments are available in this catalog. Studio keeps one active target selected at a time and uses that to drive the operational surface at <code>/_studio/</code>.</p>
-        </section>
+      <div class='hero-subgrid'>
+        {command_markup}
       </div>
     </section>
 
-    <section class='metric-grid'>
-      <article class='metric'>
-        <span>Tenants</span>
-        <strong>{len(tenants)}</strong>
-        <div class='footer-note'>Organization-level Studio partitions.</div>
-      </article>
-      <article class='metric'>
-        <span>Projects</span>
-        <strong>{len(projects)}</strong>
-        <div class='footer-note'>Distinct Machine runtimes in the catalog.</div>
-      </article>
-      <article class='metric'>
-        <span>Environments</span>
-        <strong>{len(environments)}</strong>
-        <div class='footer-note'>Switchable runtime targets for the control plane.</div>
-      </article>
-    </section>
-
-    <section class='section-grid'>
-      <section class='panel'>
-        <div class='eyebrow'>How to operate it</div>
-        <h2>Three commands. Two layers. One control plane.</h2>
-        <div class='command-grid'>
-          <article class='command-card'>
-            <code>machine</code>
-            <p>Open the TUI for the current project perspective to inspect plugins, browse the store, check services, and inspect config.</p>
+    <section class='section-stack'>
+      <section class='section-shell'>
+        <div class='eyebrow'>What Machine is</div>
+        <h2>Start simple, then grow without starting over.</h2>
+        <p>Machine is built so the way you begin still makes sense when the project gets bigger.</p>
+        <div class='hero-card-grid'>
+          <article class='info-card'>
+            <span class='card-label'>Projects</span>
+            <strong>Create and work inside projects</strong>
+            <p>Work inside real projects.</p>
           </article>
-          <article class='command-card'>
-            <code>machine dev --port ...</code>
-            <p>Run a project runtime server on its own port. This is the runtime layer that Studio later attaches to.</p>
+          <article class='info-card'>
+            <span class='card-label'>Plugins</span>
+            <strong>Compose behavior with plugins</strong>
+            <p>Add capabilities without rebuilding everything.</p>
           </article>
-          <article class='command-card'>
-            <code>machine studio --port ...</code>
-            <p>Run the aggregated Studio control plane, then enter <code>/_studio/</code> to switch between configured targets.</p>
+          <article class='info-card'>
+            <span class='card-label'>Scale</span>
+            <strong>Run one project or many</strong>
+            <p>Stay small or grow later.</p>
           </article>
         </div>
       </section>
 
-      <section class='panel'>
-        <div class='eyebrow'>Configured targets</div>
-        <h2>Everything this Studio instance can see.</h2>
-        <div class='target-grid'>
-          {target_cards}
+      <section class='section-shell'>
+        <div class='eyebrow'>Why Machine feels different</div>
+        <h2>It does not force every project into the same shape.</h2>
+        <p>The same system already supports small demo apps, scaffolded projects, and larger aggregate setups.</p>
+        <div class='triad'>
+          <article class='section-card'>
+            <span class='card-label'>One kernel</span>
+            <strong>Small core, bigger system</strong>
+            <p>A small core with room to grow.</p>
+          </article>
+          <article class='section-card'>
+            <span class='card-label'>Many plugins</span>
+            <strong>Framework and community layers</strong>
+            <p>Capabilities expand through plugins.</p>
+          </article>
+          <article class='section-card'>
+            <span class='card-label'>Local to remote</span>
+            <strong>One project or many runtimes</strong>
+            <p>Start local, then stretch further when needed.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class='section-shell'>
+        <div class='eyebrow'>Studio</div>
+        <h2>Studio shows up when one project becomes many.</h2>
+        <p>Use Studio when you want one place to switch between projects and environments.</p>
+        {studio_preview}
+      </section>
+
+      <section class='section-shell'>
+        <div class='eyebrow'>Plugin ecosystem</div>
+        <h2>Capabilities grow through the plugin ecosystem.</h2>
+        <p>Grow by adding capabilities instead of switching products.</p>
+        <div class='ecosystem-grid'>
+          {ecosystem_cards}
         </div>
       </section>
     </section>
+
+    <footer class='footer-bar'>
+      <div>Machine is the main system. Studio is there when you need a bigger view.</div>
+      <div class='footer-links'>
+        <a href='/health'>Get started</a>
+        <a href='/_studio/'>Open Studio</a>
+      </div>
+    </footer>
+    <script>
+      (() => {{
+        const button = document.getElementById('copy-install');
+        const code = document.getElementById('install-command');
+        if (!button || !code || !navigator.clipboard) return;
+
+        button.addEventListener('click', async () => {{
+          try {{
+            await navigator.clipboard.writeText(code.textContent || '');
+            button.classList.add('copied');
+            button.setAttribute('aria-label', 'Copied install command');
+            button.setAttribute('title', 'Copied');
+            window.setTimeout(() => {{
+              button.classList.remove('copied');
+              button.setAttribute('aria-label', 'Copy install command');
+              button.setAttribute('title', 'Copy install command');
+            }}, 1400);
+          }} catch (_error) {{
+            button.setAttribute('title', 'Copy failed');
+            window.setTimeout(() => {{
+              button.setAttribute('title', 'Copy install command');
+            }}, 1400);
+          }}
+        }});
+      }})();
+    </script>
   </div>
 </body>
 </html>
