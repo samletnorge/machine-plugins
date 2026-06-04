@@ -18,6 +18,22 @@ from studio_support.dependencies import (
 )
 
 
+def _machine_favicon_svg() -> str:
+    return """<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'>
+  <rect width='48' height='48' rx='12' fill='#07111B'/>
+  <defs>
+    <linearGradient id='favicon-machine-mark-gradient' x1='6' y1='6' x2='42' y2='42' gradientUnits='userSpaceOnUse'>
+      <stop stop-color='#7DD3C7'/>
+      <stop offset='1' stop-color='#67E8F9'/>
+    </linearGradient>
+  </defs>
+  <path d='M9 38V10L24 27L39 10V38' stroke='url(#favicon-machine-mark-gradient)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/>
+  <circle cx='9' cy='10' r='3.2' fill='#07111B' stroke='url(#favicon-machine-mark-gradient)' stroke-width='2'/>
+  <circle cx='24' cy='27' r='3.2' fill='#07111B' stroke='url(#favicon-machine-mark-gradient)' stroke-width='2'/>
+  <circle cx='39' cy='10' r='3.2' fill='#07111B' stroke='url(#favicon-machine-mark-gradient)' stroke-width='2'/>
+</svg>"""
+
+
 def _landing_page_html(state: StudioState) -> str:
     catalog = state.catalog
     tenants = catalog.tenants
@@ -103,6 +119,7 @@ def _landing_page_html(state: StudioState) -> str:
   <meta charset='UTF-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
   <title>Machine Core</title>
+  <link rel='icon' href='/favicon.ico' type='image/svg+xml'>
   <style>
     :root {{
       color-scheme: dark;
@@ -610,7 +627,7 @@ def create_studio_host_app(machine: Any) -> FastAPI:
 
     @app.get("/favicon.ico")
     async def favicon() -> Response:
-        return Response(status_code=204)
+        return Response(content=_machine_favicon_svg(), media_type="image/svg+xml")
 
     return app
 
