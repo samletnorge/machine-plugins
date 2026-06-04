@@ -320,6 +320,9 @@ def _context_snapshot() -> dict[str, Any]:
     tenant = tenants_by_id.get(active_context.tenant_id)
     project = projects_by_id.get(active_context.project_id)
     environment = environments_by_id.get(active_context.environment_id)
+    live_environment_status = environment.status if environment else None
+    if attachment.status != "attached":
+        live_environment_status = attachment.status
 
     project_targets = []
     projects_for_tenant = []
@@ -356,6 +359,13 @@ def _context_snapshot() -> dict[str, Any]:
                     "project_name": listed_project.name,
                     "environment": listed_environment.name,
                     "environment_status": listed_environment.status,
+                    "display_status": (
+                        attachment.status
+                        if listed_project.id == active_context.project_id
+                        and listed_environment.id == active_context.environment_id
+                        and attachment.status != "attached"
+                        else listed_environment.status
+                    ),
                     "entry": listed_project.entry,
                     "active": (
                         listed_project.id == active_context.project_id
@@ -380,6 +390,7 @@ def _context_snapshot() -> dict[str, Any]:
         "project_options": projects_for_tenant,
         "environment": environment.name if environment else None,
         "environment_status": environment.status if environment else None,
+        "environment_display_status": live_environment_status,
         "environment_connection_kind": environment.connection_kind
         if environment
         else None,
@@ -452,6 +463,7 @@ def machine_snapshot() -> dict[str, Any]:
         "entry": entry,
         "environment": environment,
         "environment_status": context["environment_status"],
+        "environment_display_status": context["environment_display_status"],
         "environment_connection_kind": environment_connection_kind,
         "environment_connection_ref": environment_connection_ref,
         "environment_options": context["environment_options"],

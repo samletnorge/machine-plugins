@@ -108,11 +108,6 @@ def build_studio_state(machine: Any) -> StudioState:
         raise RuntimeError(
             f"Studio state initialization initial attach failed: {exc}"
         ) from exc
-    if initial_attachment.status != "attached":
-        raise RuntimeError(
-            "Studio state initialization initial attach failed: "
-            f"{initial_attachment.error or 'unknown error'}"
-        )
     return StudioState(catalog=catalog, attachment_manager=attachment_manager)
 
 

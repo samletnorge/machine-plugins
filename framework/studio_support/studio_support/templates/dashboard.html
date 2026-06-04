@@ -16,7 +16,7 @@
                 <div class="hero-stat-card emphasis">
                     <span class="status-label">Runtime endpoint</span>
                     <strong>{{ environment_connection_ref or machine_name }}</strong>
-                    <p>{{ environment_connection_kind or 'local' }} attachment{% if environment_status %} · {{ environment_status }}{% endif %}</p>
+                    <p>{{ environment_connection_kind or 'local' }} attachment{% if environment_display_status %} · {{ environment_display_status }}{% endif %}</p>
                 </div>
                 <div class="hero-stat-row">
                     <article class="hero-stat-card compact">
@@ -80,8 +80,8 @@
                 <div class="target-board-card{% if target.active %} active{% endif %}">
                     <div class="target-board-topline">
                         <span class="eyebrow">{{ target.tenant_name }}</span>
-                        {% if target.environment_status %}
-                        <span class="status-chip">{{ target.environment_status }}</span>
+                        {% if target.display_status %}
+                        <span class="status-chip">{{ target.display_status }}</span>
                         {% endif %}
                     </div>
                     <strong>{{ target.project_name }}</strong>
