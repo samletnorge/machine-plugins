@@ -103,6 +103,7 @@ class RemoteMachineClient:
         self.name = self.base_url
         self._operations: dict[str, dict[str, dict[str, str]]] | None = None
         self._category_counts: dict[str, int] | None = None
+        self._owners: dict[tuple[str, str], str | None] = {}
 
     def _discover(self) -> None:
         if self._operations is not None:
@@ -140,9 +141,8 @@ class RemoteMachineClient:
         self._discover()
         return dict((self._operations or {}).get(category, {}))
 
-    def get_owner(self, category: str, name: str) -> None:
-        del category, name
-        return None
+    def get_owner(self, category: str, name: str) -> str | None:
+        return self._owners.get((category, name))
 
     def list_category(self, category: str) -> dict[str, RemoteResourceProxy]:
         try:
@@ -153,11 +153,14 @@ class RemoteMachineClient:
             raise
         if not isinstance(items, list):
             return {}
-        return {
-            item.get("name", ""): self._proxy_for(category, item)
-            for item in items
-            if isinstance(item, dict) and item.get("name")
-        }
+        proxies: dict[str, RemoteResourceProxy] = {}
+        for item in items:
+            if not isinstance(item, dict) or not item.get("name"):
+                continue
+            name = str(item.get("name", ""))
+            self._owners[(category, name)] = item.get("owner")
+            proxies[name] = self._proxy_for(category, item)
+        return proxies
 
     def resolve(self, category: str, name: str) -> RemoteResourceProxy | None:
         try:
@@ -170,6 +173,7 @@ class RemoteMachineClient:
             raise
         if not isinstance(item, dict):
             return None
+        self._owners[(category, name)] = item.get("owner")
         return self._proxy_for(category, item)
 
     def invoke_operation(

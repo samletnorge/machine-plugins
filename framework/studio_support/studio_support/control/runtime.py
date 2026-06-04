@@ -40,6 +40,10 @@ def _chat_capable_agents() -> list[str]:
     preferred: list[str] = []
     fallback: list[str] = []
     for name, agent in sorted(machine.list_category("agent").items()):
+        owner = item_owner("agent", name) or ""
+        if owner.startswith("agent_runtime_"):
+            continue
+
         run_method = getattr(agent, "run", None)
         if run_method is None:
             continue
@@ -77,6 +81,11 @@ def _chat_catalog() -> dict[str, list[str]]:
     agents: list[str] = []
     runtimes: list[str] = []
     for name, agent in sorted(machine.list_category("agent").items()):
+        owner = item_owner("agent", name) or ""
+        if owner.startswith("agent_runtime_"):
+            runtimes.append(name)
+            continue
+
         run_method = getattr(agent, "run", None)
         if run_method is None:
             continue

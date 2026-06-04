@@ -142,10 +142,15 @@ def generate_routes(machine: Any) -> APIRouter:
                 result = []
                 for name, impl in items.items():
                     serialized = _serialize(impl)
+                    owner = (
+                        machine.get_owner(cat, name)
+                        if hasattr(machine, "get_owner")
+                        else None
+                    )
                     if isinstance(serialized, dict):
-                        entry = {"name": name, **serialized}
+                        entry = {"name": name, "owner": owner, **serialized}
                     else:
-                        entry = {"name": name, "value": serialized}
+                        entry = {"name": name, "owner": owner, "value": serialized}
                     result.append(entry)
                 return result
 
@@ -166,9 +171,14 @@ def generate_routes(machine: Any) -> APIRouter:
                 if item is None:
                     raise HTTPException(404, f"{cat} '{name}' not found")
                 serialized = _serialize(item)
+                owner = (
+                    machine.get_owner(cat, name)
+                    if hasattr(machine, "get_owner")
+                    else None
+                )
                 if isinstance(serialized, dict):
-                    return {"name": name, **serialized}
-                return {"name": name, "value": serialized}
+                    return {"name": name, "owner": owner, **serialized}
+                return {"name": name, "owner": owner, "value": serialized}
 
             return _get
 
