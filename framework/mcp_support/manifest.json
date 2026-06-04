@@ -1,0 +1,14 @@
+{
+  "name": "mcp_support",
+  "version": "0.5.0",
+  "description": "mcp registry support plugin",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["categories:define", "hooks:define", "events:emit", "tool:register"],
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "mcp_support:ToolSupportPlugin"
+  }
+}
