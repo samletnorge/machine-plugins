@@ -2157,6 +2157,12 @@ wheels = [
 name = "mcp-support"
 version = "0.5.0"
 source = { editable = "framework/mcp_support" }
+dependencies = [
+    { name = "mcp" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "mcp", specifier = ">=1.0" }]
 
 [[package]]
 name = "mcp-types"

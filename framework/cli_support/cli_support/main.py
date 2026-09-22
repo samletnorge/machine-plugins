@@ -18,7 +18,13 @@ app = typer.Typer(
 
 def version_callback(value: bool):
     if value:
-        console.print("machine-core 0.5.0")
+        try:
+            from importlib.metadata import version as _pkg_version
+
+            core_version = _pkg_version("machine-core")
+        except Exception:  # noqa: BLE001 - metadata may be unavailable
+            core_version = "0.11.0"
+        console.print(f"machine-core {core_version}")
         raise typer.Exit()
 
 

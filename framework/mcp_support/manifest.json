@@ -1,14 +1,22 @@
 {
   "name": "mcp_support",
   "version": "0.5.0",
-  "description": "mcp registry support plugin",
+  "description": "Connect to Model Context Protocol servers and expose their tools",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["categories:define", "hooks:define", "events:emit", "tool:register"],
+  "capabilities": ["tool:register"],
+  "dependencies": ["mcp>=1.0"],
+  "config_schema": {
+    "servers": {
+      "type": "string",
+      "env": "MCP_SERVERS",
+      "description": "JSON array of MCP server definitions ({name, command, args, env, cwd})"
+    }
+  },
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "mcp_support:ToolSupportPlugin"
+    "entry_point": "mcp_support:MCPSupportPlugin"
   }
 }
