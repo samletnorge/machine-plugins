@@ -64,10 +64,11 @@ class PubSubProvider(ABC):
 
 
 class InMemoryPubSub(PubSubProvider):
-    def __init__(self):
+    def __init__(self, max_history: int = 1000):
         self._subscriptions: dict[str, list[PubSubSubscription]] = defaultdict(list)
         self._topics: dict[str, Topic] = {}
         self._history: list[PubSubEvent] = []
+        self._max_history = max_history
 
     async def publish(
         self, topic: str, data: Any, source: str = "", metadata: dict | None = None
@@ -78,6 +79,8 @@ class InMemoryPubSub(PubSubProvider):
             topic=topic, data=data, source=source, metadata=metadata or {}
         )
         self._history.append(event)
+        if len(self._history) > self._max_history:
+            del self._history[: len(self._history) - self._max_history]
         for sub in self._subscriptions.get(topic, []):
             try:
                 await sub.callback(event)
@@ -113,6 +116,9 @@ class InMemoryPubSub(PubSubProvider):
     @property
     def history(self) -> list[PubSubEvent]:
         return list(self._history)
+
+    def clear_history(self) -> None:
+        self._history.clear()
 
 
 # --- Plugin ---

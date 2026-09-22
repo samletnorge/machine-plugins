@@ -48,8 +48,8 @@ class LocalFileSystem(FileSystem):
         self._root = os.path.abspath(root)
 
     def _resolve(self, path: str) -> str:
-        full = os.path.normpath(os.path.join(self._root, path))
-        if not full.startswith(self._root):
+        full = os.path.abspath(os.path.join(self._root, path))
+        if os.path.commonpath([full, self._root]) != self._root:
             raise ValueError(f"Path '{path}' resolves outside root directory")
         return full
 

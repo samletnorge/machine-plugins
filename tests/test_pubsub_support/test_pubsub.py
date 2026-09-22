@@ -113,3 +113,16 @@ async def test_subscribe_returns_subscription(pubsub):
 def test_plugin_instantiation():
     plugin = PubSubSupportPlugin()
     assert hasattr(plugin, "setup")
+
+
+@pytest.mark.asyncio
+async def test_history_is_bounded():
+    from pubsub_support import InMemoryPubSub
+
+    pubsub = InMemoryPubSub(max_history=3)
+    for i in range(5):
+        await pubsub.publish("t", i)
+
+    assert [e.data for e in pubsub.history] == [2, 3, 4]
+    pubsub.clear_history()
+    assert pubsub.history == []

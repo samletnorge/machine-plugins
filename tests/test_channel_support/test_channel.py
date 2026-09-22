@@ -116,3 +116,17 @@ async def test_websocket_stub_raises():
 def test_plugin_instantiation():
     plugin = ChannelSupportPlugin()
     assert hasattr(plugin, "setup")
+
+
+@pytest.mark.asyncio
+async def test_queue_is_bounded():
+    from channel_support import InMemoryChannel
+
+    channel = InMemoryChannel(max_queue_size=2)
+    for i in range(4):
+        await channel.send("c", i)
+
+    first = await channel.receive("c")
+    second = await channel.receive("c")
+    assert [first.content, second.content] == [2, 3]
+    assert await channel.receive("c") is None

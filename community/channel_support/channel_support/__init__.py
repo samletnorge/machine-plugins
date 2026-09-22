@@ -58,9 +58,17 @@ class Channel(ABC):
 
 
 class InMemoryChannel(Channel):
-    def __init__(self):
-        self._queues: dict[str, asyncio.Queue] = defaultdict(asyncio.Queue)
+    def __init__(self, max_queue_size: int = 1000):
+        self._queues: dict[str, asyncio.Queue] = {}
         self._subscriptions: dict[str, list[Subscription]] = defaultdict(list)
+        self._max_queue_size = max_queue_size
+
+    def _queue(self, channel: str) -> asyncio.Queue:
+        queue = self._queues.get(channel)
+        if queue is None:
+            queue = asyncio.Queue(maxsize=self._max_queue_size)
+            self._queues[channel] = queue
+        return queue
 
     async def send(
         self, channel: str, content: Any, sender: str = "", metadata: dict | None = None
@@ -68,7 +76,14 @@ class InMemoryChannel(Channel):
         msg = Message(
             channel=channel, content=content, sender=sender, metadata=metadata or {}
         )
-        await self._queues[channel].put(msg)
+        queue = self._queue(channel)
+        if queue.full():
+            # Drop the oldest message to bound memory for slow consumers.
+            try:
+                queue.get_nowait()
+            except asyncio.QueueEmpty:
+                pass
+        queue.put_nowait(msg)
         # Notify subscribers
         for sub in self._subscriptions.get(channel, []):
             try:
@@ -78,7 +93,7 @@ class InMemoryChannel(Channel):
         return msg
 
     async def receive(self, channel: str, timeout: float = 0) -> Message | None:
-        q = self._queues[channel]
+        q = self._queue(channel)
         try:
             if timeout > 0:
                 return await asyncio.wait_for(q.get(), timeout=timeout)

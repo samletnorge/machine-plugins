@@ -87,3 +87,11 @@ async def test_local_read_nonexistent(local_fs):
 async def test_local_prevents_path_traversal(local_fs):
     with pytest.raises(ValueError, match="outside root"):
         await local_fs.write("../../etc/passwd", b"hack")
+
+
+@pytest.mark.asyncio
+async def test_local_prevents_sibling_prefix_escape(local_fs):
+    # A sibling directory sharing the root as a string prefix must be rejected.
+    sibling = os.path.basename(local_fs._root) + "-evil"
+    with pytest.raises(ValueError, match="outside root"):
+        await local_fs.write(f"../{sibling}/x", b"hack")

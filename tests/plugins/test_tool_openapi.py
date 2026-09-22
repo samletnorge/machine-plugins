@@ -155,3 +155,83 @@ class TestOpenAPIGenerator:
 
         tools = generate_tools({"openapi": "3.0.0", "paths": {}})
         assert tools == []
+
+    def test_ref_parameters_are_resolved(self):
+        from tool_openapi.generator import generate_tools
+
+        spec = {
+            "openapi": "3.0.0",
+            "servers": [{"url": "https://api.example.com"}],
+            "components": {
+                "parameters": {
+                    "Limit": {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {"type": "integer"},
+                    }
+                }
+            },
+            "paths": {
+                "/items": {
+                    "get": {
+                        "operationId": "list_items",
+                        "parameters": [{"$ref": "#/components/parameters/Limit"}],
+                        "responses": {},
+                    }
+                }
+            },
+        }
+
+        tools = generate_tools(spec)
+
+        assert len(tools) == 1
+        assert "limit" in tools[0].parameters["properties"]
+
+    async def test_post_query_params_are_not_in_body(self):
+        from unittest.mock import AsyncMock, MagicMock, patch
+
+        from tool_openapi.generator import generate_tools
+
+        spec = {
+            "openapi": "3.0.0",
+            "servers": [{"url": "https://api.example.com"}],
+            "paths": {
+                "/search": {
+                    "post": {
+                        "operationId": "search",
+                        "parameters": [
+                            {"name": "q", "in": "query", "schema": {"type": "string"}}
+                        ],
+                        "requestBody": {
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "properties": {"value": {"type": "integer"}},
+                                    }
+                                }
+                            }
+                        },
+                        "responses": {},
+                    }
+                }
+            },
+        }
+        tool = generate_tools(spec)[0]
+
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = {"ok": True}
+        mock_resp.raise_for_status = MagicMock()
+        client = AsyncMock()
+        client.request.return_value = mock_resp
+        client.__aenter__ = AsyncMock(return_value=client)
+        client.__aexit__ = AsyncMock(return_value=False)
+
+        with patch(
+            "tool_openapi.generator.httpx.AsyncClient", return_value=client
+        ):
+            await tool.handler(q="hello", value=7)
+
+        _, kwargs = client.request.call_args
+        assert kwargs["params"] == {"q": "hello"}
+        assert kwargs["json"] == {"value": 7}

@@ -40,12 +40,19 @@ def generate_tools(
             name = _sanitize_name(op_id)
             description = operation.get("summary", operation.get("description", name))
             params_schema = _extract_params_schema(operation, components)
+            param_details = _extract_parameter_details(operation, components)
+            param_locations = {
+                detail["name"]: detail["in"]
+                for detail in param_details
+                if detail["name"]
+            }
 
             handler = _make_handler(
                 server_url=server_url,
                 path=path,
                 method=method.upper(),
                 auth_headers=auth_headers or {},
+                param_locations=param_locations,
             )
 
             tools.append(
@@ -61,9 +68,7 @@ def generate_tools(
                         "operation_id": op_id,
                         "operation_summary": operation.get("summary", ""),
                         "operation_description": operation.get("description", ""),
-                        "parameter_details": _extract_parameter_details(
-                            operation, components
-                        ),
+                        "parameter_details": param_details,
                     },
                 )
             )
@@ -142,16 +147,38 @@ def _sanitize_name(name: str) -> str:
     return name[:64]
 
 
+def _resolve_parameter(param: Any, components: dict[str, Any]) -> dict[str, Any]:
+    """Resolve a parameter that may be a ``$ref`` into components."""
+    if not isinstance(param, dict):
+        return {}
+    ref = param.get("$ref")
+    if ref:
+        parts = ref.lstrip("#/").split("/")
+        if parts and parts[0] == "components":
+            parts = parts[1:]
+        node: Any = components
+        for part in parts:
+            if not isinstance(node, dict):
+                return {}
+            node = node.get(part, {})
+        return node if isinstance(node, dict) else {}
+    return param
+
+
 def _extract_params_schema(
     operation: dict[str, Any], components: dict[str, Any]
 ) -> dict[str, Any]:
     properties: dict[str, Any] = {}
     required: list[str] = []
 
-    for param in operation.get("parameters", []):
-        properties[param["name"]] = param.get("schema", {"type": "string"})
+    for raw in operation.get("parameters", []):
+        param = _resolve_parameter(raw, components)
+        name = param.get("name")
+        if not name:
+            continue
+        properties[name] = param.get("schema", {"type": "string"})
         if param.get("required"):
-            required.append(param["name"])
+            required.append(name)
 
     body = operation.get("requestBody", {})
     content = body.get("content", {})
@@ -175,7 +202,10 @@ def _extract_parameter_details(
     operation: dict[str, Any], components: dict[str, Any]
 ) -> list[dict[str, Any]]:
     details: list[dict[str, Any]] = []
-    for param in operation.get("parameters", []):
+    for raw in operation.get("parameters", []):
+        param = _resolve_parameter(raw, components)
+        if not param.get("name"):
+            continue
         schema = param.get("schema", {})
         details.append(
             {
@@ -190,27 +220,50 @@ def _extract_parameter_details(
 
 
 def _make_handler(
-    server_url: str, path: str, method: str, auth_headers: dict[str, str]
+    server_url: str,
+    path: str,
+    method: str,
+    auth_headers: dict[str, str],
+    param_locations: dict[str, str] | None = None,
 ):
-    """Create an async handler that makes the HTTP call for a given endpoint."""
+    """Create an async handler that makes the HTTP call for a given endpoint.
+
+    Parameters are routed by their OpenAPI location: path params are
+    substituted into the URL, query params go to the query string, and the rest
+    form the JSON body for non-GET requests.
+    """
+    param_locations = param_locations or {}
 
     async def handler(**kwargs: Any) -> Any:
         url = f"{server_url}{path}"
-        # Substitute path parameters
+        query: dict[str, Any] = {}
+        body: dict[str, Any] = {}
+        headers = dict(auth_headers)
+
         for key, value in list(kwargs.items()):
             if f"{{{key}}}" in url:
                 url = url.replace(f"{{{key}}}", str(value))
-                del kwargs[key]
+                continue
+            location = param_locations.get(key)
+            if location is None:
+                location = "query" if method in ("GET", "DELETE") else "body"
+            if location == "query":
+                query[key] = value
+            elif location == "header":
+                headers[key] = str(value)
+            elif location == "path":
+                continue
+            else:
+                body[key] = value
+
+        request_kwargs: dict[str, Any] = {"headers": headers}
+        if query:
+            request_kwargs["params"] = query
+        if method not in ("GET", "DELETE") and body:
+            request_kwargs["json"] = body
 
         async with httpx.AsyncClient(timeout=30.0) as client:
-            if method in ("GET", "DELETE"):
-                resp = await client.request(
-                    method, url, params=kwargs, headers=auth_headers
-                )
-            else:
-                resp = await client.request(
-                    method, url, json=kwargs, headers=auth_headers
-                )
+            resp = await client.request(method, url, **request_kwargs)
             resp.raise_for_status()
             try:
                 return resp.json()
