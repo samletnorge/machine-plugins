@@ -19,16 +19,43 @@ def _is_json_safe(v: Any) -> bool:
     return isinstance(v, (str, int, float, bool, type(None), list, tuple, dict))
 
 
+_SENSITIVE_KEY_MARKERS = (
+    "api_key",
+    "apikey",
+    "secret",
+    "password",
+    "passwd",
+    "access_token",
+    "refresh_token",
+    "client_secret",
+    "authorization",
+    "credential",
+)
+
+
+def _is_sensitive_key(key: str) -> bool:
+    lower = key.lower()
+    return any(marker in lower for marker in _SENSITIVE_KEY_MARKERS)
+
+
+def _redact(mapping: dict) -> dict:
+    """Replace sensitive values with a placeholder before serializing."""
+    return {
+        key: ("***" if _is_sensitive_key(str(key)) else value)
+        for key, value in mapping.items()
+    }
+
+
 def _serialize(obj: Any) -> Any:
-    """Serialize an arbitrary object to JSON-safe form."""
+    """Serialize an arbitrary object to JSON-safe form, redacting secrets."""
     if obj is None or isinstance(obj, (str, int, float, bool)):
         return obj
     if isinstance(obj, dict):
-        return {k: v for k, v in obj.items() if _is_json_safe(v)}
+        return _redact({k: v for k, v in obj.items() if _is_json_safe(v)})
     if isinstance(obj, (list, tuple)):
         return [_serialize(i) for i in obj]
     if hasattr(obj, "model_dump"):
-        return obj.model_dump()
+        return _redact(obj.model_dump())
     if hasattr(obj, "__dict__"):
         # Collect instance attrs + class-level public non-callable attrs
         # Only include JSON-safe values to avoid circular refs
@@ -44,7 +71,7 @@ def _serialize(obj: Any) -> Any:
         for k, v in obj.__dict__.items():
             if not k.startswith("_") and not callable(v) and _is_json_safe(v):
                 attrs[k] = v
-        return attrs
+        return _redact(attrs)
     return str(obj)
 
 

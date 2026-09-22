@@ -1,5 +1,8 @@
 """Main entry point for {{ project_name }}."""
-from machine_core import Machine, MachineConfig
+from machine_core import Machine, MachineConfig, bootstrap_secrets
+
+# Attach local .env and Infisical secrets to the environment before config loads.
+bootstrap_secrets()
 
 config = MachineConfig.from_pyproject()
 machine = Machine(config=config)

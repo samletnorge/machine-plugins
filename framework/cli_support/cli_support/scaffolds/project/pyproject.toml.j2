@@ -4,13 +4,76 @@ version = "0.1.0"
 description = "A machine-core AI agent project"
 requires-python = ">=3.12"
 dependencies = [
+    "machine-core[secrets]",
     "server_support",
-    "agent_brreg_expert",
+    "tool_support",
+    "model_provider_support",
+    "agent_support",
+    "prompt_support",
+    "structured_output",
+    "embeddings",
+    "memory_support",
+    "vectorstore_support",
+    "provider_ollama",
+    "provider_deepseek",
+    "embeddings_ollama",
+    "embeddings_sentence_transformers",
+    "vectorstore_lancedb",
+    "eval_support",
+    "tool_openapi",
+    "tool_filter_rag",
+    "rag_support",
+    "agent_runtime_basic",
+    "agent_runtime_pydantic",
 ]
 
+# Sources are only honoured at the project root. Mapping every plugin name here
+# lets uv resolve the bare dependencies each plugin declares transitively.
 [tool.uv.sources]
+machine-core = { git = "git+ssh://git@github.com/samletnorge/machine-core.git" }
+agent_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/agent_support" }
+auth_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/auth_support" }
+cli_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/cli_support" }
+embeddings = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/embeddings" }
+memory_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/memory_support" }
+model_provider_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/model_provider_support" }
+processor_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/processor_support" }
+prompt_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/prompt_support" }
 server_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/server_support" }
+storage_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/storage_support" }
+structured_output = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/structured_output" }
+studio_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/studio_support" }
+tool_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/tool_support" }
+vectorstore_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/vectorstore_support" }
+voice_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/voice_support" }
+workflow_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/workflow_support" }
 agent_brreg_expert = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_brreg_expert" }
+agent_runtime_basic = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_runtime_basic" }
+agent_runtime_pydantic = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_runtime_pydantic" }
+browser_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/browser_support" }
+channel_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/channel_support" }
+deployer_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/deployer_support" }
+embeddings_azure = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/embeddings_azure" }
+embeddings_google = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/embeddings_google" }
+embeddings_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/embeddings_ollama" }
+embeddings_sentence_transformers = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/embeddings_sentence_transformers" }
+observability_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/observability_support" }
+provider_azure_openai = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_azure_openai" }
+provider_deepseek = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_deepseek" }
+provider_github_copilot = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_github_copilot" }
+provider_google_gemini = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_google_gemini" }
+provider_grok = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_grok" }
+provider_groq = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_groq" }
+provider_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_ollama" }
+provider_vertex_claude = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_vertex_claude" }
+provider_vertex_gemini = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_vertex_gemini" }
+pubsub_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/pubsub_support" }
+rag_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/rag_support" }
+tool_filter_rag = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/tool_filter_rag" }
+tool_openapi = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/tool_openapi" }
+workspace_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/workspace_support" }
+vectorstore_lancedb = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-vectorstore-lancedb.git" }
+eval_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-eval-support.git" }
 
 [tool.uv]
 default-groups = "all"
@@ -20,41 +83,39 @@ entry = "src.main:machine"
 plugins = [
     "tool_support",
     "model_provider_support",
-    "agent_support",  
+    "agent_support",
+    "prompt_support",
+    "structured_output",
+    "embeddings",
+    "memory_support",
+    "vectorstore_support",
     "server_support",
     "provider_ollama",
-    "embeddings",
-    "embeddings_sentence_transformers",
+    "provider_deepseek",
     "embeddings_ollama",
-    "vectorstore_support",
+    "embeddings_sentence_transformers",
     "vectorstore_lancedb",
     "eval_support",
     "tool_openapi",
     "tool_filter_rag",
     "rag_support",
-    "agent_runtime_pydantic",
     "agent_runtime_basic",
-    "agent_brreg_expert",
+    "agent_runtime_pydantic",
 ]
 
 [tool.machine-core.studio]
-active_tenant = "tenant-samletnorge"
+active_tenant = "tenant-default"
 active_project = "project-{{ project_name }}"
 active_environment = "env-dev"
 
 [[tool.machine-core.studio.tenants]]
-id = "tenant-samletnorge"
-slug = "samletnorge"
-name = "Samletnorge"
-
-[[tool.machine-core.studio.tenants]]
-id = "tenant-mythrantic"
-slug = "mythrantic"
-name = "Mythrantic"
+id = "tenant-default"
+slug = "default"
+name = "Default"
 
 [[tool.machine-core.studio.projects]]
 id = "project-{{ project_name }}"
-tenant_id = "tenant-samletnorge"
+tenant_id = "tenant-default"
 slug = "{{ project_name }}"
 name = "{{ project_name }}"
 entry = "src.main:machine"
@@ -63,39 +124,6 @@ entry = "src.main:machine"
 agents = 0
 tools = 0
 
-[[tool.machine-core.studio.projects]]
-id = "project-car-expert"
-tenant_id = "tenant-samletnorge"
-slug = "car-expert"
-name = "Car Expert"
-entry = "src.main:machine"
-
-[tool.machine-core.studio.projects.capability_summary]
-agents = 2
-tools = 2
-
-[[tool.machine-core.studio.projects]]
-id = "project-news-finder"
-tenant_id = "tenant-samletnorge"
-slug = "news-finder"
-name = "News Finder"
-entry = "src.main:machine"
-
-[tool.machine-core.studio.projects.capability_summary]
-agents = 2
-tools = 2
-
-[[tool.machine-core.studio.projects]]
-id = "project-ai-playground"
-tenant_id = "tenant-mythrantic"
-slug = "ai-playground"
-name = "AI Playground"
-entry = "src.main:machine"
-
-[tool.machine-core.studio.projects.capability_summary]
-agents = 1
-tools = 2
-
 [[tool.machine-core.studio.environments]]
 id = "env-dev"
 project_id = "project-{{ project_name }}"
@@ -103,76 +131,6 @@ name = "dev"
 connection_kind = "local"
 connection_ref = "src.main:machine"
 status = "healthy"
-
-[[tool.machine-core.studio.environments]]
-id = "env-car-dev"
-project_id = "project-car-expert"
-name = "dev"
-connection_kind = "local"
-connection_ref = "src.main:machine"
-status = "healthy"
-
-[[tool.machine-core.studio.environments]]
-id = "env-car-staging"
-project_id = "project-car-expert"
-name = "staging"
-connection_kind = "local"
-connection_ref = "src.main:machine"
-status = "healthy"
-
-[[tool.machine-core.studio.environments]]
-id = "env-news-dev"
-project_id = "project-news-finder"
-name = "dev"
-connection_kind = "local"
-connection_ref = "src.main:machine"
-status = "healthy"
-
-[[tool.machine-core.studio.environments]]
-id = "env-news-prod"
-project_id = "project-news-finder"
-name = "prod"
-connection_kind = "local"
-connection_ref = "src.main:machine"
-status = "healthy"
-
-[[tool.machine-core.studio.environments]]
-id = "env-playground-dev"
-project_id = "project-ai-playground"
-name = "dev"
-connection_kind = "local"
-connection_ref = "src.main:machine"
-status = "healthy"
-
-# Per-plugin configuration (overrides manifest defaults & env vars)
-[tool.machine-core.plugin_configs.provider_ollama]
-base_url = "http://localhost:9012"
-model = "gemma4:latest"
-
-[tool.machine-core.plugin_configs.embeddings_ollama]
-base_url = "http://localhost:9012"
-model = "qwen3-embedding:8b"
-
-[tool.machine-core.plugin_configs.embeddings_sentence_transformers]
-model = "all-MiniLM-L6-v2"
-encode_batch_size = 512
-
-[tool.machine-core.plugin_configs.tool_filter_rag]
-embedding_provider = "ollama"
-
-[tool.machine-core.plugin_configs.eval_support]
-judge_llm = { provider = "ollama", model = "gemma4:latest" }
-
-[tool.machine-core.plugin_configs.rag_support]
-reranker_llm = { provider = "ollama", model = "gemma4:latest" }
-extractor_llm = { provider = "ollama", model = "gemma4:latest" }
-
-[tool.machine-core.plugin_configs.agent_brreg_expert]
-embedding_provider = "sentence_transformers"
-tool_filter_top_k = 200
-embed_batch_size = 20000
-upsert_batch_size = 5000
-
 
 [tool.hatch.metadata]
 allow-direct-references = true
