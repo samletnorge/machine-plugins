@@ -6,7 +6,7 @@ and context building for agent consumption.
 
 from __future__ import annotations
 
-from typing import Optional, Any
+from typing import Callable, Optional, Any
 
 from memory_support.thread import (
     Thread,
@@ -39,12 +39,24 @@ class MemoryManager:
         storage: BaseStorage,
         default_window: Optional[WindowStrategy] = None,
         fact_extractor: Optional[FactExtractor] = None,
+        hook_caller: Optional[Callable[..., Any]] = None,
     ) -> None:
         self._storage = storage
         self._default_window = default_window or LastNWindow(n=50)
+        self._hook_caller = hook_caller
         self._observational = ObservationalMemory(
             storage=storage, extractor=fact_extractor
         )
+
+    async def _emit(self, hook_name: str, **kwargs: Any) -> None:
+        if self._hook_caller is None:
+            return
+        try:
+            result = self._hook_caller(hook_name, **kwargs)
+            if hasattr(result, "__await__"):
+                await result
+        except Exception:  # noqa: BLE001 - hooks must not break memory
+            pass
 
     @property
     def storage(self) -> BaseStorage:
@@ -81,12 +93,25 @@ class MemoryManager:
         metadata: Optional[dict[str, Any]] = None,
     ) -> Message:
         """Add a message to a thread."""
+        await self._emit(
+            "hooks/beforeMemoryStore",
+            thread_id=thread_id,
+            role=role,
+            content=content,
+        )
         msg = Message(
             role=MessageRole(role),
             content=content,
             metadata=metadata or {},
         )
-        return await self._storage.add_message(thread_id, msg)
+        stored = await self._storage.add_message(thread_id, msg)
+        await self._emit(
+            "hooks/afterMemoryStore",
+            thread_id=thread_id,
+            role=role,
+            message_id=stored.id,
+        )
+        return stored
 
     async def get_messages(
         self,
@@ -117,9 +142,19 @@ class MemoryManager:
         user_id: Optional[str] = None,
     ) -> list[Fact]:
         """Extract and store facts from messages."""
-        return await self._observational.extract_and_store(
+        await self._emit(
+            "hooks/beforeFactExtraction", thread_id=thread_id, user_id=user_id
+        )
+        facts = await self._observational.extract_and_store(
             messages, thread_id=thread_id, user_id=user_id
         )
+        await self._emit(
+            "hooks/afterFactExtraction",
+            thread_id=thread_id,
+            user_id=user_id,
+            fact_count=len(facts),
+        )
+        return facts
 
     async def get_relevant_facts(
         self,

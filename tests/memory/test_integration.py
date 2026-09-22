@@ -43,7 +43,7 @@ async def test_plugin_hookspecs_registered():
     manifest = PluginManifest(
         name="memory_support",
         version="0.10.0",
-        capabilities=["categories:define", "hooks:define"],
+        capabilities=["categories:define", "hooks:define", "memory:register"],
         transport=TransportConfig(
             type="in-process",
             entry_point="memory_support:MemorySupportPlugin",

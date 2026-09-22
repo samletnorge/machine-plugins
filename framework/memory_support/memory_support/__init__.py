@@ -44,6 +44,18 @@ class MemorySupportPlugin:
             },
         )
         ctx.register_category("storage-backend")
+
+        from .in_memory_storage import InMemoryStorage
+        from .manager import MemoryManager
+
+        ctx.register(
+            "memory",
+            "default",
+            MemoryManager(
+                storage=InMemoryStorage(),
+                hook_caller=ctx._machine.hooks.call,
+            ),
+        )
         for hook_name, opts in HOOKSPECS.items():
             ctx.register_hookspec(hook_name, **opts)
 
