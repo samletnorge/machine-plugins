@@ -72,3 +72,11 @@ dev = [
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# Correctness-focused: syntax errors, invalid syntax/comparisons, undefined names.
+select = ["E9", "F63", "F7", "F82"]
