@@ -5,6 +5,13 @@
   "schema_version": "1.0.0",
   "language": "python",
   "capabilities": ["categories:define", "hooks:define", "events:emit", "memory:register", "storage-backend:register"],
+  "config_schema": {
+    "sqlite_path": {
+      "type": "string",
+      "env": "MEMORY_SQLITE_PATH",
+      "description": "If set, persist memory to this SQLite file instead of in-memory"
+    }
+  },
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {

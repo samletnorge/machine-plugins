@@ -16,9 +16,10 @@ HOOKSPECS: dict[str, dict[str, Any]] = {
 
 
 class MemorySupportPlugin:
-    async def initialize(self, **kwargs: Any) -> None:
-        """No-op — category plugins define schemas, not runtime state."""
-        pass
+    async def initialize(self, config=None, **kwargs: Any) -> None:
+        """Capture optional storage configuration."""
+        config = config or {}
+        self._sqlite_path: str | None = config.get("sqlite_path")
 
     async def setup(self, ctx: PluginContext) -> None:
         ctx.register_category(
@@ -45,14 +46,22 @@ class MemorySupportPlugin:
         )
         ctx.register_category("storage-backend")
 
-        from .in_memory_storage import InMemoryStorage
         from .manager import MemoryManager
+
+        if getattr(self, "_sqlite_path", None):
+            from .sqlite_storage import SqliteStorage
+
+            storage = SqliteStorage(self._sqlite_path)
+        else:
+            from .in_memory_storage import InMemoryStorage
+
+            storage = InMemoryStorage()
 
         ctx.register(
             "memory",
             "default",
             MemoryManager(
-                storage=InMemoryStorage(),
+                storage=storage,
                 hook_caller=ctx._machine.hooks.call,
             ),
         )
