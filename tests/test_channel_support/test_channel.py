@@ -100,14 +100,69 @@ async def test_subscribe_returns_subscription(channel):
     assert sub.subscriber_id == "x"
 
 
-# --- WebSocketChannel (stub) tests ---
+# --- WebSocketChannel tests ---
 
 
 @pytest.mark.asyncio
-async def test_websocket_stub_raises():
-    ws = WebSocketChannel()
-    with pytest.raises(NotImplementedError):
+async def test_websocket_unconnected_send_raises():
+    ws = WebSocketChannel("ws://127.0.0.1:1")
+    with pytest.raises((RuntimeError, ImportError)):
         await ws.send("ch", "data")
+
+
+@pytest.mark.asyncio
+async def test_websocket_unconnected_receive_raises():
+    ws = WebSocketChannel("ws://127.0.0.1:1")
+    with pytest.raises((RuntimeError, ImportError)):
+        await ws.receive("ch")
+
+
+@pytest.mark.asyncio
+async def test_websocket_subscribe_unsubscribe():
+    ws = WebSocketChannel("ws://127.0.0.1:1")
+
+    async def noop(msg):
+        pass
+
+    sub = await ws.subscribe("ch", noop, subscriber_id="s1")
+    assert isinstance(sub, Subscription)
+    assert sub.subscriber_id == "s1"
+    assert await ws.unsubscribe("ch", "s1") is True
+    assert await ws.unsubscribe("ch", "s1") is False
+
+
+@pytest.mark.asyncio
+async def test_websocket_send_receive_over_local_server():
+    websockets = pytest.importorskip("websockets")
+
+    async def echo(websocket):
+        async for raw in websocket:
+            await websocket.send(raw)
+
+    async with websockets.serve(echo, "127.0.0.1", 0) as server:
+        port = server.sockets[0].getsockname()[1]
+        ws = WebSocketChannel(f"ws://127.0.0.1:{port}")
+        await ws.connect()
+        try:
+            received = []
+
+            async def handler(msg):
+                received.append(msg)
+
+            await ws.subscribe("ch", handler, subscriber_id="s1")
+            sent = await ws.send("ch", {"hello": "world"}, sender="alice")
+            assert sent.channel == "ch"
+
+            msg = await ws.receive("ch", timeout=2.0)
+            assert msg is not None
+            assert msg.channel == "ch"
+            assert msg.content == {"hello": "world"}
+            assert msg.sender == "alice"
+
+            assert len(received) == 1
+            assert received[0].content == {"hello": "world"}
+        finally:
+            await ws.close()
 
 
 # --- Plugin test ---

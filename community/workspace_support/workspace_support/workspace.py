@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from loguru import logger
 
 from .filesystem import FileSystem, LocalFileSystem
-from .sandbox import Sandbox, LocalSandbox
+from .sandbox import Sandbox, LocalSandbox, DockerSandbox, require_docker
 from .skills import SkillsManager
 
 
@@ -41,10 +41,28 @@ class AgentWorkspace:
         self.sandbox = sandbox
         self.skills = skills
 
+    @staticmethod
+    def _create_sandbox(config: WorkspaceConfig) -> Sandbox:
+        """Build the sandbox selected by ``config.sandbox_type``.
+
+        Unknown values fall back to the local sandbox so misconfiguration does
+        not take the workspace down; an explicit ``"docker"`` request fails
+        loudly when docker is unavailable.
+        """
+        sandbox_type = (config.sandbox_type or "local").lower()
+        if sandbox_type == "docker":
+            require_docker()
+            return DockerSandbox()
+        if sandbox_type != "local":
+            logger.warning(
+                f"Unknown sandbox_type {config.sandbox_type!r}; falling back to 'local'"
+            )
+        return LocalSandbox(work_dir=config.root_dir)
+
     @classmethod
     def create(cls, config: WorkspaceConfig) -> AgentWorkspace:
         filesystem = LocalFileSystem(root=config.root_dir)
-        sandbox = LocalSandbox(work_dir=config.root_dir)
+        sandbox = cls._create_sandbox(config)
 
         skills = None
         if config.skills_dir:
@@ -52,7 +70,8 @@ class AgentWorkspace:
             skills.discover()
 
         logger.debug(
-            f"AgentWorkspace created at {config.root_dir} (ephemeral={config.ephemeral})"
+            f"AgentWorkspace created at {config.root_dir} (ephemeral={config.ephemeral}, "
+            f"sandbox={config.sandbox_type})"
         )
         return cls(config=config, filesystem=filesystem, sandbox=sandbox, skills=skills)
 

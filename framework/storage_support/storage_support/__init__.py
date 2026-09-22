@@ -1,26 +1,19 @@
 """Storage support plugin — registers storage backend implementations.
 
 Uses existing 'storage-backend' category from memory_support.
-Provides LocalStorageBackend and S3StorageBackend (mock).
+Provides LocalStorageBackend and a boto3-backed S3StorageBackend.
 """
 
 from __future__ import annotations
 
+import asyncio
 import os
-import shutil
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
 
 
 # --- Models ---
-
-
-@dataclass
-class StorageBucket:
-    name: str
-    created_at: float = 0.0
-    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -119,11 +112,30 @@ class LocalStorageBackend(StorageBackend):
         return sorted(results)
 
 
-# --- S3 Storage Backend (Mock) ---
+# --- S3 Storage Backend ---
+
+
+def _is_not_found(exc: BaseException) -> bool:
+    """Best-effort detection of an S3-style "object/bucket missing" error."""
+    if isinstance(exc, FileNotFoundError):
+        return True
+    response = getattr(exc, "response", None)
+    if isinstance(response, dict):
+        code = str((response.get("Error") or {}).get("Code", ""))
+        if code in {"NoSuchKey", "NoSuchBucket", "404", "NotFound"}:
+            return True
+        if response.get("ResponseMetadata", {}).get("HTTPStatusCode") == 404:
+            return True
+    return False
 
 
 class S3StorageBackend(StorageBackend):
-    """Mock S3-compatible storage (in-memory for testing)."""
+    """S3-compatible storage backend using ``boto3`` (lazily imported).
+
+    ``boto3`` is only imported on first use, so registering the backend never
+    requires the dependency. When it is absent a clear ``ImportError`` is raised
+    from the offending operation.
+    """
 
     def __init__(
         self,
@@ -131,19 +143,49 @@ class S3StorageBackend(StorageBackend):
         region: str = "us-east-1",
         endpoint_url: str | None = None,
     ):
-        self._config = {
-            "bucket": bucket_name,
-            "region": region,
-            "endpoint": endpoint_url,
-        }
-        self._store: dict[str, dict[str, StorageObject]] = {}
+        self._bucket_name = bucket_name
+        self._region = region
+        self._endpoint_url = endpoint_url
+        self._client = None
+
+    def _bucket(self, bucket: str | None) -> str:
+        return bucket or self._bucket_name
+
+    def _get_client(self):
+        if self._client is None:
+            try:
+                import boto3
+            except ImportError as e:
+                raise ImportError(
+                    "boto3 is required for S3StorageBackend. Install it with: "
+                    "pip install boto3."
+                ) from e
+            self._client = boto3.client(
+                "s3",
+                region_name=self._region,
+                endpoint_url=self._endpoint_url,
+            )
+        return self._client
 
     async def get(self, bucket: str, key: str) -> StorageObject:
-        b = self._store.get(bucket, {})
-        obj = b.get(key)
-        if not obj:
-            raise FileNotFoundError(f"s3://{bucket}/{key} not found")
-        return obj
+        client = self._get_client()
+        bucket = self._bucket(bucket)
+        try:
+            response = await asyncio.to_thread(
+                client.get_object, Bucket=bucket, Key=key
+            )
+        except Exception as e:
+            if _is_not_found(e):
+                raise FileNotFoundError(f"s3://{bucket}/{key} not found") from e
+            raise
+        data = await asyncio.to_thread(response["Body"].read)
+        return StorageObject(
+            key=key,
+            data=data,
+            content_type=response.get("ContentType", "application/octet-stream"),
+            metadata=response.get("Metadata", {}) or {},
+            size=len(data),
+        )
 
     async def put(
         self,
@@ -153,24 +195,40 @@ class S3StorageBackend(StorageBackend):
         content_type: str = "application/octet-stream",
         metadata: dict | None = None,
     ) -> StorageObject:
-        if bucket not in self._store:
-            self._store[bucket] = {}
-        obj = StorageObject(
+        client = self._get_client()
+        bucket = self._bucket(bucket)
+        await asyncio.to_thread(
+            client.put_object,
+            Bucket=bucket,
+            Key=key,
+            Body=data,
+            ContentType=content_type,
+            Metadata=metadata or {},
+        )
+        return StorageObject(
             key=key, data=data, content_type=content_type, metadata=metadata or {}
         )
-        self._store[bucket][key] = obj
-        return obj
 
     async def delete(self, bucket: str, key: str) -> bool:
-        b = self._store.get(bucket, {})
-        if key in b:
-            del b[key]
-            return True
-        return False
+        client = self._get_client()
+        bucket = self._bucket(bucket)
+        try:
+            await asyncio.to_thread(client.head_object, Bucket=bucket, Key=key)
+        except Exception as e:
+            if _is_not_found(e):
+                return False
+            raise
+        await asyncio.to_thread(client.delete_object, Bucket=bucket, Key=key)
+        return True
 
     async def list(self, bucket: str, prefix: str = "") -> list[str]:
-        b = self._store.get(bucket, {})
-        return sorted(k for k in b if k.startswith(prefix))
+        client = self._get_client()
+        bucket = self._bucket(bucket)
+        response = await asyncio.to_thread(
+            client.list_objects_v2, Bucket=bucket, Prefix=prefix
+        )
+        contents = response.get("Contents") or []
+        return sorted(item["Key"] for item in contents)
 
 
 # --- Plugin ---

@@ -130,6 +130,28 @@ def _get_docker_client():
         )
 
 
+def require_docker() -> None:
+    """Validate that the docker SDK and daemon are usable.
+
+    Raises a clear error instead of silently degrading when
+    ``sandbox_type='docker'`` is requested but docker is unavailable.
+    """
+    try:
+        import docker
+    except ImportError as e:
+        raise ImportError(
+            "sandbox_type='docker' requires the 'docker' package. Install it "
+            "with: pip install docker (or use sandbox_type='local')."
+        ) from e
+    try:
+        docker.from_env().ping()
+    except Exception as e:  # noqa: BLE001 - surface any daemon/connection error
+        raise RuntimeError(
+            "sandbox_type='docker' requires a reachable Docker daemon: "
+            f"{e} (or use sandbox_type='local')."
+        ) from e
+
+
 class DockerSandbox(Sandbox):
     """Execute code inside a Docker container."""
 
@@ -167,7 +189,8 @@ class DockerSandbox(Sandbox):
     async def execute(
         self, code: str, language: str = "python", timeout: float = 30.0
     ) -> ExecutionResult:
-        self._ensure_container()
+        # The docker SDK is synchronous; keep it off the event loop.
+        await asyncio.to_thread(self._ensure_container)
 
         if language == "python":
             cmd = ["python", "-c", code]
@@ -179,19 +202,25 @@ class DockerSandbox(Sandbox):
             )
 
         try:
-            exit_code, output = self._container.exec_run(cmd, demux=False)
+            exit_code, output = await asyncio.wait_for(
+                asyncio.to_thread(self._container.exec_run, cmd, demux=False),
+                timeout=timeout,
+            )
             output_str = output.decode("utf-8", errors="replace") if output else ""
 
             if exit_code == 0:
                 return ExecutionResult(exit_code=0, stdout=output_str)
             else:
                 return ExecutionResult(exit_code=exit_code, stderr=output_str)
+        except asyncio.TimeoutError:
+            logger.warning(f"DockerSandbox execution timed out after {timeout}s")
+            return ExecutionResult(exit_code=-1, timed_out=True)
         except Exception as e:
             logger.error(f"DockerSandbox execution error: {e}")
             return ExecutionResult(exit_code=1, stderr=str(e))
 
     async def upload(self, path: str, content: bytes) -> None:
-        self._ensure_container()
+        await asyncio.to_thread(self._ensure_container)
 
         buf = io.BytesIO()
         with tarfile.open(fileobj=buf, mode="w") as tar:
@@ -201,13 +230,17 @@ class DockerSandbox(Sandbox):
         buf.seek(0)
 
         dest_dir = os.path.dirname(f"/workspace/{path}") or "/workspace"
-        self._container.put_archive(dest_dir, buf.getvalue())
+        await asyncio.to_thread(
+            self._container.put_archive, dest_dir, buf.getvalue()
+        )
 
     async def download(self, path: str) -> bytes:
-        self._ensure_container()
+        await asyncio.to_thread(self._ensure_container)
 
         try:
-            chunks, stat = self._container.get_archive(f"/workspace/{path}")
+            chunks, stat = await asyncio.to_thread(
+                self._container.get_archive, f"/workspace/{path}"
+            )
             data = b"".join(chunks)
             buf = io.BytesIO(data)
             with tarfile.open(fileobj=buf) as tar:
@@ -216,13 +249,15 @@ class DockerSandbox(Sandbox):
                 if f is None:
                     raise FileNotFoundError(f"File not found: {path}")
                 return f.read()
+        except FileNotFoundError:
+            raise
         except Exception as e:
             raise FileNotFoundError(f"Failed to download {path}: {e}")
 
     async def cleanup(self) -> None:
         if self._container:
             try:
-                self._container.remove(force=True)
+                await asyncio.to_thread(self._container.remove, force=True)
                 logger.debug("DockerSandbox container removed")
             except Exception as e:
                 logger.warning(f"Failed to remove container: {e}")

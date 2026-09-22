@@ -60,6 +60,43 @@ async def test_workspace_create_with_defaults(workspace_dir):
 
 
 @pytest.mark.asyncio
+async def test_workspace_default_sandbox_is_local(workspace_dir):
+    ws = AgentWorkspace.create(WorkspaceConfig(root_dir=workspace_dir))
+    assert isinstance(ws.sandbox, LocalSandbox)
+
+
+@pytest.mark.asyncio
+async def test_workspace_docker_sandbox_type(workspace_dir, monkeypatch):
+    monkeypatch.setattr("workspace_support.workspace.require_docker", lambda: None)
+    ws = AgentWorkspace.create(
+        WorkspaceConfig(root_dir=workspace_dir, sandbox_type="docker")
+    )
+    from workspace_support.sandbox import DockerSandbox
+
+    assert isinstance(ws.sandbox, DockerSandbox)
+
+
+@pytest.mark.asyncio
+async def test_workspace_docker_unavailable_raises(workspace_dir, monkeypatch):
+    def boom():
+        raise RuntimeError("docker daemon unavailable")
+
+    monkeypatch.setattr("workspace_support.workspace.require_docker", boom)
+    with pytest.raises(RuntimeError):
+        AgentWorkspace.create(
+            WorkspaceConfig(root_dir=workspace_dir, sandbox_type="docker")
+        )
+
+
+@pytest.mark.asyncio
+async def test_workspace_unknown_sandbox_type_falls_back_to_local(workspace_dir):
+    ws = AgentWorkspace.create(
+        WorkspaceConfig(root_dir=workspace_dir, sandbox_type="podman")
+    )
+    assert isinstance(ws.sandbox, LocalSandbox)
+
+
+@pytest.mark.asyncio
 async def test_workspace_filesystem_operations(workspace_dir):
     ws = AgentWorkspace.create(WorkspaceConfig(root_dir=workspace_dir, ephemeral=False))
     await ws.filesystem.write("test.txt", b"hello workspace")

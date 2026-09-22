@@ -133,6 +133,42 @@ async def test_docker_sandbox_execute_error():
 
 
 @pytest.mark.asyncio
+async def test_docker_sandbox_execute_timeout():
+    import time
+
+    mock_container = MagicMock()
+
+    def slow_exec(*args, **kwargs):
+        time.sleep(1.0)
+        return (0, b"too late\n")
+
+    mock_container.exec_run = MagicMock(side_effect=slow_exec)
+    mock_container.remove = MagicMock()
+
+    mock_client = MagicMock()
+    mock_client.containers.run = MagicMock(return_value=mock_container)
+
+    with patch(
+        "workspace_support.sandbox._get_docker_client",
+        return_value=mock_client,
+    ):
+        sb = DockerSandbox(image="python:3.12-slim")
+        result = await sb.execute("print('slow')", timeout=0.1)
+        assert result.timed_out is True
+        assert result.success is False
+
+
+def test_require_docker_missing_package_raises(monkeypatch):
+    import sys
+
+    monkeypatch.setitem(sys.modules, "docker", None)
+    from workspace_support.sandbox import require_docker
+
+    with pytest.raises(ImportError):
+        require_docker()
+
+
+@pytest.mark.asyncio
 async def test_docker_sandbox_upload():
     mock_container = MagicMock()
     mock_container.put_archive = MagicMock()
