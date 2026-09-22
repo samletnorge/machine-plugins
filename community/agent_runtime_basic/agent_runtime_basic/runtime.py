@@ -101,7 +101,11 @@ class BasicAgentRunner:
                     stream=False,
                 )
                 await self._emit("before_model_invoke", request=request)
-                response: ModelResponse = await provider.generate(request)
+                try:
+                    response: ModelResponse = await provider.generate(request)
+                except Exception as exc:
+                    await self._emit("on_model_error", request=request, error=exc)
+                    raise
                 await self._emit(
                     "after_model_invoke", request=request, response=response
                 )
@@ -178,6 +182,9 @@ class BasicAgentRunner:
                             )
                         except Exception as e:
                             tool_output = f"Error executing {tool_name}: {e}"
+                            await self._emit(
+                                "on_tool_error", tool_name=tool_name, error=str(e)
+                            )
                             steps.append(
                                 AgentStep(
                                     step_type="tool_error",

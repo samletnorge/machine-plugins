@@ -1,6 +1,7 @@
 """FastAPI app factory that auto-generates routes from a Machine instance."""
 
 from __future__ import annotations
+import inspect
 import uuid
 from typing import Any
 from contextlib import asynccontextmanager
@@ -19,6 +20,21 @@ except ImportError:  # pragma: no cover - older kernel without secret bootstrap
 
 
 __all__ = ["create_app"]
+
+
+async def _call_hook(runtime: Any, hook_name: str, **kwargs: Any) -> Any:
+    """Call a machine hook, tolerating missing hook systems and failures."""
+    hooks = getattr(runtime, "hooks", None)
+    if hooks is None or not hasattr(hooks, "call"):
+        return None
+    try:
+        result = hooks.call(hook_name, **kwargs)
+        if inspect.isawaitable(result):
+            result = await result
+        return result
+    except Exception:  # noqa: BLE001 - a hook must never break the server
+        logger.debug("Hook '{}' failed", hook_name, exc_info=True)
+        return None
 
 
 def _mount_routes(app: FastAPI, machine: Any) -> None:
@@ -43,12 +59,14 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        await _call_hook(machine, "hooks/beforeServerStart", machine=machine)
         # If machine hasn't been started yet, start it (loads plugins)
         if hasattr(machine, "start") and not _has_categories(machine):
             await machine.start()
             # Re-generate routes now that plugins are loaded
             _mount_routes(app, machine)
 
+        await _call_hook(machine, "hooks/afterServerStart", machine=machine)
         cats = machine.list_categories() if hasattr(machine, "list_categories") else []
         logger.info(f"Starting Machine Core API — {len(cats)} categories")
         yield
@@ -75,8 +93,20 @@ def create_app(
     @app.middleware("http")
     async def add_request_id(request: Request, call_next):
         request_id = request.headers.get("x-request-id", str(uuid.uuid4()))
+        early = await _call_hook(
+            machine, "hooks/beforeRequest", request=request, request_id=request_id
+        )
+        if early is not None and hasattr(early, "status_code"):
+            return early
         response = await call_next(request)
         response.headers["x-request-id"] = request_id
+        await _call_hook(
+            machine,
+            "hooks/afterRequest",
+            request=request,
+            response=response,
+            request_id=request_id,
+        )
         return response
 
     # Health check — dynamic (reads registry at request time)
