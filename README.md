@@ -15,10 +15,42 @@ Projects typically compose a runtime by listing plugins under `[tool.machine-cor
 
 ## Repository Layout
 
-- `framework/`: category-defining and support plugins
+This repository is a root **uv workspace**. The root `pyproject.toml` declares
+`[tool.uv.workspace]` `members = ["framework/*", "community/*"]`, and every in-tree plugin
+resolves through `[tool.uv.sources] ... = { workspace = true }`. The kernel and the two
+satellite plugin repos are referenced by **absolute git URL** (never a relative path) so
+that consumers fetching a subdirectory package never inherit a machine-specific path.
+
+- `framework/`: category-defining and support plugins (the system's vocabulary)
 - `community/`: concrete providers, runtimes, RAG helpers, deployers, workspace tools, and domain plugins
+- `registry.json`: catalog of all plugins, tagged by `tier` (`framework`, `community`, or `external`)
 - `manifests/`: standalone manifests for plugins packaged elsewhere
 - `tests/`: integration and behavior tests across the plugin ecosystem
+
+Satellite repositories (plugins that live outside this workspace) are listed in
+`registry.json` as `external` / `source.type = "git"`:
+
+- [`machine-plugin-vectorstore-lancedb`](https://github.com/samletnorge/machine-plugin-vectorstore-lancedb)
+- [`machine-plugin-eval-support`](https://github.com/samletnorge/machine-plugin-eval-support)
+
+### Manifests and sources
+
+Every plugin ships a `manifest.json` at its plugin root. The build force-includes it inside
+the installed Python package (e.g. `site-packages/tool_support/manifest.json`), which is
+how the CLI's manifest sync discovers plugins from a project's virtualenv and copies them
+into `~/.config/machine-core/plugins/<name>/manifest.json` for the kernel.
+
+Consumer projects reference plugins by git **subdirectory** source, for example:
+
+```toml
+[tool.uv.sources]
+machine-core = { git = "git+ssh://git@github.com/samletnorge/machine-core.git" }
+tool_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/tool_support" }
+provider_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_ollama" }
+vectorstore_lancedb = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-vectorstore-lancedb.git" }
+eval_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-eval-support.git" }
+```
+
 
 ## Framework Plugins
 
@@ -52,7 +84,10 @@ Examples in this repository include:
 
 ## Plugin Model
 
-Each plugin is described by a `manifest.json` and typically exposes a plugin class with `initialize()`, `setup(ctx)`, and `shutdown()` methods.
+Each plugin is described by a `manifest.json` (shipped inside its installed package) and
+typically exposes a plugin class with `initialize()`, `setup(ctx)`, and `shutdown()` methods.
+A `Machine` starts empty and loads only the plugins declared under
+`[tool.machine-core].plugins` in the consuming project.
 
 Typical lifecycle:
 
@@ -61,6 +96,7 @@ Typical lifecycle:
 3. the plugin is initialized with the resolved config
 4. `setup(ctx)` is called with a capability-scoped `PluginContext`
 5. the plugin defines categories, registers implementations, or subscribes to hooks and events
+6. `machine-core` emits `PluginEnabled`, then runs the application's `when_ready` callbacks
 
 Plugins collaborate primarily through the registry:
 
