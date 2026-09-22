@@ -22,6 +22,14 @@ class PromptSupportPlugin:
         for hook_name, opts in HOOKSPECS.items():
             ctx.register_hookspec(hook_name, **opts)
 
+        from .registry import PromptRegistry
+
+        ctx.register(
+            "prompt",
+            "default",
+            PromptRegistry(hook_caller=ctx._machine.hooks.call),
+        )
+
     async def shutdown(self, **kwargs):
         """No-op — no resources to release."""
         pass
