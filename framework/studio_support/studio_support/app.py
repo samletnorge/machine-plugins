@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from html import escape
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,21 @@ from studio_support.dependencies import (
     build_studio_state,
     reset_bound_studio_state,
 )
+
+
+def _machine_lifespan(machine: Any):
+    """Start the Machine once, so plugins and when_ready callbacks run."""
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        categories = (
+            machine.list_categories() if hasattr(machine, "list_categories") else []
+        )
+        if hasattr(machine, "start") and not categories:
+            await machine.start()
+        yield
+
+    return lifespan
 
 
 def _machine_favicon_svg() -> str:
@@ -611,7 +627,7 @@ def _landing_page_html(state: StudioState) -> str:
 def create_studio_host_app(machine: Any) -> FastAPI:
     """Create the top-level Studio host app with a landing page at /."""
     studio_state = build_studio_state(machine)
-    app = FastAPI(title="Machine Core")
+    app = FastAPI(title="Machine Core", lifespan=_machine_lifespan(machine))
     app.state.studio_state = studio_state
 
     studio = create_studio_app(machine, studio_state=studio_state)
@@ -639,7 +655,12 @@ def create_studio_app(
     if studio_state is None:
         studio_state = build_studio_state(machine)
 
-    app = FastAPI(title="Machine Studio", docs_url=None, redoc_url=None)
+    app = FastAPI(
+        title="Machine Studio",
+        docs_url=None,
+        redoc_url=None,
+        lifespan=_machine_lifespan(machine),
+    )
     app.state.studio_state = studio_state
 
     @app.middleware("http")

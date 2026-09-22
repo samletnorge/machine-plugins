@@ -242,3 +242,31 @@ def test_machine_snapshot_does_not_fabricate_project_targets_when_catalog_empty(
         reset_studio_state()
         if previous_state is not None:
             set_studio_state(previous_state)
+
+
+async def test_machine_lifespan_starts_machine_once():
+    from studio_support.app import _machine_lifespan
+
+    class StartableMachine:
+        def __init__(self) -> None:
+            self.started = 0
+            self.categories: list[str] = []
+
+        def list_categories(self) -> list[str]:
+            return list(self.categories)
+
+        async def start(self) -> None:
+            self.started += 1
+            self.categories.append("agent")
+
+    machine = StartableMachine()
+    lifespan = _machine_lifespan(machine)
+
+    async with lifespan(None):
+        pass
+    assert machine.started == 1
+
+    # A second startup (host + mounted sub-app) must not start it again.
+    async with lifespan(None):
+        pass
+    assert machine.started == 1
