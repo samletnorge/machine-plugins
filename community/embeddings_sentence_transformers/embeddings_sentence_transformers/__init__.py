@@ -66,9 +66,6 @@ class EmbeddingsSentenceTransformersPlugin:
             vectors=vectors,
             model_ref=request.model_ref or self._model_name,
             dimensions=dimensions,
-            usage={
-                "input_count": len(texts),
-                "encode_batch_size": self._encode_batch_size,
-            },
+            usage={"input_count": len(texts)},
             duration_ms=(time.monotonic() - start) * 1000,
         )

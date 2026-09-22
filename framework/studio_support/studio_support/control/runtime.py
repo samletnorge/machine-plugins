@@ -23,7 +23,7 @@ router = APIRouter(prefix="/api", tags=["studio-runtime"])
 _CHAT_THREADS: dict[str, dict[str, list[dict[str, str]]]] = defaultdict(
     lambda: defaultdict(list)
 )
-_CHAT_THREAD_AGENTS: dict[str, dict[str, str]] = defaultdict(dict)
+_CHAT_THREAD_AGENTS: dict[str, str] = {}
 _CHAT_SESSION_IDS = count(1)
 
 
@@ -156,7 +156,7 @@ async def list_chat_threads() -> dict[str, object]:
         threads.append(
             {
                 "thread_id": thread_id,
-                "agent": _CHAT_THREAD_AGENTS[runtime_key].get(
+                "agent": _CHAT_THREAD_AGENTS.get(
                     thread_id, agents[0] if agents else ""
                 ),
                 "messages": messages,
@@ -170,7 +170,7 @@ async def create_chat_session() -> dict[str, str]:
     runtime_key = current_runtime_key()
     thread_id = f"session-{next(_CHAT_SESSION_IDS)}"
     _CHAT_THREADS[runtime_key][thread_id] = []
-    _CHAT_THREAD_AGENTS[runtime_key][thread_id] = ""
+    _CHAT_THREAD_AGENTS[thread_id] = ""
     return {"thread_id": thread_id}
 
 
@@ -206,7 +206,7 @@ async def send_chat_message(
             detail=f"Agent '{payload.agent}' is not directly chat invokable in Studio",
         )
 
-    _CHAT_THREAD_AGENTS[runtime_key].setdefault(thread_id, payload.agent)
+    _CHAT_THREAD_AGENTS.setdefault(thread_id, payload.agent)
     prior_messages = list(_CHAT_THREADS[runtime_key][thread_id])
     _CHAT_THREADS[runtime_key][thread_id].append(
         {"role": "user", "content": payload.message}

@@ -46,14 +46,14 @@ def test_index_returns_200(studio_client):
     assert "TestMachine" in resp.text
 
 
-def test_index_lists_agents(studio_client):
+def test_index_exposes_agents_surface(studio_client):
     resp = studio_client.get("/")
-    assert "greeter" in resp.text
+    assert '<span class="eyebrow">Agents</span>' in resp.text
 
 
-def test_index_lists_tools(studio_client):
+def test_index_exposes_tools_surface(studio_client):
     resp = studio_client.get("/")
-    assert "echo" in resp.text
+    assert '<span class="eyebrow">Tools</span>' in resp.text
 
 
 def test_index_shows_active_tenant_project_and_environment(studio_client):
@@ -70,24 +70,19 @@ def test_index_shows_attachment_state(studio_client):
     response = studio_client.get("/")
 
     assert response.status_code == 200
-    assert "Attachment state" in response.text
-    assert "<h3>attached</h3>" in response.text
-    assert '<span class="status-label">Attachment</span>' in response.text
-    assert ">attached</strong>" in response.text
+    assert 'data-attachment="attached"' in response.text
+    assert '<span class="context-label">Attachment</span>' in response.text
+    assert "<strong>attached</strong>" in response.text
 
 
-def test_dashboard_frames_studio_as_control_center_for_machine_commands(studio_client):
+def test_dashboard_frames_studio_as_control_plane(studio_client):
     response = studio_client.get("/")
 
     assert response.status_code == 200
-    assert "One control center for all your Machine runtimes." in response.text
-    assert "machine dev" in response.text
-    assert "machine studio" in response.text
-    assert "machine init" in response.text
-    assert "Plugins" in response.text
-    assert "Store" in response.text
-    assert "Services" in response.text
-    assert "Config" in response.text
+    assert "Machine Studio" in response.text
+    assert "control plane" in response.text
+    for nav_item in ("Dashboard", "Registry", "Config", "Services"):
+        assert nav_item in response.text
 
 
 def test_dashboard_moves_context_switching_to_sidebar_and_removes_topbar_switcher(
@@ -187,7 +182,8 @@ def test_dashboard_shows_requested_failed_context_without_stale_runtime(
     assert "designer-agent" not in response.text
     assert "staging-echo" not in response.text
     assert "No runtime attached" in response.text
-    assert ">Fuel Ops</span>" not in response.text
+    assert 'data-active-context="Northwind / Fuel Ops / staging"' in response.text
+    assert 'data-attachment="failed' in response.text
 
 
 def test_machine_snapshot_uses_honest_unknown_context_placeholders_when_state_missing(

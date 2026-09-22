@@ -62,11 +62,6 @@ def test_upsert_request_minimal():
     assert req.text is None
 
 
-async def test_vectorstore_category_registered():
+async def test_vectorstore_category_registered(machine_with_all_plugins):
     """vectorstore_support should register the 'vector_store' category."""
-    from machine_core import Machine
-
-    m = Machine()
-    await m.start()
-    assert "vector_store" in m._registry
-    await m.shutdown()
+    assert "vector_store" in machine_with_all_plugins.list_categories()

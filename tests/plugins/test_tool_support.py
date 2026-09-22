@@ -64,15 +64,13 @@ def test_tool_decorator_custom_name():
     assert td.description == "Custom adder"
 
 
-def test_tool_decorator_preserves_callable():
+async def test_tool_decorator_preserves_callable():
     @tool()
     async def echo(text: str) -> str:
         """Echo text."""
         return text
 
-    import asyncio
-
-    result = asyncio.get_event_loop().run_until_complete(echo(text="hi"))
+    result = await echo(text="hi")
     assert result == "hi"
 
 

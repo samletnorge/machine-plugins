@@ -43,7 +43,7 @@ class TestLanceDBStore:
         await store.upsert([r1])
         await store.upsert([r2])
         tbl = store._db.open_table("docs")
-        assert len(tbl.to_pandas()) == 2
+        assert tbl.count_rows() == 2
 
     async def test_search_returns_results(self, store):
         r = UpsertRequest(

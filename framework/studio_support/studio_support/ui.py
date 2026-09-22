@@ -224,18 +224,6 @@ def _catalog_project_config() -> dict[str, Any]:
     return data.get("tool", {}).get("machine-core", {})
 
 
-def _entry_project_config(entry: str | None) -> dict[str, Any]:
-    if not entry:
-        return {}
-    root = Path(entry)
-    pyproject = root / "pyproject.toml"
-    if not pyproject.exists():
-        return {}
-    with pyproject.open("rb") as f:
-        data = tomllib.load(f)
-    return data.get("tool", {}).get("machine-core", {})
-
-
 def _project_config() -> dict[str, Any]:
     return _catalog_project_config()
 
@@ -297,6 +285,7 @@ def _context_snapshot() -> dict[str, Any]:
             "project_options": [],
             "environment": None,
             "environment_status": None,
+            "environment_display_status": None,
             "environment_connection_kind": None,
             "environment_connection_ref": None,
             "environment_options": [],
@@ -438,7 +427,7 @@ def machine_snapshot() -> dict[str, Any]:
         (target.get("tenant_slug"), target.get("project_slug"))
         for target in project_targets
     }
-    project_config = _entry_project_config(entry)
+    project_config = _project_config()
     environment_connection_ref = context["environment_connection_ref"]
     environment_connection_kind = context["environment_connection_kind"]
     plugins_declared = project_config.get("plugins", [])

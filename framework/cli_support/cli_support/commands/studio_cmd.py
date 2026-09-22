@@ -37,7 +37,14 @@ def studio_command(
     host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to."),
 ):
     """Launch the Studio web UI for testing agents and tools."""
-    import studio_support
+    try:
+        import studio_support
+    except ImportError:
+        console.print(
+            "[red]Error: studio_support is not installed. "
+            "Install it with: uv pip install studio_support[/red]"
+        )
+        raise typer.Exit(code=1) from None
 
     root = find_project_root()
     if root is None:
