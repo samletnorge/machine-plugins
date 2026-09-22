@@ -9,6 +9,6 @@
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
-    "entry_point": "machine_auth:AuthSupportPlugin"
+    "entry_point": "auth_support:AuthSupportPlugin"
   }
 }

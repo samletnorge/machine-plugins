@@ -6,8 +6,7 @@ dependencies = ["pydantic-ai>=1.0.0"]
 
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
-sources = {"." = "agent_runtime_pydantic"}
+packages = ["agent_runtime_pydantic"]
 
 
 [build-system]

@@ -6,8 +6,7 @@ dependencies = []
 
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
-sources = {"." = "agent_runtime_basic"}
+packages = ["agent_runtime_basic"]
 
 
 [build-system]

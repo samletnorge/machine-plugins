@@ -7,8 +7,7 @@ dependencies = ["httpx>=0.28"]
 
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
-sources = {"." = "embeddings_ollama"}
+packages = ["embeddings_ollama"]
 
 [build-system]
 requires = ["hatchling"]

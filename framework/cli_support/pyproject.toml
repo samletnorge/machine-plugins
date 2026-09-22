@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "machine CLI tooling for machine-core"
 requires-python = ">=3.12"
 dependencies = [
-    "machine-core @ git+ssh://git@github.com/samletnorge/machine-core.git",
+    "machine-core",
     "typer>=0.12.0", 
     "rich>=13.0.0", 
     "jinja2>=3.1.0", 
@@ -14,10 +14,6 @@ dependencies = [
     "studio_support",
 ]
 
-
-[tool.uv.sources]
-server_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/server_support" }
-studio_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/studio_support" }
 
 [dependency-groups]
 framework = [

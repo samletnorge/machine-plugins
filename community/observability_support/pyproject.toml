@@ -16,6 +16,7 @@ sentry = ["sentry-sdk[opentelemetry]>=2.0.0"]
 
 
 [tool.hatch.build.targets.wheel]
+packages = ["observability_support"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "manifest.json" = "observability_support/manifest.json"

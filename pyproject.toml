@@ -1,0 +1,71 @@
+[project]
+name = "machine-plugins"
+version = "0.0.0"
+description = "Workspace root for the machine-core framework and community plugins"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["framework/*", "community/*"]
+
+# Sources are only honoured at the workspace root. Workspace members resolve to
+# each other via { workspace = true }; the kernel and the two satellite plugin
+# repos are pulled from local checkouts during development.
+[tool.uv.sources]
+agent_support = { workspace = true }
+agent_runtime_basic = { workspace = true }
+agent_runtime_pydantic = { workspace = true }
+auth_support = { workspace = true }
+browser_support = { workspace = true }
+channel_support = { workspace = true }
+cli_support = { workspace = true }
+deployer_support = { workspace = true }
+embeddings = { workspace = true }
+embeddings_azure = { workspace = true }
+embeddings_google = { workspace = true }
+embeddings_ollama = { workspace = true }
+embeddings_sentence_transformers = { workspace = true }
+mcp_support = { workspace = true }
+memory_support = { workspace = true }
+model_provider_support = { workspace = true }
+observability_support = { workspace = true }
+processor_support = { workspace = true }
+prompt_support = { workspace = true }
+provider_azure_openai = { workspace = true }
+provider_github_copilot = { workspace = true }
+provider_google_gemini = { workspace = true }
+provider_grok = { workspace = true }
+provider_groq = { workspace = true }
+provider_ollama = { workspace = true }
+provider_vertex_claude = { workspace = true }
+provider_vertex_gemini = { workspace = true }
+pubsub_support = { workspace = true }
+rag_support = { workspace = true }
+server_support = { workspace = true }
+storage_support = { workspace = true }
+structured_output = { workspace = true }
+studio_support = { workspace = true }
+tool_filter_rag = { workspace = true }
+tool_openapi = { workspace = true }
+tool_support = { workspace = true }
+vectorstore_support = { workspace = true }
+voice_support = { workspace = true }
+workflow_support = { workspace = true }
+workspace_support = { workspace = true }
+machine_core = { path = "../../machine-core", editable = true }
+eval_support = { path = "../machine-plugin-eval-support", editable = true }
+vectorstore_lancedb = { path = "../machine-plugin-vectorstore-lancedb", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.28.1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

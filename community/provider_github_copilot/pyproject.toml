@@ -10,6 +10,7 @@ machine-core-copilot-login = "provider_github_copilot.cli:main"
 
 
 [tool.hatch.build.targets.wheel]
+packages = ["provider_github_copilot"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "manifest.json" = "provider_github_copilot/manifest.json"

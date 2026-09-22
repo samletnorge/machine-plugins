@@ -3,13 +3,15 @@ name = "embeddings_sentence_transformers"
 version = "0.1.0"
 description = "SentenceTransformers embedding provider for machine-core"
 requires-python = ">=3.11"
-dependencies = [
+dependencies = []
+
+[project.optional-dependencies]
+local = [
     "sentence-transformers>=3.0",
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
-sources = {"." = "embeddings_sentence_transformers"}
+packages = ["embeddings_sentence_transformers"]
 
 [build-system]
 requires = ["hatchling"]

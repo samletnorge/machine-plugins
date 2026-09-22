@@ -36,23 +36,3 @@ packages = ["server_support"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "manifest.json" = "server_support/manifest.json"
-
-
-[tool.uv.sources]
-machine_core = { git = "git+ssh://git@github.com/samletnorge/machine-core.git" }
-agent_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/agent_support" }
-tool_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/tool_support" }
-model_provider_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/model_provider_support" }
-vectorstore_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/vectorstore_support" }
-voice_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/voice_support" }
-agent_runtime_pydantic = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_runtime_pydantic" }
-agent_runtime_basic = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/agent_runtime_basic" }
-embeddings = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "framework/embeddings" }
-embeddings_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/embeddings_ollama" }
-eval_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-eval-support.git" }
-vectorstore_lancedb = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-vectorstore-lancedb.git" }
-tool_openapi = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/tool_openapi" }
-tool_filter_rag = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/tool_filter_rag" }
-rag_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/rag_support" }
-provider_ollama = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/provider_ollama" }
-embeddings_sentence_transformers = { git = "git+ssh://git@github.com/samletnorge/machine-plugins.git", subdirectory = "community/embeddings_sentence_transformers" }
