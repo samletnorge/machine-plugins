@@ -1,0 +1,34 @@
+{
+  "name": "provider_deepseek",
+  "version": "0.1.0",
+  "description": "DeepSeek LLM provider over the OpenAI-compatible chat completions API",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["model_provider:register"],
+  "dependencies": ["httpx>=0.28"],
+  "config_schema": {
+    "base_url": {
+      "type": "string",
+      "default": "https://api.deepseek.com",
+      "env": "DEEPSEEK_BASE_URL",
+      "description": "DeepSeek API base URL"
+    },
+    "api_key": {
+      "type": "string",
+      "env": "DEEPSEEK_API_KEY",
+      "description": "DeepSeek API key"
+    },
+    "model": {
+      "type": "string",
+      "default": "deepseek-chat",
+      "env": "DEEPSEEK_MODEL",
+      "description": "Default model to use"
+    }
+  },
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "provider_deepseek:DeepSeekProviderPlugin"
+  }
+}

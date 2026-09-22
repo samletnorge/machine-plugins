@@ -31,6 +31,7 @@ members = [
     "processor-support",
     "prompt-support",
     "provider-azure-openai",
+    "provider-deepseek",
     "provider-github-copilot",
     "provider-google-gemini",
     "provider-grok",
@@ -3138,6 +3139,17 @@ requires-dist = [
 ]
 
 [[package]]
+name = "provider-deepseek"
+version = "0.1.0"
+source = { editable = "community/provider_deepseek" }
+dependencies = [
+    { name = "httpx" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "httpx", specifier = ">=0.28" }]
+
+[[package]]
 name = "provider-github-copilot"
 version = "0.1.0"
 source = { editable = "community/provider_github_copilot" }
@@ -4181,6 +4193,7 @@ dependencies = [
     { name = "loguru" },
     { name = "machine-core" },
     { name = "model-provider-support" },
+    { name = "provider-deepseek" },
     { name = "provider-ollama" },
     { name = "rag-support" },
     { name = "sse-starlette" },
@@ -4206,6 +4219,7 @@ requires-dist = [
     { name = "loguru", specifier = ">=0.7.0" },
     { name = "machine-core", editable = "../../machine-core" },
     { name = "model-provider-support", editable = "framework/model_provider_support" },
+    { name = "provider-deepseek", editable = "community/provider_deepseek" },
     { name = "provider-ollama", editable = "community/provider_ollama" },
     { name = "rag-support", editable = "community/rag_support" },
     { name = "sse-starlette", specifier = ">=1.6.0" },

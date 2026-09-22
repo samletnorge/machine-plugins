@@ -35,6 +35,7 @@ observability_support = { workspace = true }
 processor_support = { workspace = true }
 prompt_support = { workspace = true }
 provider_azure_openai = { workspace = true }
+provider_deepseek = { workspace = true }
 provider_github_copilot = { workspace = true }
 provider_google_gemini = { workspace = true }
 provider_grok = { workspace = true }

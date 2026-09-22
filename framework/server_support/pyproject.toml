@@ -24,6 +24,7 @@ dependencies = [
     "tool_filter_rag",
     "rag_support",
     "provider_ollama",
+    "provider_deepseek",
     "embeddings_sentence_transformers",
 ]
 
