@@ -129,3 +129,34 @@ async def test_plugin_hookspecs_registered():
     assert "before_tool_call" in m.hooks._specs
     assert "after_tool_call" in m.hooks._specs
     assert "on_tool_error" in m.hooks._specs
+
+
+def test_tool_schema_handles_optional_containers_enums_and_literals():
+    from enum import Enum
+    from typing import Literal, Optional
+
+    from tool_support import tool
+
+    class Color(str, Enum):
+        red = "red"
+        blue = "blue"
+
+    @tool()
+    async def search(
+        query: str,
+        limit: Optional[int] = None,
+        tags: list[str] = [],  # noqa: B006 - schema test only
+        mode: Literal["fast", "slow"] = "fast",
+        color: Color = Color.red,
+    ) -> str:
+        return query
+
+    parameters = search.__tool_definition__.parameters
+    properties = parameters["properties"]
+
+    assert properties["query"] == {"type": "string"}
+    assert properties["limit"] == {"type": "integer"}
+    assert properties["tags"] == {"type": "array", "items": {"type": "string"}}
+    assert properties["mode"]["enum"] == ["fast", "slow"]
+    assert properties["color"]["enum"] == ["red", "blue"]
+    assert parameters["required"] == ["query"]
