@@ -6,11 +6,13 @@ from contextlib import asynccontextmanager, contextmanager
 from typing import Any, Generator, AsyncGenerator
 
 from opentelemetry import trace
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
     SimpleSpanProcessor,
     SpanExporter,
 )
+from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
 from opentelemetry.trace import StatusCode, Span
 
 from observability_support.config import ObservabilityConfig
@@ -18,6 +20,42 @@ from observability_support.spans import (
     SpanKind,
     create_span_attributes,
 )
+
+_EXPORTER_BUILDERS = {
+    "otlp": ("observability_support.exporters.otlp", "build_otlp_exporter"),
+    "datadog": ("observability_support.exporters.datadog", "build_datadog_exporter"),
+    "jaeger": ("observability_support.exporters.jaeger", "build_jaeger_exporter"),
+    "langfuse": (
+        "observability_support.exporters.langfuse",
+        "build_langfuse_exporter",
+    ),
+    "langsmith": (
+        "observability_support.exporters.langsmith",
+        "build_langsmith_exporter",
+    ),
+    "sentry": ("observability_support.exporters.sentry", "build_sentry_exporter"),
+}
+
+
+def resolve_exporter(config: ObservabilityConfig) -> SpanExporter | None:
+    """Resolve an exporter instance from ``config.exporter`` by name."""
+    name = (config.exporter or "").lower()
+    if not name:
+        return None
+    try:
+        if name == "console":
+            from observability_support.exporters.console import ConsoleSpanExporter
+
+            return ConsoleSpanExporter()
+        if name in _EXPORTER_BUILDERS:
+            import importlib
+
+            module_name, func_name = _EXPORTER_BUILDERS[name]
+            builder = getattr(importlib.import_module(module_name), func_name)
+            return builder(config)
+    except Exception:  # noqa: BLE001 - a missing backend must not break startup
+        return None
+    return None
 
 
 class _NoOpSpanContext:
@@ -57,10 +95,15 @@ class MachineTracer:
         if not config.enabled:
             return cls(provider=None, enabled=False)
 
-        provider = TracerProvider()
+        resource = Resource.create({"service.name": config.service_name})
+        provider_kwargs: dict[str, Any] = {"resource": resource}
+        if config.sample_rate < 1.0:
+            provider_kwargs["sampler"] = TraceIdRatioBased(config.sample_rate)
+        provider = TracerProvider(**provider_kwargs)
 
-        if _test_exporter:
-            provider.add_span_processor(SimpleSpanProcessor(_test_exporter))
+        exporter = _test_exporter or resolve_exporter(config)
+        if exporter is not None:
+            provider.add_span_processor(SimpleSpanProcessor(exporter))
 
         return cls(provider=provider, enabled=True)
 

@@ -96,3 +96,31 @@ def test_tracer_span_set_attribute_after_creation(tracer_with_memory):
         span.set_attribute(SpanAttributes.TOKEN_OUTPUT, 150)
     spans = exporter.get_finished_spans()
     assert spans[0].attributes[SpanAttributes.TOKEN_INPUT] == 300
+
+
+def test_resolve_exporter_by_name():
+    from observability_support.tracer import resolve_exporter
+    from observability_support.exporters.console import ConsoleSpanExporter
+
+    assert isinstance(
+        resolve_exporter(ObservabilityConfig(exporter="console")),
+        ConsoleSpanExporter,
+    )
+    assert resolve_exporter(ObservabilityConfig(exporter="does-not-exist")) is None
+    assert resolve_exporter(ObservabilityConfig(exporter="")) is None
+
+
+def test_from_config_attaches_a_span_processor():
+    tracer = MachineTracer.from_config(ObservabilityConfig(exporter="console"))
+
+    processors = getattr(
+        tracer._provider._active_span_processor, "_span_processors", []
+    )
+    assert processors, "an exporter should be attached by default"
+
+
+def test_from_config_sets_service_name_resource():
+    tracer = MachineTracer.from_config(
+        ObservabilityConfig(exporter="console", service_name="svc-x")
+    )
+    assert tracer._provider.resource.attributes["service.name"] == "svc-x"
