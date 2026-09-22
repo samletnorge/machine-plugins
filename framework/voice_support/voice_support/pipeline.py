@@ -19,6 +19,14 @@ class PipelineResult:
     audio_chunks: list[bytes] = field(default_factory=list)
 
 
+def _agent_text(result: object) -> str:
+    """Extract text from an agent result (object, dict, or raw value)."""
+    if isinstance(result, dict):
+        return str(result.get("output") or result.get("text") or result)
+    output = getattr(result, "output", None) or getattr(result, "data", None)
+    return str(output) if output is not None else str(result)
+
+
 class VoiceAgentPipeline:
     def __init__(
         self,
@@ -47,7 +55,7 @@ class VoiceAgentPipeline:
     async def run(self, audio_input: AsyncIterator[bytes]) -> AsyncIterator[bytes]:
         user_text = await self._stt.listen(audio_input, self.listen_options)
         result = await self.agent.run(user_text)
-        agent_text = result.output if hasattr(result, "output") else result.data
+        agent_text = _agent_text(result)
         audio_stream = await self._tts.speak(agent_text, self.speak_options)
         async for chunk in audio_stream:
             yield chunk
@@ -57,7 +65,7 @@ class VoiceAgentPipeline:
     ) -> PipelineResult:
         user_text = await self._stt.listen(audio_input, self.listen_options)
         result = await self.agent.run(user_text)
-        agent_text = result.output if hasattr(result, "output") else result.data
+        agent_text = _agent_text(result)
         audio_stream = await self._tts.speak(agent_text, self.speak_options)
         audio_chunks = []
         async for chunk in audio_stream:
