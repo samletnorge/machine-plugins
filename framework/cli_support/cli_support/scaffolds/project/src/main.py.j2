@@ -7,6 +7,11 @@ bootstrap_secrets()
 config = MachineConfig.from_pyproject()
 machine = Machine(config=config)
 
-# Register your agents, tools, and workflows here:
-# from .agents.example import example_agent
-# machine.register("agent", "example", example_agent)
+
+@machine.when_ready
+async def _register_project_items() -> None:
+    """Register this project's own tools and agents once plugins have loaded."""
+    from .agents.example import WORD_COUNT_TOOL, ExampleAgent
+
+    machine.register("tool", WORD_COUNT_TOOL.name, WORD_COUNT_TOOL)
+    machine.register("agent", "assistant", ExampleAgent(machine))

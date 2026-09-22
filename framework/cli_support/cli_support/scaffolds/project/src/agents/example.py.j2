@@ -1,8 +1,55 @@
-"""Example agent for {{ project_name }}."""
+"""Example agent and tool for {{ project_name }}.
 
-# Define your agent here. Example:
-#
-# from machine_core import Machine
-#
-# async def greet(prompt: str) -> str:
-#     return f"Hello! You said: {prompt}"
+The tool is registered into the ``tool`` category and the agent into the
+``agent`` category. Both categories are defined by their support plugins, so
+registration happens in a ``when_ready`` callback (after plugins load).
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from agent_support.schemas import AgentDefinition
+from tool_support import tool
+
+
+@tool(name="word_count", description="Count the words in a piece of text.")
+async def word_count(text: str) -> int:
+    """Return the number of whitespace-separated words in ``text``."""
+    return len(text.split())
+
+
+WORD_COUNT_TOOL = word_count.__tool_definition__
+
+ASSISTANT_DEFINITION = AgentDefinition(
+    name="assistant",
+    description="A concise assistant that can use tools.",
+    model_ref="deepseek/deepseek-chat",
+    tool_refs=["word_count"],
+    instruction=(
+        "You are a concise assistant. Use the available tools when they help, "
+        "then answer the user in one short paragraph."
+    ),
+)
+
+
+class ExampleAgent:
+    """Chat-invokable agent backed by the basic agent runtime."""
+
+    description = "Example assistant agent (basic runtime + tools)"
+
+    def __init__(self, machine: Any) -> None:
+        self._machine = machine
+
+    async def run(self, input: str, context: dict[str, Any] | None = None) -> Any:
+        runtime = self._machine.resolve("agent", "basic")
+        if runtime is None:
+            raise RuntimeError(
+                "agent_runtime_basic is not loaded; add it to [tool.machine-core].plugins"
+            )
+        tools = [
+            self._machine.resolve("tool", name)
+            for name in ASSISTANT_DEFINITION.tool_refs
+        ]
+        result = await runtime.run(ASSISTANT_DEFINITION, input, tools, context)
+        return result.output

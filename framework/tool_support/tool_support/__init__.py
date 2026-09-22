@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .hooks import HOOKSPECS
+from .decorator import tool
+from .schemas import ToolDefinition, ToolResult
+
+__all__ = ["ToolSupportPlugin", "tool", "ToolDefinition", "ToolResult", "HOOKSPECS"]
 
 if TYPE_CHECKING:
     from machine_core.plugin.context import PluginContext
