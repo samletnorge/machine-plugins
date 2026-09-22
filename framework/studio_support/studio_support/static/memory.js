@@ -1,1 +1,1 @@
-import{y as t}from"./assets/api-CfNpsCnV.js";import{D as m}from"./assets/DomainPanel-B6PuNj48.js";import"./assets/attributes-DhD-Lvmh.js";const o=document.getElementById("memory-island");o&&t(m,{target:o,props:{domain:"memory",title:"Memory",endpoint:o.dataset.endpoint??"/_studio/api/memory/threads"}});
+import{z as t}from"./assets/api-DgXn3BUQ.js";import{D as m}from"./assets/DomainPanel-CCYZqe6z.js";const o=document.getElementById("memory-island");o&&t(m,{target:o,props:{domain:"memory",title:"Memory",endpoint:o.dataset.endpoint??"/_studio/api/memory/threads"}});

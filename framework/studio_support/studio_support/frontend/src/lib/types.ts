@@ -45,14 +45,35 @@ export interface RuntimeAttachmentSummary {
   error: string | null;
 }
 
+export interface JsonSchemaProperty {
+  type?: string;
+  title?: string;
+  description?: string;
+  enum?: Array<string | number | boolean>;
+  default?: unknown;
+  format?: string;
+  minimum?: number;
+  maximum?: number;
+  example?: unknown;
+  items?: {
+    type?: string;
+  };
+}
+
+export interface JsonSchema {
+  type?: string;
+  title?: string;
+  description?: string;
+  properties?: Record<string, JsonSchemaProperty>;
+  required?: string[];
+}
+
 export interface ToolDetail {
   name: string;
   description: string;
   owner: string | null;
   operations: string[];
-  input_schema: {
-    properties?: Record<string, { type?: string; title?: string }>;
-  };
+  input_schema: JsonSchema;
 }
 
 export interface WorkflowGraphPayload {

@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
     <title>{% block title %}{{ page_title }} · Machine Studio{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <link rel="stylesheet" href="{{ request.url_for('static', path='studio.css') }}">
 </head>
@@ -12,8 +15,9 @@
     data-active-context="{{ tenant_name }} / {{ project_name }} / {{ environment }}"
     data-attachment="{{ attachment_status }}{% if attachment_error %} · {{ attachment_error }}{% endif %}"
 >
+    <a class="skip-link" href="#page-frame">Skip to content</a>
     <div class="studio-shell">
-        <aside class="studio-sidebar">
+        <aside class="studio-sidebar" aria-label="Studio sidebar">
             <div class="brand-block brand-block-shell">
                 <div class="brand-row">
                     <a class="brand-link" href="{{ request.scope.root_path }}/">
@@ -35,17 +39,17 @@
                             <strong>Machine Studio</strong>
                             <small>Mission Control</small>
                         </span>
-                        <button type="button" class="mode-toggle icon-only brand-mode-toggle" id="mode-toggle" aria-label="Toggle color mode">
-                            <span class="mode-toggle-icon mode-toggle-dark">{{ icon('moon') }}</span>
-                            <span class="mode-toggle-icon mode-toggle-light">{{ icon('sun') }}</span>
-                            <span id="mode-label">Dark</span>
-                        </button>
                     </a>
+                    <button type="button" class="mode-toggle icon-only brand-mode-toggle" id="mode-toggle" aria-label="Toggle color mode">
+                        <span class="mode-toggle-icon mode-toggle-dark">{{ icon('moon') }}</span>
+                        <span class="mode-toggle-icon mode-toggle-light">{{ icon('sun') }}</span>
+                        <span id="mode-label">Dark</span>
+                    </button>
                 </div>
                 <details class="sidebar-context-disclosure">
                     <summary class="context-switcher-header">
                         <span>
-                            <span class="context-label">Context</span>
+                            <span class="context-label">Working context</span>
                             <strong>{{ tenant_name }} / {{ project_name }} / {{ environment }}</strong>
                         </span>
                         <span class="context-disclosure-icon">{{ icon('chevron') }}</span>
@@ -93,7 +97,7 @@
                 <section class="nav-group">
                     <header>{{ section["section"] }}</header>
                     {% for item in section["items"] %}
-                    <a href="{{ item.href }}" class="nav-item {% if active_nav == item.key %}active{% endif %}">
+                    <a href="{{ item.href }}" class="nav-item {% if active_nav == item.key %}active{% endif %}" {% if active_nav == item.key %}aria-current="page"{% endif %}>
                         <span class="nav-icon">{{ icon(item.icon) }}</span>
                         <span class="nav-label">{{ item.label }}</span>
                         {% if item.status %}
@@ -161,7 +165,7 @@
             </section>
             {% endif %}
 
-            <main class="page-frame">
+            <main class="page-frame" id="page-frame">
                 {% block content %}{% endblock %}
             </main>
         </div>

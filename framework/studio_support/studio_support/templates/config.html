@@ -7,6 +7,7 @@
                 <span class="eyebrow">tool.machine-core</span>
                 <h3>Selected project configuration</h3>
             </div>
+            <span class="pill">{{ environment or 'no environment' }}</span>
         </div>
         <pre class="code-panel">{{ project_config | tojson(indent=2) }}</pre>
     </article>
@@ -25,6 +26,7 @@
                 hx-swap="innerHTML"
             >Refresh env</button>
         </div>
+        <p class="section-lede">Only variable names are shown. Values stay on the server and are never rendered here.</p>
         <ul id="config-env-list" class="simple-list mono">
             {% for name in env_names %}
             <li>{{ name }}</li>

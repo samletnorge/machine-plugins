@@ -7,6 +7,7 @@
                 <span class="eyebrow">Status</span>
                 <h3>Lifecycle</h3>
             </div>
+            <span class="pill strong">{{ attachment_status }}</span>
         </div>
         <div class="detail-list">
             <div><span>Studio mount</span><strong>/_studio</strong></div>
@@ -27,7 +28,7 @@
         <div class="pill-list service-actions">
             <button
                 type="button"
-                class="secondary-button"
+                class="primary-button"
                 hx-post="{{ request.scope.root_path }}/api/services/restart"
                 hx-target="#service-action-result"
                 hx-swap="innerHTML"

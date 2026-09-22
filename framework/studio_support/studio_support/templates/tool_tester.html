@@ -7,10 +7,14 @@
                 <span class="eyebrow">Tool</span>
                 <h3>{{ tool_name }}</h3>
             </div>
+            <span class="pill">handler</span>
         </div>
-        <p>{{ tool.description or tool.__doc__ or "No tool description available." }}</p>
+        <p class="section-lede">{{ tool.description or tool.__doc__ or "No tool description available." }}</p>
         <form id="tool-form" class="tool-form">
-            <textarea id="tool-input" class="control-textarea" placeholder='{"input": "value"}'></textarea>
+            <label class="context-field">
+                <span class="context-label">JSON input</span>
+                <textarea id="tool-input" class="control-textarea" placeholder='{"input": "value"}'></textarea>
+            </label>
             <button type="submit" class="primary-button">Execute</button>
         </form>
     </article>

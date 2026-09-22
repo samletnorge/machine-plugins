@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components/icons.html" import icon %}
 {% block content %}
 <section class="content-grid two-up">
     <article class="panel">
@@ -15,7 +16,8 @@
                 hx-swap="innerHTML"
             >Refresh JSON</button>
         </div>
-        <div class="panel-subsection inline-form">
+        <div class="panel-subsection search-field">
+            <span class="search-field-icon">{{ icon('search') }}</span>
             <input
                 type="search"
                 name="q"
@@ -36,8 +38,8 @@
                     <p>{{ manifest.description or "No manifest description available." }}</p>
                 </div>
                 <div class="list-card-meta">
-                    <span>{{ manifest.version or "?" }}</span>
-                    <span>{{ manifest.language or "python" }}</span>
+                    <span class="pill">{{ manifest.version or "?" }}</span>
+                    <span class="pill">{{ manifest.language or "python" }}</span>
                 </div>
             </article>
             {% endfor %}
@@ -46,7 +48,10 @@
             {% endif %}
             </div>
         </div>
-        <pre id="registry-json" class="code-panel min">{{ manifests | tojson(indent=2) }}</pre>
+        <details class="code-disclosure">
+            <summary class="context-label">Raw manifest JSON</summary>
+            <pre id="registry-json" class="code-panel min">{{ manifests | tojson(indent=2) }}</pre>
+        </details>
     </article>
 
     <article class="panel">
@@ -71,6 +76,9 @@
                 {% for plugin in loaded_plugins %}
                 <span class="pill strong">{{ plugin }}</span>
                 {% endfor %}
+                {% if not loaded_plugins %}
+                <span class="muted">No plugins are loaded in the active runtime.</span>
+                {% endif %}
             </div>
         </div>
     </article>

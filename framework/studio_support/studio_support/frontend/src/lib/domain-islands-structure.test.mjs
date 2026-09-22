@@ -27,6 +27,12 @@ assert.match(panel, /class="[^"]*domain-table/);
 assert.match(panel, /class="[^"]*domain-category/);
 assert.match(panel, /<table/);
 assert.match(panel, /item\.operations/);
+assert.match(panel, /class="[^"]*domain-skeleton/);
+assert.match(panel, /class="[^"]*domain-state error"[^>]*role="alert"/);
+assert.match(panel, /class="[^"]*domain-stats/);
+assert.match(panel, /data-label="Operations"/);
+assert.match(panel, /aria-busy=\{loading\}/);
+assert.match(panel, /<style>/);
 
 for (const { name, title, target, endpoint } of domains) {
   const island = readFileSync(new URL(`../islands/${name}.ts`, import.meta.url), 'utf8');

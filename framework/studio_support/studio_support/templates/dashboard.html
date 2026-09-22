@@ -5,7 +5,7 @@
         <div class="mission-hero-copy">
             <span class="eyebrow">Machine Studio</span>
             <h2>{{ tenant_name }} / {{ project_name }} / {{ environment }}</h2>
-            <p>Use Studio as the control plane for the current runtime now, then widen out to the rest of the fleet when you need to inspect inventory, compare environments, or move into tools and workflows.</p>
+            <p>Studio is the control plane for this runtime. Inspect what is loaded right now, then widen out to the rest of the fleet to compare environments, move into tools, or trace a workflow.</p>
             <div class="hero-actions mission-actions">
                 <a href="{{ request.scope.root_path }}/chat" class="panel-link block">Open runtime console</a>
                 <a href="{{ request.scope.root_path }}/registry" class="panel-link block subtle">Inspect registry</a>
@@ -74,6 +74,7 @@
                     <span class="eyebrow">Fleet map</span>
                     <h3>Project environments</h3>
                 </div>
+                <span class="panel-count">{{ project_targets|length }}</span>
             </div>
             <div class="target-board">
                 {% for target in project_targets %}
@@ -88,6 +89,9 @@
                     <p>{{ target.environment }}</p>
                 </div>
                 {% endfor %}
+                {% if not project_targets %}
+                <p class="muted">No environments are registered for this catalog yet.</p>
+                {% endif %}
             </div>
         </article>
 
@@ -105,6 +109,9 @@
                     <strong>{{ category_counts.get(category, 0) }}</strong>
                 </div>
                 {% endfor %}
+                {% if not categories %}
+                <p class="muted">This runtime has not registered any categories yet.</p>
+                {% endif %}
             </div>
         </article>
     </div>

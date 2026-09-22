@@ -1,14 +1,17 @@
 {% extends "base.html" %}
+{% from "components/icons.html" import icon %}
 {% block content %}
 <section class="panel">
     <div class="panel-header">
         <div>
             <span class="eyebrow">Control plane</span>
             <h3>{{ section_title }}</h3>
+            <p class="section-lede">{{ section_description }}</p>
         </div>
-        <span class="pill">{{ 'installed' if payload and payload.installed else 'not installed' }}</span>
+        <span class="pill {% if payload and payload.installed %}strong{% endif %}">
+            {{ 'installed' if payload and payload.installed else 'not installed' }}
+        </span>
     </div>
-    <p>{{ section_description }}</p>
     {% if payload and payload.installed %}
         {% for category, items in payload.categories.items() %}
             {% if items %}
@@ -21,10 +24,20 @@
                     <tbody>
                         {% for item in items %}
                         <tr>
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.owner or '—' }}</td>
-                            <td>{{ item.description }}</td>
-                            <td>{{ item.operations | join(', ') or '—' }}</td>
+                            <td data-label="Name"><strong>{{ item.name }}</strong></td>
+                            <td data-label="Owner">{{ item.owner or '—' }}</td>
+                            <td data-label="Description">{{ item.description }}</td>
+                            <td data-label="Operations">
+                                {% if item.operations %}
+                                <div class="pill-list dense">
+                                    {% for operation in item.operations %}
+                                    <span class="pill">{{ operation }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <span class="muted">—</span>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -33,7 +46,11 @@
             {% endif %}
         {% endfor %}
     {% else %}
-    <p class="muted">This surface is empty because its plugin is not installed in the active runtime.</p>
+    <div class="empty-state">
+        <span class="empty-state-mark">{{ icon('blocks') }}</span>
+        <strong>No plugin attached to this surface</strong>
+        <p>This surface is empty because its plugin is not installed in the active runtime. Attach the plugin and reload the context to populate it.</p>
+    </div>
     {% endif %}
 </section>
 {% endblock %}

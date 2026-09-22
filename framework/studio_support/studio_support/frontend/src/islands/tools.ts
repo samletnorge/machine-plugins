@@ -7,7 +7,8 @@ if (target) {
   mount(SchemaForm, {
     target,
     props: {
-      detailEndpoint: target.dataset.detailEndpoint ?? ''
+      detailEndpoint: target.dataset.detailEndpoint ?? '',
+      executeEndpoint: target.dataset.executeEndpoint ?? ''
     }
   });
 }

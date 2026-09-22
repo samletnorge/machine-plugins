@@ -281,6 +281,16 @@
         "path": "community/provider_azure_openai"
       }
     },
+    "provider_deepseek": {
+      "version": "0.1.0",
+      "description": "DeepSeek LLM provider over the OpenAI-compatible chat completions API",
+      "tier": "community",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "community/provider_deepseek"
+      }
+    },
     "provider_github_copilot": {
       "version": "0.1.0",
       "description": "GitHub Copilot LLM provider via OAuth device flow + pydantic-ai",

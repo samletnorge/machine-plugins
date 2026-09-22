@@ -8,17 +8,30 @@
         </div>
         <span class="pill">{{ active_nav }}</span>
     </div>
-    <p>{{ section_description }}</p>
+    <p class="section-lede">{{ section_description }}</p>
     {% if account_page %}
     <div class="account-panel">
-        <label class="theme-select account-theme-select">
-            <span>Theme</span>
-            <select id="theme-picker">
-                {% for key, theme in themes.items() %}
-                <option value="{{ key }}">{{ theme.label }}</option>
-                {% endfor %}
-            </select>
-        </label>
+        <div class="account-row">
+            <div class="account-row-copy">
+                <strong>Appearance</strong>
+                <p class="muted">Pick the theme Machine Studio uses across the control plane. Your choice is stored in this browser.</p>
+            </div>
+            <label class="theme-select account-theme-select">
+                <span>Theme</span>
+                <select id="theme-picker">
+                    {% for key, theme in themes.items() %}
+                    <option value="{{ key }}">{{ theme.label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+        <div class="account-row">
+            <div class="account-row-copy">
+                <strong>Color mode</strong>
+                <p class="muted">Switch between dark and light with the toggle in the sidebar. Both themes ship with a full light mode.</p>
+            </div>
+            <span class="pill strong">Dark / Light</span>
+        </div>
     </div>
     {% endif %}
     <pre class="code-panel">{{ {"implemented": false, "next": active_nav} | tojson(indent=2) }}</pre>

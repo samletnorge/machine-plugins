@@ -8,13 +8,17 @@
                 <h3>Machine runtime API</h3>
             </div>
         </div>
+        <p class="section-lede">Stable JSON endpoints generated from the Machine registry, grouped by category.</p>
         <div class="stack-list compact">
             {% for category in categories %}
             <div class="metric-row">
-                <span>/api/{{ category }}</span>
+                <span class="mono">/api/{{ category }}</span>
                 <strong>{{ category_counts.get(category, 0) }}</strong>
             </div>
             {% endfor %}
+            {% if not categories %}
+            <p class="muted">No runtime categories are registered.</p>
+            {% endif %}
         </div>
     </article>
 
@@ -25,6 +29,7 @@
                 <h3>Studio surfaces</h3>
             </div>
         </div>
+        <p class="section-lede">Operator-facing routes served from the mounted control plane.</p>
         <ul class="simple-list mono">
             <li>/_studio/</li>
             <li>/_studio/registry</li>

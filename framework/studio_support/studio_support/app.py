@@ -77,552 +77,702 @@ def _landing_page_html(state: StudioState) -> str:
         ]
     )
 
-    ecosystem_cards = "".join(
-        [
-            "<span class='ecosystem-pill'>Agents</span>",
-            "<span class='ecosystem-pill'>Tools</span>",
-            "<span class='ecosystem-pill'>Model providers</span>",
-            "<span class='ecosystem-pill'>Workflows</span>",
-            "<span class='ecosystem-pill'>RAG</span>",
-            "<span class='ecosystem-pill'>Browser</span>",
-            "<span class='ecosystem-pill'>Workspace</span>",
-            "<span class='ecosystem-pill'>Deploy</span>",
-        ]
+    def _icon(path: str) -> str:
+        return (
+            "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' "
+            "stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' "
+            f"aria-hidden='true'>{path}</svg>"
+        )
+
+    build_items = [
+        (
+            "Agents",
+            "Register user-facing agents with tools, memory, and their own run loop.",
+            "<circle cx='12' cy='8' r='3.4'/><path d='M5.5 20a6.5 6.5 0 0 1 13 0'/>",
+        ),
+        (
+            "Tools",
+            "Define typed handlers and expose them over a stable runtime API.",
+            "<path d='M14.7 6.3a4 4 0 0 0 3 5.5L10 19.5 4.5 14l7.7-7.7a4 4 0 0 0 2.5 0Z'/><path d='m13 3 8 8'/>",
+        ),
+        (
+            "RAG",
+            "Compose pipelines, chunkers, rerankers, and retrievers as plugins.",
+            "<circle cx='11' cy='11' r='6'/><path d='m20 20-4.2-4.2'/>",
+        ),
+        (
+            "Memory",
+            "Thread history and working memory with a persistent storage backend.",
+            "<path d='m12 4 8 4-8 4-8-4Z'/><path d='m4 12 8 4 8-4'/><path d='m4 16 8 4 8-4'/>",
+        ),
+        (
+            "Workflows",
+            "Model sequential and parallel steps as an inspectable graph.",
+            "<rect x='4' y='4' width='6' height='6' rx='1.4'/><rect x='14' y='4' width='6' height='6' rx='1.4'/><rect x='9' y='14' width='6' height='6' rx='1.4'/><path d='M10 7h4'/><path d='M12 10v4'/>",
+        ),
+        (
+            "Evals",
+            "Score prompts and models with datasets, scorers, and run comparisons.",
+            "<path d='M4 19h16'/><path d='M7 16V9'/><path d='M12 16V5'/><path d='M17 16v-7'/>",
+        ),
+        (
+            "MCP",
+            "Connect Model Context Protocol servers as first-class tool providers.",
+            "<path d='M9 7V5a3 3 0 0 1 6 0v2'/><rect x='5' y='7' width='14' height='12' rx='2.4'/>",
+        ),
+        (
+            "Studio",
+            "One control plane to switch contexts, inspect the fleet, and operate.",
+            "<rect x='3.5' y='4' width='17' height='4' rx='1.4'/><rect x='3.5' y='11' width='7' height='9' rx='1.4'/><rect x='13.5' y='11' width='7' height='9' rx='1.4'/>",
+        ),
+    ]
+
+    build_cards = "".join(
+        (
+            "<article class='build-card reveal'>"
+            f"<span class='build-icon'>{_icon(path)}</span>"
+            f"<h3>{title}</h3>"
+            f"<p>{copy}</p>"
+            "</article>"
+        )
+        for title, copy, path in build_items
     )
 
-    studio_preview = f"""
-      <article class='studio-preview-card'>
-        <span class='card-label'>Studio</span>
-        <strong>{len(projects)} projects across {len(environments)} environments</strong>
-        <p>When one project becomes many, Studio gives you one place to switch between them.</p>
-        <div class='studio-preview-strip'>
-          <span>{active_target}</span>
-          <span class='studio-preview-sep'></span>
-          <span>/_studio/</span>
-        </div>
-      </article>
-    """
+    feature_items = [
+        (
+            "Project-scoped",
+            "Everything is scoped to a project and environment, so growing to many projects never means starting over.",
+        ),
+        (
+            "Composable plugins",
+            "Add agents, tools, workflows, and storage as plugins instead of rewriting the core system.",
+        ),
+        (
+            "Model gateway",
+            "Put OpenAI, Anthropic, Google, Groq, and local models behind one provider contract.",
+        ),
+        (
+            "Stable runtime API",
+            "A generated /api/* data plane that stays consistent as your registry changes.",
+        ),
+        (
+            "Operator control plane",
+            "Studio inspects the fleet, switches contexts, and tests tools without leaving the browser.",
+        ),
+        (
+            "Observable by default",
+            "Traces, evaluations, and memory inspection live next to the code that produces them.",
+        ),
+    ]
 
-    studio_note = f"""
-      <article class='studio-note reveal-item'>
-        <span class='card-label'>Current context</span>
-        <strong>{active_target}</strong>
-        <p>Studio stays off to the side until you need to coordinate across projects or environments.</p>
-      </article>
-    """
-
-    command_markup = (
-        "<div class='command-stage'>"
-        "<div class='command-orbit orbit-a'></div>"
-        "<div class='command-orbit orbit-b'></div>"
-        "<div class='command-core'>"
-        "<span class='command-kicker'>Install Machine</span>"
-        "<div class='command-shell'>"
-        f"<code id='install-command'>{escape(install_command)}</code>"
-        "<button type='button' class='copy-button icon-only' id='copy-install' aria-label='Copy install command' title='Copy install command'>"
-        "<span class='copy-icon' aria-hidden='true'>⧉</span>"
-        "</button>"
-        "</div>"
-        "<p class='command-caption'>Paste this once. Then start building.</p>"
-        "</div>"
-        "</div>"
+    feature_cards = "".join(
+        (
+            "<article class='feature-card reveal'>"
+            f"<span class='feature-index'>{index:02d}</span>"
+            f"<h3>{title}</h3>"
+            f"<p>{copy}</p>"
+            "</article>"
+        )
+        for index, (title, copy) in enumerate(feature_items, start=1)
     )
 
-    return f"""
-<!DOCTYPE html>
+    stats = [
+        (len(tenants), "Tenants"),
+        (len(projects), "Projects"),
+        (len(environments), "Environments"),
+        (len(build_items), "Capability areas"),
+    ]
+    stat_cells = "".join(
+        f"<div class='stat'><strong>{value}</strong><span>{label}</span></div>"
+        for value, label in stats
+    )
+
+    style = """
+    * { box-sizing: border-box; }
+    :root {
+        color-scheme: dark;
+        --bg: #060d16;
+        --bg-soft: #0a1622;
+        --panel: rgba(15, 27, 42, 0.68);
+        --panel-strong: rgba(11, 21, 33, 0.92);
+        --text: #eaf2fb;
+        --muted: #93a7bd;
+        --line: rgba(148, 172, 198, 0.16);
+        --line-strong: rgba(148, 172, 198, 0.28);
+        --teal: #7dd3c7;
+        --cyan: #67e8f9;
+        --violet: #a78bfa;
+        --amber: #fbbf24;
+        --grad: linear-gradient(135deg, #7dd3c7, #67e8f9);
+        --radius: 18px;
+        --shadow: 0 30px 90px rgba(2, 8, 23, 0.55);
+        --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        --font-display: 'Sora', 'Inter', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font-sans);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+        background:
+            radial-gradient(60rem 40rem at 12% -8%, rgba(125, 211, 199, 0.2), transparent 55%),
+            radial-gradient(50rem 36rem at 92% 4%, rgba(103, 232, 249, 0.14), transparent 55%),
+            radial-gradient(46rem 34rem at 50% 120%, rgba(167, 139, 250, 0.12), transparent 58%),
+            linear-gradient(180deg, #08121d 0%, #060d16 46%, #04090f 100%);
+        background-attachment: fixed;
+    }
+    a { color: inherit; text-decoration: none; }
+    h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.035em; margin: 0; }
+    p { margin: 0; }
+    img, svg { display: block; }
+    .container { width: min(1180px, calc(100% - 44px)); margin: 0 auto; }
+    .nav {
+        position: sticky;
+        top: 0;
+        z-index: 60;
+        backdrop-filter: blur(18px);
+        background: rgba(7, 15, 25, 0.72);
+        border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 68px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+        width: 40px; height: 40px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 12px;
+        background: linear-gradient(180deg, rgba(12, 24, 38, 0.96), rgba(9, 18, 29, 0.9));
+        border: 1px solid rgba(125, 211, 199, 0.26);
+        box-shadow: 0 14px 34px rgba(3, 10, 18, 0.4);
+    }
+    .brand-mark svg { width: 26px; height: 26px; }
+    .brand-copy strong { font-family: var(--font-display); font-size: 1.02rem; letter-spacing: -0.02em; display: block; }
+    .brand-copy small { color: var(--muted); font-size: 0.76rem; }
+    .nav-links { display: flex; align-items: center; gap: 26px; }
+    .nav-links a { color: var(--muted); font-size: 0.92rem; font-weight: 500; transition: color 160ms ease; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(125, 211, 199, 0.3);
+        background: linear-gradient(135deg, rgba(125, 211, 199, 0.18), rgba(103, 232, 249, 0.1));
+        font-size: 0.9rem; font-weight: 600;
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+    .nav-cta:hover { transform: translateY(-1px); border-color: rgba(125, 211, 199, 0.5); }
+
+    .hero { position: relative; padding: 96px 0 64px; text-align: center; overflow: hidden; }
+    .hero::before {
+        content: "";
+        position: absolute; inset: -20% 10% auto 10%; height: 480px;
+        background: radial-gradient(circle at center, rgba(125, 211, 199, 0.16), transparent 62%);
+        pointer-events: none;
+    }
+    .badge {
+        display: inline-flex; align-items: center; gap: 10px;
+        padding: 8px 15px;
+        border-radius: 999px;
+        border: 1px solid var(--line-strong);
+        background: rgba(9, 19, 31, 0.7);
+        color: var(--muted);
+        font-size: 0.82rem;
+    }
+    .badge .dot {
+        width: 8px; height: 8px; border-radius: 999px;
+        background: var(--grad);
+        box-shadow: 0 0 16px rgba(125, 211, 199, 0.9);
+    }
+    .hero h1 {
+        max-width: 17ch;
+        margin: 22px auto 20px;
+        font-size: clamp(2.7rem, 6.4vw, 4.7rem);
+        line-height: 1.02;
+        letter-spacing: -0.045em;
+    }
+    .hero h1 .grad {
+        background: var(--grad);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .hero-sub {
+        max-width: 62ch;
+        margin: 0 auto;
+        color: var(--muted);
+        font-size: clamp(1rem, 1.6vw, 1.16rem);
+        line-height: 1.65;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 30px 0 8px; }
+    .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+        padding: 14px 24px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.98rem;
+        transition: transform 160ms ease, filter 160ms ease, border-color 160ms ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--grad); color: #04202c; box-shadow: 0 16px 40px rgba(125, 211, 199, 0.28); }
+    .btn-primary:hover { filter: brightness(1.04); }
+    .btn-ghost { border: 1px solid var(--line-strong); background: rgba(8, 18, 29, 0.6); }
+    .btn-ghost:hover { border-color: rgba(125, 211, 199, 0.44); }
+    .hero-chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 26px; }
+    .chip {
+        padding: 7px 13px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(9, 19, 31, 0.55);
+        color: var(--muted);
+        font-size: 0.8rem;
+    }
+
+    .install { padding: 18px 0 72px; }
+    .terminal {
+        position: relative;
+        max-width: 860px;
+        margin: 0 auto;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, rgba(12, 24, 38, 0.92), rgba(7, 14, 23, 0.96));
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .terminal-bar {
+        display: flex; align-items: center; gap: 8px;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(6, 12, 20, 0.7);
+    }
+    .terminal-bar .dot { width: 11px; height: 11px; border-radius: 999px; }
+    .dot-red { background: #f87171; } .dot-amber { background: #fbbf24; } .dot-green { background: #34d399; }
+    .terminal-title { margin-left: 10px; color: var(--muted); font-size: 0.82rem; }
+    .terminal-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: center;
+        padding: 22px 20px;
+    }
+    .terminal-body code {
+        display: block;
+        text-align: left;
+        font-family: 'SFMono-Regular', 'JetBrains Mono', 'Consolas', monospace;
+        font-size: clamp(0.84rem, 1.3vw, 0.98rem);
+        line-height: 1.7;
+        color: #d8ecf5;
+        word-break: break-word;
+    }
+    .terminal-body code .prompt { color: var(--teal); margin-right: 8px; user-select: none; }
+    .copy-button {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        height: 46px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(125, 211, 199, 0.24);
+        background: linear-gradient(135deg, rgba(125, 211, 199, 0.16), rgba(103, 232, 249, 0.1));
+        color: var(--text);
+        font: inherit; font-weight: 600; cursor: pointer;
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+    .copy-button:hover { transform: translateY(-1px); border-color: rgba(125, 211, 199, 0.48); }
+    .copy-button.copied { border-color: rgba(125, 211, 199, 0.6); box-shadow: 0 0 0 8px rgba(125, 211, 199, 0.08); }
+    .terminal-caption { padding: 0 20px 20px; color: var(--muted); font-size: 0.9rem; }
+
+    section.block { padding: 72px 0; }
+    .section-head { max-width: 60ch; margin-bottom: 40px; }
+    .eyebrow {
+        display: inline-block;
+        color: var(--cyan);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 0.74rem;
+        font-weight: 600;
+        margin-bottom: 14px;
+    }
+    .section-head h2 { font-size: clamp(1.9rem, 3.6vw, 2.8rem); line-height: 1.08; }
+    .section-head p { margin-top: 14px; color: var(--muted); font-size: 1.04rem; line-height: 1.65; }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .feature-card {
+        position: relative;
+        padding: 26px 24px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, rgba(13, 25, 39, 0.7), rgba(9, 18, 29, 0.82));
+        overflow: hidden;
+        transition: transform 180ms ease, border-color 180ms ease;
+    }
+    .feature-card:hover { transform: translateY(-3px); border-color: var(--line-strong); }
+    .feature-card::after {
+        content: "";
+        position: absolute; inset: auto -30% -60% 30%; height: 180px;
+        background: radial-gradient(circle, rgba(125, 211, 199, 0.14), transparent 65%);
+        pointer-events: none;
+    }
+    .feature-index {
+        display: inline-flex;
+        font-family: var(--font-display);
+        font-size: 0.82rem;
+        color: var(--teal);
+        letter-spacing: 0.08em;
+        margin-bottom: 14px;
+    }
+    .feature-card h3 { font-size: 1.16rem; }
+    .feature-card p { margin-top: 10px; color: var(--muted); font-size: 0.94rem; line-height: 1.6; }
+
+    .build-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+    .build-card {
+        display: grid;
+        gap: 12px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, rgba(13, 25, 39, 0.66), rgba(8, 16, 26, 0.82));
+        transition: transform 180ms ease, border-color 180ms ease;
+    }
+    .build-card:hover { transform: translateY(-3px); border-color: rgba(125, 211, 199, 0.4); }
+    .build-icon {
+        width: 46px; height: 46px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 13px;
+        color: var(--teal);
+        background: rgba(125, 211, 199, 0.12);
+        border: 1px solid rgba(125, 211, 199, 0.22);
+    }
+    .build-icon svg { width: 24px; height: 24px; }
+    .build-card h3 { font-size: 1.06rem; }
+    .build-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.58; }
+
+    .stats-band {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1px;
+        margin: 0 auto;
+        padding: 1px;
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: var(--line);
+    }
+    .stat { padding: 26px 22px; background: linear-gradient(180deg, rgba(13, 25, 39, 0.9), rgba(8, 16, 26, 0.94)); }
+    .stat strong { display: block; font-family: var(--font-display); font-size: 2.3rem; letter-spacing: -0.05em; }
+    .stat span { display: block; margin-top: 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.72rem; }
+
+    .context-strip {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+        margin-top: 26px;
+        padding: 16px 20px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(9, 19, 31, 0.55);
+        color: var(--muted);
+        font-size: 0.92rem;
+    }
+    .context-strip .tag {
+        padding: 5px 11px;
+        border-radius: 999px;
+        border: 1px solid rgba(125, 211, 199, 0.24);
+        background: rgba(125, 211, 199, 0.1);
+        color: var(--teal);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    .context-strip strong { color: var(--text); }
+
+    .cta-band {
+        margin: 24px 0 0;
+        padding: 54px 40px;
+        border: 1px solid rgba(125, 211, 199, 0.22);
+        border-radius: calc(var(--radius) + 6px);
+        text-align: center;
+        background:
+            radial-gradient(circle at 20% 20%, rgba(125, 211, 199, 0.16), transparent 42%),
+            radial-gradient(circle at 84% 30%, rgba(167, 139, 250, 0.14), transparent 44%),
+            linear-gradient(180deg, rgba(12, 24, 38, 0.9), rgba(7, 14, 23, 0.95));
+        box-shadow: var(--shadow);
+    }
+    .cta-band h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
+    .cta-band p { margin: 14px auto 26px; max-width: 52ch; color: var(--muted); line-height: 1.6; }
+    .cta-band .hero-actions { margin: 0; }
+
+    .reveal { opacity: 1; transform: none; }
+    html.js .reveal { opacity: 0; transform: translateY(22px); transition: opacity 520ms ease, transform 520ms ease; }
+    html.js .reveal.reveal-visible { opacity: 1; transform: translateY(0); }
+
+    footer.footer {
+        margin-top: 72px;
+        border-top: 1px solid var(--line);
+        background: rgba(5, 11, 18, 0.7);
+        padding: 52px 0 40px;
+    }
+    .footer-grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px; }
+    .footer-brand p { margin-top: 14px; max-width: 34ch; color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+    .footer-col h4 { margin: 0 0 14px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+    .footer-col a { display: block; margin-bottom: 10px; color: var(--text); font-size: 0.92rem; opacity: 0.86; transition: opacity 140ms ease, color 140ms ease; }
+    .footer-col a:hover { opacity: 1; color: var(--teal); }
+    .footer-bottom {
+        display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px;
+        margin-top: 42px; padding-top: 22px;
+        border-top: 1px solid var(--line);
+        color: var(--muted); font-size: 0.86rem;
+    }
+
+    @media (max-width: 980px) {
+        .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .build-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .footer-grid { grid-template-columns: 1fr 1fr; }
+        .nav-links { display: none; }
+    }
+    @media (max-width: 640px) {
+        .feature-grid, .build-grid, .stats-band, .footer-grid { grid-template-columns: 1fr; }
+        .terminal-body { grid-template-columns: 1fr; }
+        .copy-button { width: 100%; }
+        .hero { padding: 72px 0 48px; }
+        .cta-band { padding: 40px 22px; }
+    }
+    """
+
+    script = """
+    (() => {
+        document.documentElement.classList.add('js');
+        const button = document.getElementById('copy-install');
+        const code = document.getElementById('install-command');
+        if (button && code && navigator.clipboard) {
+            button.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(code.textContent || '');
+                    button.classList.add('copied');
+                    const label = button.querySelector('.copy-label');
+                    if (label) label.textContent = 'Copied';
+                    window.setTimeout(() => {
+                        button.classList.remove('copied');
+                        if (label) label.textContent = 'Copy';
+                    }, 1600);
+                } catch (_error) {
+                    const label = button.querySelector('.copy-label');
+                    if (label) label.textContent = 'Copy failed';
+                    window.setTimeout(() => {
+                        if (label) label.textContent = 'Copy';
+                    }, 1600);
+                }
+            });
+        }
+
+        const revealables = document.querySelectorAll('.reveal');
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                for (const entry of entries) {
+                    if (!entry.isIntersecting) continue;
+                    entry.target.classList.add('reveal-visible');
+                    observer.unobserve(entry.target);
+                }
+            }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+            revealables.forEach((node, index) => {
+                node.style.transitionDelay = `${Math.min(index * 45, 240)}ms`;
+                observer.observe(node);
+            });
+        } else {
+            revealables.forEach((node) => node.classList.add('reveal-visible'));
+        }
+    })();
+    """
+
+    return f"""<!DOCTYPE html>
 <html lang='en'>
 <head>
   <meta charset='UTF-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-  <title>Machine Core</title>
+  <meta name='description' content='Machine Core is the open control plane for building, running, and managing AI projects with agents, tools, RAG, memory, workflows, and evals.'>
+  <title>Machine Core · Build, run, and manage AI projects</title>
   <link rel='icon' href='/favicon.ico' type='image/svg+xml'>
-  <style>
-    :root {{
-      color-scheme: dark;
-      --bg: #07111b;
-      --panel: rgba(10, 24, 39, 0.82);
-      --panel-strong: rgba(8, 19, 31, 0.94);
-      --text: #eff6ff;
-      --muted: #9db2c8;
-      --line: rgba(157, 178, 200, 0.2);
-      --teal: #7dd3c7;
-      --cyan: #67e8f9;
-      --violet: #a78bfa;
-      --amber: #fbbf24;
-      --shadow: 0 30px 100px rgba(2, 8, 23, 0.45);
-    }}
-    * {{ box-sizing: border-box; }}
-    body {{
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(125, 211, 199, 0.22), transparent 28%),
-        radial-gradient(circle at 85% 15%, rgba(103, 232, 249, 0.16), transparent 24%),
-        linear-gradient(180deg, #08121d 0%, #07111b 45%, #050c13 100%);
-    }}
-    a {{ color: inherit; text-decoration: none; }}
-    .shell {{ max-width: 1280px; margin: 0 auto; padding: 24px; }}
-    .topbar {{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 16px 20px;
-      border: 1px solid var(--line);
-      background: rgba(7, 17, 27, 0.55);
-      backdrop-filter: blur(18px);
-      box-shadow: var(--shadow);
-    }}
-    .brand {{ display: flex; align-items: center; gap: 14px; }}
-    .brand-mark {{
-      width: 52px;
-      height: 52px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 16px;
-      background: linear-gradient(180deg, rgba(8, 18, 29, 0.96), rgba(12, 24, 37, 0.92));
-      border: 1px solid rgba(125, 211, 199, 0.18);
-      box-shadow: 0 18px 36px rgba(3, 10, 18, 0.28);
-    }}
-    .brand-mark svg {{
-      display: block;
-      width: 36px;
-      height: 36px;
-    }}
-    .brand-copy strong, .hero-copy h1, .panel h2, .metric strong {{ letter-spacing: -0.03em; }}
-    .brand-copy small, .eyebrow, .metric span, .panel p, .command-card p, .footer-note {{ color: var(--muted); }}
-    .studio-link {{
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 18px;
-      border: 1px solid rgba(125, 211, 199, 0.28);
-      background: linear-gradient(135deg, rgba(125, 211, 199, 0.16), rgba(103, 232, 249, 0.08));
-      color: var(--text);
-      font-weight: 600;
-    }}
-    .hero {{ display: grid; gap: 26px; padding: 46px 0 22px; justify-items: center; text-align: center; }}
-    .hero-copy {{
-      width: min(980px, 100%);
-      padding: 24px 0 0;
-      background: none;
-      border: 0;
-      box-shadow: none;
-      position: relative;
-      overflow: hidden;
-    }}
-    .eyebrow {{ text-transform: uppercase; letter-spacing: 0.16em; font-size: 12px; }}
-    .hero-copy h1 {{ font-size: clamp(3.6rem, 8vw, 7rem); line-height: 0.88; margin: 16px auto 18px; max-width: 11ch; }}
-    .hero-copy p {{ font-size: 1.08rem; max-width: 56ch; margin: 0 auto 18px; }}
-    .hero-actions {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 14px 0 0; }}
-    .hero-primary {{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 22px;
-      background: linear-gradient(135deg, rgba(125, 211, 199, 0.9), rgba(103, 232, 249, 0.82));
-      color: #04202c;
-      font-weight: 700;
-    }}
-    .hero-secondary {{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 22px;
-      border: 1px solid var(--line);
-      background: rgba(8, 18, 29, 0.58);
-      font-weight: 600;
-    }}
-    .hero-tagline {{
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border: 1px solid rgba(125, 211, 199, 0.22);
-      background: rgba(8, 18, 29, 0.56);
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin-bottom: 10px;
-    }}
-    .hero-tagline::before {{
-      content: "";
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--teal), var(--cyan));
-      box-shadow: 0 0 18px rgba(125, 211, 199, 0.9);
-    }}
-    .hero-subgrid {{ width: min(920px, 100%); margin-top: 6px; }}
-    .command-stage {{
-      position: relative;
-      min-height: 332px;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      border: 1px solid rgba(125, 211, 199, 0.14);
-      background:
-        radial-gradient(circle at 18% 24%, rgba(125, 211, 199, 0.14), transparent 26%),
-        radial-gradient(circle at 80% 18%, rgba(167, 139, 250, 0.14), transparent 24%),
-        linear-gradient(180deg, rgba(9, 20, 31, 0.9), rgba(5, 12, 20, 0.94));
-      box-shadow: var(--shadow);
-    }}
-    .command-orbit {{
-      position: absolute;
-      border: 1px solid rgba(125, 211, 199, 0.14);
-      border-radius: 999px;
-      animation: drift 14s linear infinite;
-    }}
-    .orbit-a {{ width: 560px; height: 560px; opacity: 0.6; }}
-    .orbit-b {{ width: 380px; height: 380px; animation-direction: reverse; animation-duration: 11s; opacity: 0.45; }}
-    .command-core {{
-      position: relative;
-      z-index: 1;
-      width: min(820px, calc(100% - 44px));
-      padding: 34px 28px;
-      background: linear-gradient(180deg, rgba(12, 25, 39, 0.88), rgba(8, 17, 27, 0.95));
-      border: 1px solid rgba(125, 211, 199, 0.18);
-      box-shadow: 0 28px 90px rgba(3, 10, 18, 0.48);
-    }}
-    .command-kicker {{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
-      color: var(--cyan);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-    }}
-    .command-kicker::before {{
-      content: "";
-      width: 28px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--cyan));
-    }}
-    .command-shell {{
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 16px;
-      align-items: center;
-      padding: 20px 22px;
-      border: 1px solid rgba(125, 211, 199, 0.16);
-      background: rgba(5, 12, 20, 0.9);
-      margin-bottom: 18px;
-    }}
-    .command-shell code {{
-      display: block;
-      text-align: left;
-      color: var(--text);
-      font-size: clamp(0.92rem, 1.3vw, 1.08rem);
-      line-height: 1.8;
-      word-break: break-word;
-    }}
-    .copy-button {{
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
-      border: 1px solid rgba(125, 211, 199, 0.22);
-      background: linear-gradient(135deg, rgba(125, 211, 199, 0.18), rgba(103, 232, 249, 0.12));
-      color: var(--text);
-      font: inherit;
-      cursor: pointer;
-      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-    }}
-    .copy-button.icon-only {{
-      justify-content: center;
-      width: 58px;
-      height: 58px;
-      padding: 0;
-      border-radius: 999px;
-    }}
-    .copy-button:hover {{
-      transform: translateY(-1px);
-      border-color: rgba(125, 211, 199, 0.42);
-      background: linear-gradient(135deg, rgba(125, 211, 199, 0.26), rgba(103, 232, 249, 0.18));
-    }}
-    .copy-button.copied {{
-      border-color: rgba(125, 211, 199, 0.5);
-      box-shadow: 0 0 0 10px rgba(125, 211, 199, 0.08);
-    }}
-    .copy-icon {{
-      display: inline-grid;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 999px;
-      background: rgba(125, 211, 199, 0.14);
-      animation: pulse 2.6s ease-in-out infinite;
-      font-size: 1rem;
-    }}
-    .command-caption {{ margin: 0; font-size: 0.98rem; color: var(--muted); }}
-    .hero-grid {{ display: grid; gap: 18px; margin-top: 18px; }}
-    .feature-rail {{ display: grid; gap: 18px; }}
-    .info-card, .studio-preview-card, .studio-note, .example-card {{
-      padding: 20px;
-      border: 1px solid var(--line);
-      background: rgba(8, 18, 29, 0.56);
-      box-shadow: var(--shadow);
-    }}
-    .info-card, .studio-preview-card, .studio-note, .ecosystem-pill {{
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 520ms ease, transform 520ms ease;
-    }}
-    .reveal-visible {{
-      opacity: 1 !important;
-      transform: translateY(0) !important;
-    }}
-    .info-card strong, .studio-preview-card strong, .studio-note strong, .example-card strong {{
-      display: block;
-      margin: 8px 0 10px;
-      font-size: 1.14rem;
-      letter-spacing: -0.02em;
-    }}
-    .info-card p, .studio-preview-card p, .studio-note p, .example-card p {{ margin: 0; color: var(--muted); }}
-    .section-stack {{ display: grid; gap: 72px; padding: 56px 0 72px; }}
-    .section-shell {{
-      padding: 40px;
-      border: 1px solid var(--line);
-      background: var(--panel-strong);
-      box-shadow: var(--shadow);
-    }}
-    .section-shell h2 {{ margin: 8px 0 8px; font-size: 2rem; letter-spacing: -0.03em; }}
-    .section-shell > p {{ margin: 0; color: var(--muted); max-width: 62ch; }}
-    .section-shell.story-layout,
-    .section-shell.alt-layout {{
-      display: grid;
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-      gap: 42px;
-      align-items: start;
-    }}
-    .section-intro {{ display: grid; gap: 10px; }}
-    .capability-row,
-    .ecosystem-grid {{ display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }}
-    .ecosystem-pill {{
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px 14px;
-      border: 1px solid rgba(125, 211, 199, 0.2);
-      background: rgba(8, 18, 29, 0.5);
-      color: var(--text);
-      font-weight: 600;
-    }}
-    .info-card.spotlight {{
-      background: linear-gradient(180deg, rgba(10, 26, 40, 0.88), rgba(13, 31, 49, 0.96));
-      border-color: rgba(125, 211, 199, 0.22);
-    }}
-    .info-card.spotlight strong {{ font-size: 1.28rem; }}
-    .story-layout .section-intro {{ padding-right: 12px; }}
-    .studio-side {{ display: grid; gap: 18px; align-content: start; }}
-    .studio-note {{ background: rgba(8, 18, 29, 0.42); }}
-    .studio-preview-card {{
-      background: linear-gradient(180deg, rgba(10, 24, 39, 0.72), rgba(14, 31, 49, 0.9));
-      border-color: rgba(125, 211, 199, 0.22);
-    }}
-    .studio-preview-card strong {{ font-size: 1.26rem; }}
-    .studio-preview-strip {{
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-      color: var(--text);
-    }}
-    .studio-preview-sep {{ width: 18px; height: 1px; background: linear-gradient(90deg, rgba(125, 211, 199, 0.4), transparent); }}
-    .footer-bar {{
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      padding: 20px 0 40px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }}
-    .footer-links {{ display: flex; gap: 16px; flex-wrap: wrap; }}
-    .footer-links a {{ color: var(--text); }}
-    .panel {{
-      padding: 22px;
-      border: 1px solid var(--line);
-      background: var(--panel);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-    }}
-    .card-label {{ color: var(--cyan); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.75rem; }}
-    .footer-note {{ padding-top: 8px; font-size: 0.92rem; }}
-    @keyframes pulse {{
-      0%, 100% {{ transform: scale(1); box-shadow: 0 0 0 0 rgba(125, 211, 199, 0.18); }}
-      50% {{ transform: scale(1.08); box-shadow: 0 0 0 14px rgba(125, 211, 199, 0); }}
-    }}
-    @keyframes drift {{
-      from {{ transform: rotate(0deg); }}
-      to {{ transform: rotate(360deg); }}
-    }}
-    @media (max-width: 980px) {{
-      .feature-rail,
-      .capability-row,
-      .ecosystem-grid,
-      .section-shell.story-layout,
-      .section-shell.alt-layout {{ grid-template-columns: 1fr; }}
-      .command-shell {{ grid-template-columns: 1fr; }}
-      .copy-button.icon-only {{ width: 58px; }}
-    }}
-  </style>
+  <link rel='preconnect' href='https://fonts.googleapis.com'>
+  <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap'>
+  <style>{style}</style>
 </head>
 <body>
-  <div class='shell'>
-    <header class='topbar'>
-      <div class='brand'>
-        <div class='brand-mark' aria-hidden='true'>
+  <header class='nav'>
+    <div class='container nav-inner'>
+      <a class='brand' href='/'>
+        <span class='brand-mark' aria-hidden='true'>
           <svg viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
             <defs>
-              <linearGradient id='machine-mark-gradient' x1='6' y1='6' x2='42' y2='42' gradientUnits='userSpaceOnUse'>
+              <linearGradient id='landing-machine-mark' x1='6' y1='6' x2='42' y2='42' gradientUnits='userSpaceOnUse'>
                 <stop stop-color='#7DD3C7'/>
                 <stop offset='1' stop-color='#67E8F9'/>
               </linearGradient>
             </defs>
-            <path d='M9 38V10L24 27L39 10V38' stroke='url(#machine-mark-gradient)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/>
-            <circle cx='9' cy='10' r='3.2' fill='#07111B' stroke='url(#machine-mark-gradient)' stroke-width='2'/>
-            <circle cx='24' cy='27' r='3.2' fill='#07111B' stroke='url(#machine-mark-gradient)' stroke-width='2'/>
-            <circle cx='39' cy='10' r='3.2' fill='#07111B' stroke='url(#machine-mark-gradient)' stroke-width='2'/>
+            <path d='M9 38V10L24 27L39 10V38' stroke='url(#landing-machine-mark)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/>
+            <circle cx='9' cy='10' r='3.2' fill='#060d16' stroke='url(#landing-machine-mark)' stroke-width='2'/>
+            <circle cx='24' cy='27' r='3.2' fill='#060d16' stroke='url(#landing-machine-mark)' stroke-width='2'/>
+            <circle cx='39' cy='10' r='3.2' fill='#060d16' stroke='url(#landing-machine-mark)' stroke-width='2'/>
           </svg>
-        </div>
-        <div class='brand-copy'>
-          <strong>Machine Core</strong><br>
-          <small>One system to build, run, and manage AI projects</small>
-        </div>
-      </div>
-      <a class='studio-link' href='/_studio/'>Open Studio</a>
-    </header>
+        </span>
+        <span class='brand-copy'>
+          <strong>Machine Core</strong>
+          <small>One system for AI projects</small>
+        </span>
+      </a>
+      <nav class='nav-links' aria-label='Primary'>
+        <a href='#features'>Features</a>
+        <a href='#build'>What you can build</a>
+        <a href='#install-machine'>Install</a>
+        <a href='/_studio/'>Studio</a>
+      </nav>
+      <a class='nav-cta' href='/_studio/'>Open Studio &rarr;</a>
+    </div>
+  </header>
 
+  <main>
     <section class='hero'>
-      <div class='hero-copy'>
-        <div class='hero-tagline'>From the first project to everything that comes after</div>
-        <div class='eyebrow'>Machine Core</div>
-        <h1>One system to build, run, and manage AI projects.</h1>
-        <p>Start with one project, keep shipping, and grow into bigger setups without changing how the system works underneath you.</p>
+      <div class='container'>
+        <span class='badge'><span class='dot'></span> Open-source control plane for AI projects</span>
+        <h1>Build, run, and manage AI projects on <span class='grad'>one system</span>.</h1>
+        <p class='hero-sub'>Start with a single project and keep shipping. Machine Core keeps the way you began working even when the project grows into many runtimes, contexts, and operators.</p>
         <div class='hero-actions'>
-          <a class='hero-primary' href='#install-machine'>Install Machine</a>
-          <a class='hero-secondary' href='/_studio/'>Open Studio</a>
+          <a class='btn btn-primary' href='#install-machine'>Install Machine</a>
+          <a class='btn btn-ghost' href='/_studio/'>Open Studio</a>
         </div>
-      </div>
-
-      <div class='hero-subgrid' id='install-machine'>
-        {command_markup}
+        <div class='hero-chips'>
+          <span class='chip'>Agents</span>
+          <span class='chip'>Tools</span>
+          <span class='chip'>RAG</span>
+          <span class='chip'>Memory</span>
+          <span class='chip'>Workflows</span>
+          <span class='chip'>Evals</span>
+          <span class='chip'>MCP</span>
+          <span class='chip'>Studio</span>
+        </div>
       </div>
     </section>
 
-    <section class='section-stack'>
-      <section class='section-shell story-layout reveal-block'>
-        <div class='section-intro'>
-          <div class='eyebrow'>What Machine Core is</div>
+    <section class='install' id='install-machine'>
+      <div class='container'>
+        <div class='terminal'>
+          <div class='terminal-bar'>
+            <span class='dot dot-red'></span>
+            <span class='dot dot-amber'></span>
+            <span class='dot dot-green'></span>
+            <span class='terminal-title'>install.sh</span>
+          </div>
+          <div class='terminal-body'>
+            <code id='install-command'><span class='prompt'>$</span>{escape(install_command)}</code>
+            <button type='button' class='copy-button' id='copy-install' aria-label='Copy install command' title='Copy install command'>
+              <span class='copy-label'>Copy</span>
+              <span aria-hidden='true'>&#10697;</span>
+            </button>
+          </div>
+          <p class='terminal-caption'>Paste this once. Machine Core wires up the runtime, the plugin system, and Studio.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class='block' id='features'>
+      <div class='container'>
+        <div class='section-head'>
+          <span class='eyebrow'>Why Machine Core</span>
           <h2>Start simple, then grow without starting over.</h2>
-          <p>Machine Core is built so the way you begin still makes sense when the project gets bigger.</p>
-          <div class='capability-row'>
-            {ecosystem_cards}
-          </div>
+          <p>Every capability is a plugin with a stable contract, so the system you learn on day one is the system you run in production.</p>
         </div>
-        <div class='feature-rail'>
-          <article class='info-card spotlight reveal-item'>
-            <span class='card-label'>Projects</span>
-            <strong>Create and work inside projects</strong>
-            <p>Work inside real projects.</p>
-          </article>
-          <article class='info-card reveal-item'>
-            <span class='card-label'>Plugins</span>
-            <strong>Compose behavior with plugins</strong>
-            <p>Add capabilities without rebuilding everything.</p>
-          </article>
-          <article class='info-card reveal-item'>
-            <span class='card-label'>Scale</span>
-            <strong>Run one project or many</strong>
-            <p>Stay small or grow later.</p>
-          </article>
+        <div class='feature-grid'>
+          {feature_cards}
         </div>
-      </section>
-
-      <section class='section-shell alt-layout reveal-block'>
-        <div class='section-intro'>
-          <div class='eyebrow'>Studio</div>
-          <h2>Studio stays out of the way until you need a wider view.</h2>
-          <p>The same system already supports small demo apps, scaffolded projects, and larger aggregate setups. Studio is the control surface when you need to move across them.</p>
-        </div>
-        <div class='studio-side'>
-          <div class='reveal-item'>
-            {studio_preview}
-          </div>
-          {studio_note}
-        </div>
-      </section>
-
-      <section class='section-shell reveal-block'>
-        <div class='section-intro'>
-          <div class='eyebrow'>Plugin ecosystem</div>
-          <h2>Add capabilities instead of changing systems.</h2>
-          <p>Grow by adding capabilities instead of switching products.</p>
-        </div>
-        <div class='ecosystem-grid'>
-          {ecosystem_cards}
-        </div>
-      </section>
+      </div>
     </section>
 
-    <footer class='footer-bar'>
-      <div>Machine Core is the main system. Studio is there when you need a bigger view.</div>
-      <div class='footer-links'>
-        <a href='#install-machine'>Install Machine</a>
-        <a href='/_studio/'>Open Studio</a>
+    <section class='block' id='build'>
+      <div class='container'>
+        <div class='section-head'>
+          <span class='eyebrow'>What you can build</span>
+          <h2>Add capabilities instead of changing systems.</h2>
+          <p>Compose the parts you need today, and attach the rest when the project asks for them.</p>
+        </div>
+        <div class='build-grid'>
+          {build_cards}
+        </div>
       </div>
-    </footer>
-    <script>
-      (() => {{
-        const button = document.getElementById('copy-install');
-        const code = document.getElementById('install-command');
-        if (!button || !code || !navigator.clipboard) return;
+    </section>
 
-        button.addEventListener('click', async () => {{
-          try {{
-            await navigator.clipboard.writeText(code.textContent || '');
-            button.classList.add('copied');
-            button.setAttribute('aria-label', 'Copied install command');
-            button.setAttribute('title', 'Copied');
-            window.setTimeout(() => {{
-              button.classList.remove('copied');
-              button.setAttribute('aria-label', 'Copy install command');
-              button.setAttribute('title', 'Copy install command');
-            }}, 1400);
-          }} catch (_error) {{
-            button.setAttribute('title', 'Copy failed');
-            window.setTimeout(() => {{
-              button.setAttribute('title', 'Copy install command');
-            }}, 1400);
-          }}
-        }});
+    <section class='block'>
+      <div class='container'>
+        <div class='stats-band'>
+          {stat_cells}
+        </div>
+        <div class='context-strip'>
+          <span class='tag'>Live context</span>
+          <span>Currently inspecting <strong>{active_target}</strong></span>
+          <span>Studio &middot; /_studio/</span>
+        </div>
+      </div>
+    </section>
 
-        const revealables = document.querySelectorAll('.reveal-item, .ecosystem-pill');
-        const observer = new IntersectionObserver((entries) => {{
-          for (const entry of entries) {{
-            if (!entry.isIntersecting) continue;
-            entry.target.classList.add('reveal-visible');
-            observer.unobserve(entry.target);
-          }}
-        }}, {{ threshold: 0.18, rootMargin: '0px 0px -40px 0px' }});
+    <section class='block'>
+      <div class='container'>
+        <div class='cta-band'>
+          <span class='eyebrow'>Ready when you are</span>
+          <h2>Install once. Keep building.</h2>
+          <p>Bring your own models, add your own tools, and operate everything from one control plane.</p>
+          <div class='hero-actions'>
+            <a class='btn btn-primary' href='#install-machine'>Install Machine</a>
+            <a class='btn btn-ghost' href='/_studio/'>Open Studio</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-        revealables.forEach((node, index) => {{
-          node.style.transitionDelay = `${{Math.min(index * 45, 260)}}ms`;
-          observer.observe(node);
-        }});
-      }})();
-    </script>
-  </div>
+  <footer class='footer'>
+    <div class='container'>
+      <div class='footer-grid'>
+        <div class='footer-brand'>
+          <div class='brand'>
+            <span class='brand-mark' aria-hidden='true'>
+              <svg viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                <path d='M9 38V10L24 27L39 10V38' stroke='#7dd3c7' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/>
+              </svg>
+            </span>
+            <span class='brand-copy'><strong>Machine Core</strong><small>One system for AI projects</small></span>
+          </div>
+          <p>The open control plane for agents, tools, RAG, memory, workflows, and evals.</p>
+        </div>
+        <div class='footer-col'>
+          <h4>Product</h4>
+          <a href='#features'>Features</a>
+          <a href='#build'>What you can build</a>
+          <a href='#install-machine'>Install</a>
+        </div>
+        <div class='footer-col'>
+          <h4>Runtime</h4>
+          <a href='/_studio/agents'>Agents</a>
+          <a href='/_studio/tools'>Tools</a>
+          <a href='/_studio/sections/rag'>RAG</a>
+        </div>
+        <div class='footer-col'>
+          <h4>Operate</h4>
+          <a href='/_studio/'>Studio</a>
+          <a href='/_studio/docs'>Docs</a>
+          <a href='/health'>Health</a>
+        </div>
+      </div>
+      <div class='footer-bottom'>
+        <span>Machine Core &middot; Studio is the control plane when you need a wider view.</span>
+        <span>Built to run one project or many.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>{script}</script>
 </body>
 </html>
 """
-
 
 def create_studio_host_app(machine: Any) -> FastAPI:
     """Create the top-level Studio host app with a landing page at /."""

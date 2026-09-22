@@ -34,12 +34,21 @@
         </article>
         {% endfor %}
         {% if not resources %}
-        <p class="muted">{{ empty_copy }}</p>
+        <div class="empty-state">
+            <strong>{{ empty_copy }}</strong>
+            <p>Attach a runtime that registers this category, then reload the context.</p>
+        </div>
         {% endif %}
     </div>
 </section>
 {% if resource_category == 'workflow' and workflow_name %}
 <section class="panel">
+    <div class="panel-header">
+        <div>
+            <span class="eyebrow">Workflow graph</span>
+            <h3>{{ workflow_name }}</h3>
+        </div>
+    </div>
     <div
         id="workflow-island"
         data-title="Workflow graph"
