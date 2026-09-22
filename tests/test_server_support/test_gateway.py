@@ -90,3 +90,60 @@ async def test_gateway_validates_api_key():
         headers={"Authorization": "Bearer invalid-key"},
     )
     assert resp.status_code == 401
+
+
+class _FakeProvider:
+    async def generate(self, request):
+        from model_provider_support.schemas import ModelResponse
+
+        return ModelResponse(
+            provider="fake",
+            model=request.model,
+            output="hello",
+            usage={"prompt_tokens": 1, "completion_tokens": 2, "total_tokens": 3},
+        )
+
+
+class _FakeMachine:
+    def resolve(self, category, name):
+        if category == "model_provider" and name == "fake":
+            return _FakeProvider()
+        return None
+
+    def list_category(self, category):
+        return {"fake": _FakeProvider()} if category == "model_provider" else {}
+
+
+def _gateway_client(machine=None, **config_kwargs):
+    router = create_gateway_router(
+        GatewayConfig(cache_enabled=False, **config_kwargs), machine=machine
+    )
+    app = FastAPI()
+    app.include_router(router)
+    return TestClient(app)
+
+
+def test_gateway_proxies_to_registered_provider():
+    client = _gateway_client(_FakeMachine())
+    resp = client.post(
+        "/gateway/chat/completions",
+        json={
+            "provider": "fake",
+            "model": "fake-model",
+            "messages": [{"role": "user", "content": "hi"}],
+        },
+    )
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["object"] == "chat.completion"
+    assert data["choices"][0]["message"]["content"] == "hello"
+    assert data["usage"]["total_tokens"] == 3
+
+
+def test_gateway_returns_503_without_provider():
+    client = _gateway_client(None)
+    resp = client.post(
+        "/gateway/chat/completions", json={"model": "ghost", "messages": []}
+    )
+    assert resp.status_code == 503

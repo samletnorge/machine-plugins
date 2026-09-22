@@ -118,6 +118,11 @@ def create_app(
                 categories[cat] = len(machine.list_category(cat))
         return {"status": "healthy", "categories": categories}
 
+    # Model gateway (OpenAI-compatible proxy over registered providers)
+    from .gateway import GatewayConfig, create_gateway_router
+
+    app.include_router(create_gateway_router(GatewayConfig(), machine=machine))
+
     # If machine already has categories (pre-loaded or test), generate routes now
     if _has_categories(machine):
         _mount_routes(app, machine)
