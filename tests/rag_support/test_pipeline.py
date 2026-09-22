@@ -98,3 +98,32 @@ async def test_retrieve_empty_store():
     )
     results = await p.retrieve("anything")
     assert results == []
+
+
+class AsyncAwareChunker:
+    """Chunker with an async path that must be preferred by the pipeline."""
+
+    def __init__(self):
+        self.used_async = False
+
+    def chunk(self, text: str, **kwargs):
+        raise AssertionError("sync chunk() should not be called in async ingest")
+
+    async def chunk_async(self, text: str, **kwargs):
+        from rag_support.models import Chunk
+
+        self.used_async = True
+        return [Chunk(text=text, index=0)]
+
+
+async def test_ingest_prefers_chunk_async():
+    chunker = AsyncAwareChunker()
+    p = RAGPipeline(
+        chunker=chunker,
+        extractors=[],
+        vector_store=InMemoryVectorStore(),
+        embedder=MockEmbedder(),
+    )
+    count = await p.ingest([IngestDocument(id="d1", text="Hello async world")])
+    assert count == 1
+    assert chunker.used_async is True

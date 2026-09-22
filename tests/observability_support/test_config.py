@@ -1,7 +1,7 @@
 """Tests for observability configuration."""
 
 import pytest
-from observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig, SpanConfig
 
 
 def test_default_config():
@@ -54,3 +54,27 @@ def test_config_sample_rate_bounds():
         ObservabilityConfig(sample_rate=1.5)
     with pytest.raises(ValueError):
         ObservabilityConfig(sample_rate=-0.1)
+
+
+def test_config_has_default_span_config():
+    cfg = ObservabilityConfig()
+    assert isinstance(cfg.span, SpanConfig)
+    assert cfg.span.record_exceptions is True
+    assert cfg.span.record_input is False
+    assert cfg.span.record_output is False
+    assert cfg.span.max_attribute_length == 1024
+
+
+def test_config_accepts_custom_span_config():
+    cfg = ObservabilityConfig(
+        span=SpanConfig(
+            record_exceptions=False,
+            record_input=True,
+            record_output=True,
+            max_attribute_length=10,
+        )
+    )
+    assert cfg.span.record_exceptions is False
+    assert cfg.span.record_input is True
+    assert cfg.span.record_output is True
+    assert cfg.span.max_attribute_length == 10

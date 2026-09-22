@@ -15,10 +15,13 @@ from opentelemetry.sdk.trace.export import (
 from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
 from opentelemetry.trace import StatusCode, Span
 
-from observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig, SpanConfig
 from observability_support.spans import (
+    SpanAttributes,
     SpanKind,
     create_span_attributes,
+    truncate_attribute_value,
+    truncate_attributes,
 )
 
 _EXPORTER_BUILDERS = {
@@ -64,6 +67,9 @@ class _NoOpSpanContext:
     def set_attribute(self, key: str, value: Any) -> None:
         pass
 
+    def set_attributes(self, attributes: dict[str, Any]) -> None:
+        pass
+
     def __enter__(self):
         return self
 
@@ -77,12 +83,47 @@ class _NoOpSpanContext:
         pass
 
 
+class _SpanProxy:
+    """Wraps a real span to apply SpanConfig rules on attribute writes.
+
+    Values set both at span creation and later via ``set_attribute`` are
+    truncated to ``max_attribute_length``, and input/output attributes are
+    dropped entirely unless the corresponding recording flag is enabled.
+    All other attribute access is delegated to the wrapped span.
+    """
+
+    def __init__(self, span: Span, config: SpanConfig) -> None:
+        object.__setattr__(self, "_span", span)
+        object.__setattr__(self, "_config", config)
+
+    def set_attribute(self, key: str, value: Any) -> None:
+        if key == SpanAttributes.INPUT and not self._config.record_input:
+            return
+        if key == SpanAttributes.OUTPUT and not self._config.record_output:
+            return
+        value = truncate_attribute_value(value, self._config.max_attribute_length)
+        self._span.set_attribute(key, value)
+
+    def set_attributes(self, attributes: dict[str, Any]) -> None:
+        for key, value in attributes.items():
+            self.set_attribute(key, value)
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(object.__getattribute__(self, "_span"), name)
+
+
 class MachineTracer:
     """Wraps OpenTelemetry TracerProvider with machine-core conventions."""
 
-    def __init__(self, provider: TracerProvider | None, enabled: bool = True) -> None:
+    def __init__(
+        self,
+        provider: TracerProvider | None,
+        enabled: bool = True,
+        span_config: SpanConfig | None = None,
+    ) -> None:
         self._provider = provider
         self._enabled = enabled
+        self._span_config = span_config or SpanConfig()
         self._tracer = provider.get_tracer("machine-core") if provider else None
 
     @classmethod
@@ -93,7 +134,7 @@ class MachineTracer:
     ) -> MachineTracer:
         """Create tracer from config. _test_exporter overrides for testing."""
         if not config.enabled:
-            return cls(provider=None, enabled=False)
+            return cls(provider=None, enabled=False, span_config=config.span)
 
         resource = Resource.create({"service.name": config.service_name})
         provider_kwargs: dict[str, Any] = {"resource": resource}
@@ -105,7 +146,20 @@ class MachineTracer:
         if exporter is not None:
             provider.add_span_processor(SimpleSpanProcessor(exporter))
 
-        return cls(provider=provider, enabled=True)
+        return cls(provider=provider, enabled=True, span_config=config.span)
+
+    def _prepare_attributes(
+        self, kind: SpanKind, attr_kwargs: dict[str, Any]
+    ) -> dict[str, Any]:
+        kwargs = dict(attr_kwargs)
+        if not self._span_config.record_input:
+            kwargs.pop("input", None)
+        if not self._span_config.record_output:
+            kwargs.pop("output", None)
+        attributes = create_span_attributes(kind=kind, **kwargs)
+        return truncate_attributes(
+            attributes, self._span_config.max_attribute_length
+        )
 
     @contextmanager
     def span(
@@ -119,13 +173,19 @@ class MachineTracer:
             yield _NoOpSpanContext()
             return
 
-        attributes = create_span_attributes(kind=kind, **attr_kwargs)
-        with self._tracer.start_as_current_span(name, attributes=attributes) as span:
+        attributes = self._prepare_attributes(kind, attr_kwargs)
+        with self._tracer.start_as_current_span(
+            name,
+            attributes=attributes,
+            record_exception=False,
+            set_status_on_exception=False,
+        ) as span:
             try:
-                yield span
+                yield _SpanProxy(span, self._span_config)
             except Exception as exc:
-                span.set_status(StatusCode.ERROR, str(exc))
-                span.record_exception(exc)
+                if self._span_config.record_exceptions:
+                    span.set_status(StatusCode.ERROR, str(exc))
+                    span.record_exception(exc)
                 raise
 
     @asynccontextmanager
@@ -140,13 +200,19 @@ class MachineTracer:
             yield _NoOpSpanContext()
             return
 
-        attributes = create_span_attributes(kind=kind, **attr_kwargs)
-        with self._tracer.start_as_current_span(name, attributes=attributes) as span:
+        attributes = self._prepare_attributes(kind, attr_kwargs)
+        with self._tracer.start_as_current_span(
+            name,
+            attributes=attributes,
+            record_exception=False,
+            set_status_on_exception=False,
+        ) as span:
             try:
-                yield span
+                yield _SpanProxy(span, self._span_config)
             except Exception as exc:
-                span.set_status(StatusCode.ERROR, str(exc))
-                span.record_exception(exc)
+                if self._span_config.record_exceptions:
+                    span.set_status(StatusCode.ERROR, str(exc))
+                    span.record_exception(exc)
                 raise
 
     def add_exporter(self, exporter: SpanExporter) -> None:

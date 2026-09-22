@@ -31,6 +31,8 @@ class SpanAttributes:
     STEP_NAME = "machine.step.name"
     ERROR_TYPE = "machine.error.type"
     ERROR_MESSAGE = "machine.error.message"
+    INPUT = "machine.input"
+    OUTPUT = "machine.output"
 
 
 def create_span_attributes(
@@ -47,6 +49,8 @@ def create_span_attributes(
     cost_usd: float | None = None,
     error_type: str | None = None,
     error_message: str | None = None,
+    input: Any = None,
+    output: Any = None,
 ) -> dict[str, Any]:
     """Build a span attribute dict, omitting None values."""
     mapping: list[tuple[str, Any]] = [
@@ -62,5 +66,27 @@ def create_span_attributes(
         (SpanAttributes.COST_USD, cost_usd),
         (SpanAttributes.ERROR_TYPE, error_type),
         (SpanAttributes.ERROR_MESSAGE, error_message),
+        (SpanAttributes.INPUT, input),
+        (SpanAttributes.OUTPUT, output),
     ]
     return {k: v for k, v in mapping if v is not None}
+
+
+def truncate_attribute_value(value: Any, max_length: int) -> Any:
+    """Truncate string attribute values to ``max_length`` characters.
+
+    Non-string values (numbers, bools, sequences) are returned unchanged.
+    """
+    if isinstance(value, str) and max_length > 0 and len(value) > max_length:
+        return value[:max_length]
+    return value
+
+
+def truncate_attributes(attributes: dict[str, Any], max_length: int) -> dict[str, Any]:
+    """Return a copy of ``attributes`` with string values truncated."""
+    if max_length <= 0:
+        return dict(attributes)
+    return {
+        key: truncate_attribute_value(value, max_length)
+        for key, value in attributes.items()
+    }

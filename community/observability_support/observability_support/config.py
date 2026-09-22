@@ -7,6 +7,15 @@ from typing import Any
 from pydantic import BaseModel, Field, field_validator
 
 
+class SpanConfig(BaseModel):
+    """Configuration for individual span behavior."""
+
+    record_exceptions: bool = True
+    record_input: bool = False
+    record_output: bool = False
+    max_attribute_length: int = 1024
+
+
 class ObservabilityConfig(BaseModel):
     """Configuration for the observability_support plugin.
 
@@ -20,12 +29,4 @@ class ObservabilityConfig(BaseModel):
     endpoint: str | None = None
     sample_rate: float = Field(default=1.0, ge=0.0, le=1.0)
     extra: dict[str, Any] = Field(default_factory=dict)
-
-
-class SpanConfig(BaseModel):
-    """Configuration for individual span behavior."""
-
-    record_exceptions: bool = True
-    record_input: bool = False
-    record_output: bool = False
-    max_attribute_length: int = 1024
+    span: SpanConfig = Field(default_factory=SpanConfig)

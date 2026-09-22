@@ -3,7 +3,7 @@
 import pytest
 import asyncio
 from observability_support.tracer import MachineTracer
-from observability_support.config import ObservabilityConfig
+from observability_support.config import ObservabilityConfig, SpanConfig
 from observability_support.spans import SpanKind, SpanAttributes
 from tests.observability_support.helpers import InMemorySpanExporter
 
@@ -124,3 +124,123 @@ def test_from_config_sets_service_name_resource():
         ObservabilityConfig(exporter="console", service_name="svc-x")
     )
     assert tracer._provider.resource.attributes["service.name"] == "svc-x"
+
+
+def _tracer_with_span_config(exporter, **span_kwargs):
+    return MachineTracer.from_config(
+        ObservabilityConfig(
+            exporter="console",
+            service_name="test-service",
+            span=SpanConfig(**span_kwargs),
+        ),
+        _test_exporter=exporter,
+    )
+
+
+def test_span_config_truncates_initial_string_attributes():
+    exporter = InMemorySpanExporter()
+    tracer = _tracer_with_span_config(exporter, max_attribute_length=5)
+    with tracer.span(
+        "op",
+        kind=SpanKind.AGENT_CALL,
+        agent_name="a-very-long-agent-name",
+    ):
+        pass
+    spans = exporter.get_finished_spans()
+    assert spans[0].attributes[SpanAttributes.AGENT_NAME] == "a-ver"
+
+
+def test_span_config_truncates_attributes_set_after_creation():
+    exporter = InMemorySpanExporter()
+    tracer = _tracer_with_span_config(exporter, max_attribute_length=3)
+    with tracer.span("op", kind=SpanKind.AGENT_CALL) as span:
+        span.set_attribute(SpanAttributes.AGENT_NAME, "abcdefgh")
+    spans = exporter.get_finished_spans()
+    assert spans[0].attributes[SpanAttributes.AGENT_NAME] == "abc"
+
+
+def test_span_config_does_not_truncate_non_string_attributes():
+    exporter = InMemorySpanExporter()
+    tracer = _tracer_with_span_config(exporter, max_attribute_length=2)
+    with tracer.span(
+        "op", kind=SpanKind.LLM_REQUEST, token_input=12345, latency_ms=99.5
+    ):
+        pass
+    attrs = exporter.get_finished_spans()[0].attributes
+    assert attrs[SpanAttributes.TOKEN_INPUT] == 12345
+    assert attrs[SpanAttributes.LATENCY_MS] == 99.5
+
+
+def test_span_config_record_exceptions_disabled():
+    exporter = InMemorySpanExporter()
+    tracer = _tracer_with_span_config(exporter, record_exceptions=False)
+    with pytest.raises(ValueError):
+        with tracer.span("failing-op", kind=SpanKind.TOOL_INVOKE):
+            raise ValueError("boom")
+    span = exporter.get_finished_spans()[0]
+    assert span.status.is_ok is True
+    assert not any(e.name == "exception" for e in span.events)
+
+
+def test_span_config_record_exceptions_enabled_by_default():
+    exporter = InMemorySpanExporter()
+    tracer = _tracer_with_span_config(exporter)
+    with pytest.raises(ValueError):
+        with tracer.span("failing-op", kind=SpanKind.TOOL_INVOKE):
+            raise ValueError("boom")
+    span = exporter.get_finished_spans()[0]
+    assert span.status.is_ok is False
+    assert any(e.name == "exception" for e in span.events)
+
+
+def test_span_config_records_input_output_only_when_enabled():
+    exporter = InMemorySpanExporter()
+    tracer = _tracer_with_span_config(exporter)
+    with tracer.span("op", kind=SpanKind.LLM_REQUEST, input="prompt", output="reply"):
+        pass
+    attrs = exporter.get_finished_spans()[0].attributes
+    assert SpanAttributes.INPUT not in attrs
+    assert SpanAttributes.OUTPUT not in attrs
+
+
+def test_span_config_captures_input_output_when_enabled():
+    exporter = InMemorySpanExporter()
+    tracer = _tracer_with_span_config(
+        exporter, record_input=True, record_output=True
+    )
+    with tracer.span("op", kind=SpanKind.LLM_REQUEST, input="prompt", output="reply"):
+        pass
+    attrs = exporter.get_finished_spans()[0].attributes
+    assert attrs[SpanAttributes.INPUT] == "prompt"
+    assert attrs[SpanAttributes.OUTPUT] == "reply"
+
+
+def test_span_config_input_output_truncated_when_enabled():
+    exporter = InMemorySpanExporter()
+    tracer = _tracer_with_span_config(
+        exporter, record_input=True, record_output=True, max_attribute_length=4
+    )
+    with tracer.span(
+        "op", kind=SpanKind.LLM_REQUEST, input="prompt-text", output="reply-text"
+    ):
+        pass
+    attrs = exporter.get_finished_spans()[0].attributes
+    assert attrs[SpanAttributes.INPUT] == "prom"
+    assert attrs[SpanAttributes.OUTPUT] == "repl"
+
+
+def test_from_config_forwards_span_config_to_proxy():
+    exporter = InMemorySpanExporter()
+    tracer = MachineTracer.from_config(
+        ObservabilityConfig(
+            exporter="console",
+            span=SpanConfig(record_exceptions=False, max_attribute_length=1),
+        ),
+        _test_exporter=exporter,
+    )
+    with tracer.span("op", kind=SpanKind.AGENT_CALL, agent_name="abc") as span:
+        span.set_attribute(SpanAttributes.TOOL_NAME, "tool")
+    span = exporter.get_finished_spans()[0]
+    assert span.attributes[SpanAttributes.AGENT_NAME] == "a"
+    assert span.attributes[SpanAttributes.TOOL_NAME] == "t"
+

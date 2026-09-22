@@ -43,6 +43,29 @@ class TestTokenChunker:
         chunks = chunker.chunk(text)
         assert len(chunks) >= 4
 
+    def test_uses_real_tokenizer_when_available(self):
+        from rag_support.chunking.token import _load_encoding
+
+        if _load_encoding("cl100k_base") is None:
+            pytest.skip("tiktoken encoding unavailable")
+        text = " ".join(f"word{i}" for i in range(100))
+        chunker = TokenChunker(max_tokens=20, token_overlap=0)
+        encoding = _load_encoding("cl100k_base")
+        expected = len(encoding.encode(text))
+        # More real tokens than whitespace words means more chunks than a
+        # naive whitespace split would produce.
+        assert expected > 100
+        chunks = chunker.chunk(text)
+        assert len(chunks) >= (expected // 20) - 1
+        assert all(c.text for c in chunks)
+        assert [c.index for c in chunks] == list(range(len(chunks)))
+
+    def test_overlap_carries_tokens(self):
+        text = " ".join(f"word{i}" for i in range(50))
+        chunker = TokenChunker(max_tokens=10, token_overlap=5)
+        chunks = chunker.chunk(text)
+        assert len(chunks) > 1
+
     def test_empty_text(self):
         assert TokenChunker().chunk("") == []
 
@@ -151,3 +174,34 @@ class TestSemanticChunker:
 
     def test_empty_text(self):
         assert SemanticChunker(embedder=None).chunk("") == []
+
+    async def test_chunk_async_uses_caller_loop(self):
+        class MockEmbedder:
+            async def embed_batch(self, texts, **kw):
+                return [[float(i)] for i, _ in enumerate(texts)]
+
+        text = "Sentence one. Totally different topic. Back to first topic."
+        chunker = SemanticChunker(embedder=MockEmbedder(), similarity_threshold=0.5)
+        chunks = await chunker.chunk_async(text)
+        assert len(chunks) >= 1
+        assert [c.index for c in chunks] == list(range(len(chunks)))
+
+    async def test_sync_chunk_from_running_loop(self):
+        class MockEmbedder:
+            async def embed_batch(self, texts, **kw):
+                return [[float(i)] for i, _ in enumerate(texts)]
+
+        text = "Sentence one. Totally different topic. Back to first topic."
+        chunker = SemanticChunker(embedder=MockEmbedder(), similarity_threshold=0.5)
+        chunks = chunker.chunk(text)
+        assert len(chunks) >= 1
+
+    def test_sync_chunk_no_running_loop(self):
+        class MockEmbedder:
+            async def embed_batch(self, texts, **kw):
+                return [[float(i)] for i, _ in enumerate(texts)]
+
+        text = "Sentence one. Totally different topic. Back to first topic."
+        chunker = SemanticChunker(embedder=MockEmbedder(), similarity_threshold=0.5)
+        chunks = chunker.chunk(text)
+        assert len(chunks) >= 1

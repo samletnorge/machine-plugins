@@ -48,6 +48,17 @@ class RAGPipeline:
         self.reranker = reranker
         self.table = table
 
+    async def _chunk(self, text: str) -> list:
+        """Chunk text, preferring an async chunker when one is available.
+
+        Async chunkers (e.g. ``SemanticChunker``) expose ``chunk_async`` so
+        embedding clients stay bound to the caller's event loop.
+        """
+        chunk_async = getattr(self.chunker, "chunk_async", None)
+        if callable(chunk_async):
+            return await chunk_async(text)
+        return self.chunker.chunk(text)
+
     async def ingest(self, documents: list[IngestDocument]) -> int:
         """Ingest documents: chunk -> extract metadata -> embed -> store.
 
@@ -60,7 +71,7 @@ class RAGPipeline:
         all_upserts: list[UpsertRequest] = []
 
         for doc in documents:
-            chunks = self.chunker.chunk(doc.text)
+            chunks = await self._chunk(doc.text)
             if not chunks:
                 continue
 
