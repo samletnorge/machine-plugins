@@ -12,8 +12,10 @@ package = false
 members = ["framework/*", "community/*"]
 
 # Sources are only honoured at the workspace root. Workspace members resolve to
-# each other via { workspace = true }; the kernel and the two satellite plugin
-# repos are pulled from local checkouts during development.
+# each other via { workspace = true }. The kernel and the two satellite plugin
+# repos are referenced by absolute git URL (never a relative path) so that
+# consumers fetching a subdirectory package do not inherit a machine-specific
+# path through this workspace root.
 [tool.uv.sources]
 agent_support = { workspace = true }
 agent_runtime_basic = { workspace = true }
@@ -56,9 +58,9 @@ vectorstore_support = { workspace = true }
 voice_support = { workspace = true }
 workflow_support = { workspace = true }
 workspace_support = { workspace = true }
-machine_core = { path = "../../machine-core", editable = true }
-eval_support = { path = "../machine-plugin-eval-support", editable = true }
-vectorstore_lancedb = { path = "../machine-plugin-vectorstore-lancedb", editable = true }
+machine_core = { git = "git+ssh://git@github.com/samletnorge/machine-core.git" }
+eval_support = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-eval-support.git" }
+vectorstore_lancedb = { git = "git+ssh://git@github.com/samletnorge/machine-plugin-vectorstore-lancedb.git" }
 
 [dependency-groups]
 dev = [

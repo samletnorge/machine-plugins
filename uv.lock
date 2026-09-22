@@ -664,7 +664,7 @@ framework = [
 requires-dist = [
     { name = "httpx", specifier = ">=0.27" },
     { name = "jinja2", specifier = ">=3.1.0" },
-    { name = "machine-core", editable = "../../machine-core" },
+    { name = "machine-core", git = "ssh://git@github.com/samletnorge/machine-core.git" },
     { name = "rich", specifier = ">=13.0.0" },
     { name = "server-support", editable = "framework/server_support" },
     { name = "studio-support", editable = "framework/studio_support" },
@@ -999,15 +999,9 @@ provides-extras = ["local"]
 [[package]]
 name = "eval-support"
 version = "0.5.0"
-source = { editable = "../machine-plugin-eval-support" }
+source = { git = "ssh://git@github.com/samletnorge/machine-plugin-eval-support.git#7d452da6f76bf6cd0d5f7c96b0575a2bf772af9d" }
 dependencies = [
     { name = "loguru" },
-    { name = "rag-support" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "loguru", specifier = ">=0.7" },
     { name = "rag-support" },
 ]
 
@@ -2022,7 +2016,7 @@ wheels = [
 [[package]]
 name = "machine-core"
 version = "0.11.0"
-source = { editable = "../../machine-core" }
+source = { git = "ssh://git@github.com/samletnorge/machine-core.git#5e2c5ca7c4852bce06760a5fb7d9cceffe219695" }
 dependencies = [
     { name = "fastapi" },
     { name = "jinja2" },
@@ -2031,28 +2025,6 @@ dependencies = [
     { name = "python-multipart" },
     { name = "sse-starlette" },
     { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastapi", specifier = ">=0.136.1" },
-    { name = "infisicalsdk", marker = "extra == 'secrets'", specifier = ">=1.0.17" },
-    { name = "jinja2", specifier = ">=3.1.6" },
-    { name = "loguru", specifier = ">=0.7.3" },
-    { name = "pydantic", specifier = ">=2.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.24.0" },
-    { name = "python-multipart", specifier = ">=0.0.28" },
-    { name = "sse-starlette", specifier = ">=3.4.4" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.47.0" },
-]
-provides-extras = ["secrets", "dev"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "pytest", specifier = ">=9.0.3" },
-    { name = "pytest-asyncio", specifier = ">=1.3.0" },
 ]
 
 [[package]]
@@ -4214,10 +4186,10 @@ requires-dist = [
     { name = "embeddings", editable = "framework/embeddings" },
     { name = "embeddings-ollama", editable = "community/embeddings_ollama" },
     { name = "embeddings-sentence-transformers", editable = "community/embeddings_sentence_transformers" },
-    { name = "eval-support", editable = "../machine-plugin-eval-support" },
+    { name = "eval-support", git = "ssh://git@github.com/samletnorge/machine-plugin-eval-support.git" },
     { name = "fastapi", specifier = ">=0.100.0" },
     { name = "loguru", specifier = ">=0.7.0" },
-    { name = "machine-core", editable = "../../machine-core" },
+    { name = "machine-core", git = "ssh://git@github.com/samletnorge/machine-core.git" },
     { name = "model-provider-support", editable = "framework/model_provider_support" },
     { name = "provider-deepseek", editable = "community/provider_deepseek" },
     { name = "provider-ollama", editable = "community/provider_ollama" },
@@ -4227,7 +4199,7 @@ requires-dist = [
     { name = "tool-openapi", editable = "community/tool_openapi" },
     { name = "tool-support", editable = "framework/tool_support" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.20.0" },
-    { name = "vectorstore-lancedb", editable = "../machine-plugin-vectorstore-lancedb" },
+    { name = "vectorstore-lancedb", git = "ssh://git@github.com/samletnorge/machine-plugin-vectorstore-lancedb.git" },
     { name = "vectorstore-support", editable = "framework/vectorstore_support" },
     { name = "voice-support", editable = "framework/voice_support" },
 ]
@@ -4741,15 +4713,9 @@ wheels = [
 [[package]]
 name = "vectorstore-lancedb"
 version = "0.1.0"
-source = { editable = "../machine-plugin-vectorstore-lancedb" }
+source = { git = "ssh://git@github.com/samletnorge/machine-plugin-vectorstore-lancedb.git#5f72c8fb3fb4746e5d2cfba0ad92dac5b70f3ff3" }
 dependencies = [
     { name = "lancedb" },
-    { name = "vectorstore-support" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "lancedb", specifier = ">=0.6" },
     { name = "vectorstore-support" },
 ]
 
