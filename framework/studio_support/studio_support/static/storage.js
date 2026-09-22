@@ -1,0 +1,1 @@
+import{y as o}from"./assets/api-CfNpsCnV.js";import{D as e}from"./assets/DomainPanel-B6PuNj48.js";import"./assets/attributes-DhD-Lvmh.js";const t=document.getElementById("storage-island");t&&o(e,{target:t,props:{domain:"storage",title:"Storage",endpoint:t.dataset.endpoint??"/_studio/api/storage/files"}});

@@ -1,0 +1,1 @@
+import{y as i}from"./assets/api-CfNpsCnV.js";import{D as o}from"./assets/DomainPanel-B6PuNj48.js";import"./assets/attributes-DhD-Lvmh.js";const t=document.getElementById("rag-island");t&&i(o,{target:t,props:{domain:"rag",title:"RAG",endpoint:t.dataset.endpoint??"/_studio/api/rag/pipelines"}});

@@ -1,0 +1,1 @@
+import{y as a}from"./assets/api-CfNpsCnV.js";import{D as o}from"./assets/DomainPanel-B6PuNj48.js";import"./assets/attributes-DhD-Lvmh.js";const t=document.getElementById("evals-island");t&&a(o,{target:t,props:{domain:"evals",title:"Evals",endpoint:t.dataset.endpoint??"/_studio/api/evals/runs"}});

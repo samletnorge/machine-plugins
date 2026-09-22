@@ -1,0 +1,1 @@
+import{y as o}from"./assets/api-CfNpsCnV.js";import{D as n}from"./assets/DomainPanel-B6PuNj48.js";import"./assets/attributes-DhD-Lvmh.js";const t=document.getElementById("pubsub-island");t&&o(n,{target:t,props:{domain:"pubsub",title:"Pub/Sub",endpoint:t.dataset.endpoint??"/_studio/api/pubsub/events"}});

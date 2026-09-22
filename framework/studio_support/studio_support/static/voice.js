@@ -1,0 +1,1 @@
+import{y as i}from"./assets/api-CfNpsCnV.js";import{D as t}from"./assets/DomainPanel-B6PuNj48.js";import"./assets/attributes-DhD-Lvmh.js";const o=document.getElementById("voice-island");o&&i(t,{target:o,props:{domain:"voice",title:"Voice",endpoint:o.dataset.endpoint??"/_studio/api/voice/voices"}});

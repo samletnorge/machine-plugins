@@ -1,0 +1,1 @@
+import{y as o}from"./assets/api-CfNpsCnV.js";import{D as a}from"./assets/DomainPanel-B6PuNj48.js";import"./assets/attributes-DhD-Lvmh.js";const t=document.getElementById("auth-island");t&&o(a,{target:t,props:{domain:"auth",title:"Auth",endpoint:t.dataset.endpoint??"/_studio/api/auth/keys"}});

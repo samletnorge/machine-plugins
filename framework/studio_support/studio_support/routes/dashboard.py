@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 
 from studio_support.control._common import domain_payload
 from studio_support.ui import SECTION_COPY, render_template
@@ -22,6 +22,21 @@ SECTION_DOMAINS: dict[str, tuple[str, list[str]]] = {
     "browser": ("browser", ["browser"]),
     "voice": ("voice", ["voice_provider"]),
     "pubsub": ("pubsub", ["pubsub"]),
+}
+
+# domain -> control-plane JSON endpoint backing its Svelte island
+DOMAIN_ENDPOINTS: dict[str, str] = {
+    "memory": "/api/memory/threads",
+    "rag": "/api/rag/pipelines",
+    "evals": "/api/evals/runs",
+    "storage": "/api/storage/files",
+    "deploy": "/api/deploy/targets",
+    "observe": "/api/observe/traces",
+    "auth": "/api/auth/keys",
+    "workspace": "/api/workspace/files",
+    "browser": "/api/browser/sessions",
+    "voice": "/api/voice/voices",
+    "pubsub": "/api/pubsub/events",
 }
 
 
@@ -79,4 +94,26 @@ async def planned_section(request: Request, section_key: str):
         active_nav=section_key,
         section_title=title,
         section_description=description,
+    )
+
+
+@router.get("/islands/{domain}")
+async def domain_island(request: Request, domain: str):
+    """Render the Svelte island page for a control-plane domain."""
+    if domain not in DOMAIN_ENDPOINTS:
+        raise HTTPException(status_code=404, detail=f"Unknown island domain: {domain}")
+
+    title, description = SECTION_COPY.get(
+        domain,
+        (domain.replace("-", " ").title(), "Live control-plane data for this domain."),
+    )
+    return render_template(
+        request,
+        "islands/domain.html",
+        page_title=title,
+        active_nav=domain,
+        section_title=title,
+        section_description=description,
+        island_domain=domain,
+        island_endpoint=DOMAIN_ENDPOINTS[domain],
     )

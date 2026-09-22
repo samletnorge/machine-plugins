@@ -66,3 +66,18 @@ export interface WorkflowGraphPayload {
 export interface WorkflowRunsPayload {
   runs: Array<{ run_id: string; status: string }>;
 }
+
+export interface DomainItem {
+  name: string;
+  owner?: string | null;
+  description?: string;
+  operations?: string[];
+}
+
+export interface DomainPayload {
+  domain: string;
+  installed: boolean;
+  implemented?: boolean;
+  categories: Record<string, DomainItem[]>;
+  items: DomainItem[];
+}
