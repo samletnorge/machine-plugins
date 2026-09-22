@@ -1,0 +1,31 @@
+name: CI
+
+# Requires a repository secret `SSH_PRIVATE_KEY`: an SSH key with read access
+# to the private machine-core and satellite repos (the workspace resolves them
+# over git+ssh).
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up SSH for private git dependencies
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Trust github.com host key
+        run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-packages
+      - name: Lint
+        run: uvx ruff check framework community tests
+      - name: Tests
+        run: uv run pytest tests -q

@@ -61,3 +61,46 @@ class TestTemporalAdapter:
         adapter = TemporalAdapter(endpoint="localhost:7233", namespace="default")
         with pytest.raises(KeyError):
             await adapter.trigger("nope", data={})
+
+    @pytest.mark.asyncio
+    async def test_start_workflow_uses_temporal_client(self, monkeypatch):
+        import sys
+        import types
+
+        class _FakeHandle:
+            id = "durable-wf-abc"
+            result_run_id = "run_1"
+
+        class _FakeClient:
+            started: list = []
+
+            @classmethod
+            async def connect(cls, endpoint, namespace=None):
+                cls.endpoint = endpoint
+                cls.namespace = namespace
+                return cls()
+
+            async def start_workflow(self, workflow, arg, id=None, task_queue=None):
+                self.started.append((workflow, arg, id, task_queue))
+                return _FakeHandle()
+
+        temporalio = types.ModuleType("temporalio")
+        client_mod = types.ModuleType("temporalio.client")
+        client_mod.Client = _FakeClient
+        temporalio.client = client_mod
+        monkeypatch.setitem(sys.modules, "temporalio", temporalio)
+        monkeypatch.setitem(sys.modules, "temporalio.client", client_mod)
+
+        adapter = TemporalAdapter(endpoint="localhost:7233", namespace="default")
+        wf = Workflow(name="durable-wf")
+        wf.then(double)
+        adapter.register_workflow(wf)
+
+        result = await adapter.trigger("durable-wf", data={"value": 10})
+
+        assert result["engine"] == "temporal"
+        assert result["workflow_id"] == "durable-wf-abc"
+        assert result["run_id"] == "run_1"
+        assert _FakeClient.started[0][0] == "durable-wf"
+        assert _FakeClient.started[0][3] == "machine-core-durable-wf"
+        assert _FakeClient.endpoint == "localhost:7233"

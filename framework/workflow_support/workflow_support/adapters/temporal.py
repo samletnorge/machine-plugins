@@ -58,7 +58,35 @@ class TemporalAdapter(ExternalEngineAdapter):
     async def _start_workflow_execution(
         self, workflow_name: str, data: dict[str, Any]
     ) -> dict[str, Any]:
-        """Start a workflow execution via Temporal. Override in tests or use Temporal SDK."""
-        raise NotImplementedError(
-            "Temporal SDK integration required. Install temporalio and configure client."
+        """Start a workflow execution on a Temporal server.
+
+        Connects to the configured endpoint/namespace and starts the workflow by
+        its registered type name. Requires the ``temporalio`` SDK; the workflow
+        type must be registered with a Temporal worker (which is the
+        application's responsibility).
+        """
+        try:
+            from temporalio.client import Client
+        except ImportError as exc:  # pragma: no cover - optional dependency
+            raise ImportError(
+                "temporalio is required for the Temporal adapter. "
+                "Install with: pip install temporalio"
+            ) from exc
+
+        import uuid
+
+        client = await Client.connect(self.endpoint, namespace=self.namespace)
+        workflow_id = f"{workflow_name}-{uuid.uuid4().hex[:8]}"
+        handle = await client.start_workflow(
+            workflow_name,
+            data,
+            id=workflow_id,
+            task_queue=f"machine-core-{workflow_name}",
         )
+        return {
+            "workflow_id": getattr(handle, "id", workflow_id),
+            "run_id": getattr(handle, "result_run_id", None),
+            "namespace": self.namespace,
+            "engine": "temporal",
+            "status": "started",
+        }
