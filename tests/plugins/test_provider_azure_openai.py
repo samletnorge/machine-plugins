@@ -13,7 +13,7 @@ from model_provider_support.schemas import (
 
 
 async def test_azure_manifest_has_dependencies():
-    from machine_core.plugins import builtin_manifests
+    from tests.conftest import discover_manifests as builtin_manifests
 
     manifests = builtin_manifests()
     azure = next((m for m in manifests if m.name == "provider_azure_openai"), None)

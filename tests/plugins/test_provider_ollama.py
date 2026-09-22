@@ -28,7 +28,7 @@ async def test_ollama_registers_as_model_provider():
 
 async def test_ollama_manifest_has_dependencies():
     """Ollama manifest should declare its dependencies."""
-    from machine_core.plugins import builtin_manifests
+    from tests.conftest import discover_manifests as builtin_manifests
 
     manifests = builtin_manifests()
     ollama = next((m for m in manifests if m.name == "provider_ollama"), None)

@@ -1,45 +1,38 @@
 """Tests for VoiceSupportPlugin and manifest."""
 
 import json
-import pytest
 from pathlib import Path
+
+from tests.conftest import WORKSPACE_ROOT
+
+MANIFEST_PATH = WORKSPACE_ROOT / "framework" / "voice_support" / "manifest.json"
 
 
 class TestManifest:
     def test_manifest_exists(self):
-        manifest_path = Path("src/machine_core/plugins/voice_support/manifest.json")
-        assert manifest_path.exists()
+        assert MANIFEST_PATH.exists()
 
     def test_manifest_valid_json(self):
-        manifest_path = Path("src/machine_core/plugins/voice_support/manifest.json")
-        data = json.loads(manifest_path.read_text())
-        assert data["name"] == "voice-support"
+        data = json.loads(MANIFEST_PATH.read_text())
+        assert data["name"] == "voice_support"
         assert data["schema_version"] == "1.0.0"
         assert data["language"] == "python"
         assert "categories:define" in data["capabilities"]
-        assert (
-            "voice_support:VoiceSupportPlugin"
-            in data["transport"]["entry_point"]
-        )
+        assert data["transport"]["entry_point"] == "voice_support:VoiceSupportPlugin"
 
 
 class TestVoiceSupportPlugin:
     def test_import(self):
         from voice_support import VoiceSupportPlugin
 
-        plugin = VoiceSupportPlugin()
-        assert plugin is not None
+        assert VoiceSupportPlugin() is not None
 
-    @pytest.mark.asyncio
     async def test_initialize(self):
         from voice_support import VoiceSupportPlugin
 
-        plugin = VoiceSupportPlugin()
-        await plugin.initialize()
+        await VoiceSupportPlugin().initialize()
 
-    @pytest.mark.asyncio
     async def test_shutdown(self):
         from voice_support import VoiceSupportPlugin
 
-        plugin = VoiceSupportPlugin()
-        await plugin.shutdown()
+        await VoiceSupportPlugin().shutdown()

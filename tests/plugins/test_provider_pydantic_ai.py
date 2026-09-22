@@ -140,7 +140,7 @@ class TestVertexClaudeProvider:
 
 @pytest.mark.asyncio
 async def test_all_pydantic_ai_manifests_exist():
-    from machine_core.plugins import builtin_manifests
+    from tests.conftest import discover_manifests as builtin_manifests
 
     manifests = {m.name: m for m in builtin_manifests()}
     expected = [

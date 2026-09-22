@@ -156,19 +156,16 @@ class TestGoogleEmbeddingProvider:
 
 def test_all_embedding_manifests():
     """Check that all 3 embedding provider manifests are discoverable."""
-    import pathlib
+    from tests.conftest import WORKSPACE_ROOT
 
-    plugins_dir = (
-        pathlib.Path(__file__).resolve().parent.parent.parent
-        / "src"
-        / "machine_core"
-        / "plugins"
-    )
     expected = {"embeddings_ollama", "embeddings_azure", "embeddings_google"}
     found = set()
-    for manifest_path in plugins_dir.glob("embeddings_*/manifest.json"):
-        with open(manifest_path) as f:
-            data = json.load(f)
+    for manifest_path in (WORKSPACE_ROOT / "community").glob(
+        "embeddings_*/manifest.json"
+    ):
+        data = json.loads(manifest_path.read_text())
+        if data["name"] not in expected:
+            continue
         found.add(data["name"])
         assert "embedding:register" in data["capabilities"]
         assert data["schema_version"] == "1.0.0"

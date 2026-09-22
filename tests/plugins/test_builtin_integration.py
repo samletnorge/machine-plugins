@@ -1,49 +1,39 @@
-"""Integration tests: all builtin plugins loaded together."""
+"""Integration tests: all workspace plugins loaded together."""
 
 import asyncio
 
-import pytest
 from machine_core import Machine, Runnable, Streamable
-from machine_core.machine import MachineConfig
-from machine_core.stream import StreamResponse, StreamChunk
+from machine_core.stream import StreamResponse, StreamChunk  # noqa: F401
+
+from tests.conftest import load_workspace_plugins
 
 
-async def _machine_with_all_builtins() -> Machine:
-    """Helper: create Machine and load all builtins."""
-    m = Machine()
-    await m.start()
-    return m
+async def _machine_with_all_plugins() -> Machine:
+    """Helper: create a Machine and load every workspace plugin."""
+    machine = Machine()
+    await load_workspace_plugins(machine)
+    return machine
 
 
-async def test_all_builtins_load():
-    """All 7 category plugins and implementation plugins should load without conflict."""
-    m = await _machine_with_all_builtins()
-    assert "tool" in m._registry
-    assert "model_provider" in m._registry
-    assert "agent" in m._registry
-    assert "prompt" in m._registry
-    assert "structured_output" in m._registry
-    assert "embedding" in m._registry
-    assert "vector_store" in m._registry
-    await m.shutdown()
-
-
-async def test_disabled_plugins():
-    """Disabled plugins should not load."""
-    m = Machine(
-        config=MachineConfig(disabled_plugins=["prompt_support", "structured_output"])
-    )
-    await m.start()
-    assert "tool" in m._registry
-    assert "agent" in m._registry
-    assert "prompt" not in m._registry
-    assert "structured_output" not in m._registry
+async def test_all_plugins_load():
+    """Every category plugin should load and register its category."""
+    m = await _machine_with_all_plugins()
+    for category in (
+        "tool",
+        "model_provider",
+        "agent",
+        "prompt",
+        "structured_output",
+        "embedding",
+        "vector_store",
+    ):
+        assert category in m.list_categories(), f"Missing category: {category}"
     await m.shutdown()
 
 
 async def test_cross_category_registration():
     """Register items across categories via Machine API."""
-    m = await _machine_with_all_builtins()
+    m = await _machine_with_all_plugins()
 
     from tool_support.schemas import ToolDefinition
 
@@ -79,7 +69,7 @@ async def test_cross_category_registration():
 
 async def test_protocol_check_on_resolved():
     """Registered items can be checked against core protocols."""
-    m = await _machine_with_all_builtins()
+    m = await _machine_with_all_plugins()
 
     class FakeAgent:
         async def run(self, input, **kwargs):
@@ -98,7 +88,7 @@ async def test_protocol_check_on_resolved():
 
 async def test_hookspecs_from_all_plugins():
     """All hookspecs from all plugins should be registered."""
-    m = await _machine_with_all_builtins()
+    m = await _machine_with_all_plugins()
     expected_hooks = [
         "before_tool_call",
         "after_tool_call",
@@ -130,7 +120,7 @@ async def test_hookspecs_from_all_plugins():
 
 async def test_event_observation_across_plugins():
     """Events from one plugin's category can be observed by anyone."""
-    m = await _machine_with_all_builtins()
+    m = await _machine_with_all_plugins()
 
     from machine_core.plugin.events import ItemRegistered
 

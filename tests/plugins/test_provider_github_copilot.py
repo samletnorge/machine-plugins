@@ -155,7 +155,7 @@ def test_get_pydantic_model():
 
 
 async def test_copilot_manifest():
-    from machine_core.plugins import builtin_manifests
+    from tests.conftest import discover_manifests as builtin_manifests
 
     manifests = {m.name: m for m in builtin_manifests()}
     assert "provider_github_copilot" in manifests
