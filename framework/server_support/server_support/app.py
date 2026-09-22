@@ -12,6 +12,14 @@ from loguru import logger
 
 from .dependencies import set_machine
 
+try:
+    from machine_core import bootstrap_secrets
+except ImportError:  # pragma: no cover - older kernel without secret bootstrap
+    bootstrap_secrets = None  # type: ignore[assignment]
+
+
+__all__ = ["create_app"]
+
 
 def _mount_routes(app: FastAPI, machine: Any) -> None:
     """Generate and include dynamic routes from the Machine registry."""
@@ -29,6 +37,8 @@ def create_app(
     cors_origins: list[str] | None = None,
 ) -> FastAPI:
     """Create a FastAPI app with auto-generated routes from the Machine registry."""
+    if bootstrap_secrets is not None:
+        bootstrap_secrets()
     set_machine(machine)
 
     @asynccontextmanager
