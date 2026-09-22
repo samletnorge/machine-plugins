@@ -45,9 +45,16 @@ def test_domain_endpoints_return_domain_payloads(studio_client, path: str, domai
     assert "items" in payload
 
 
-def test_planned_section_renders_domain_payload(studio_client):
+def test_domain_section_renders_control_plane_page(studio_client):
     response = studio_client.get("/sections/deploy")
 
     assert response.status_code == 200
-    assert '"implemented": false' in response.text
-    assert '"next": "deploy"' in response.text
+    assert "Control plane" in response.text
+    assert "Deploy" in response.text
+
+
+def test_unknown_section_still_renders_placeholder(studio_client):
+    response = studio_client.get("/sections/not-a-domain")
+
+    assert response.status_code == 200
+    assert '"next": "not-a-domain"' in response.text
