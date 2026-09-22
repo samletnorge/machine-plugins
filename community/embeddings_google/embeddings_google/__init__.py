@@ -32,7 +32,10 @@ class GoogleEmbeddingPlugin:
         dimensions = int(os.environ.get("EMBEDDING_DIMENSIONS", "768"))
 
         provider = GoogleEmbeddingProvider(
-            api_key=api_key, model=model, dimensions=dimensions
+            api_key=api_key,
+            model=model,
+            dimensions=dimensions,
+            hook_caller=ctx._machine.hooks.call,
         )
         ctx.register("embedding", "google", provider)
 

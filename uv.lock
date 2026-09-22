@@ -4713,7 +4713,7 @@ wheels = [
 [[package]]
 name = "vectorstore-lancedb"
 version = "0.1.0"
-source = { git = "ssh://git@github.com/samletnorge/machine-plugin-vectorstore-lancedb.git#5f72c8fb3fb4746e5d2cfba0ad92dac5b70f3ff3" }
+source = { git = "ssh://git@github.com/samletnorge/machine-plugin-vectorstore-lancedb.git#9034978d13d313531bc05e9bc77b17f14bcffd13" }
 dependencies = [
     { name = "lancedb" },
     { name = "vectorstore-support" },

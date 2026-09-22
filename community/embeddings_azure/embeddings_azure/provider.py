@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from typing import Any, Callable
 
 import httpx
 
@@ -17,12 +18,24 @@ class AzureEmbeddingProvider:
         deployment: str,
         api_version: str = "2024-12-01-preview",
         use_token_auth: bool = False,
+        hook_caller: Callable[..., Any] | None = None,
     ):
         self.endpoint = endpoint.rstrip("/")
         self.api_key = api_key
         self.deployment = deployment
         self.api_version = api_version
         self.use_token_auth = use_token_auth
+        self._hook_caller = hook_caller
+
+    async def _fire(self, hook_name: str, **kwargs: Any) -> None:
+        if self._hook_caller is None:
+            return
+        try:
+            result = self._hook_caller(hook_name, **kwargs)
+            if hasattr(result, "__await__"):
+                await result
+        except Exception:  # noqa: BLE001 - hooks must not break embedding
+            pass
 
     async def invoke(self, request):
         if isinstance(request, EmbeddingRequest):
@@ -37,6 +50,7 @@ class AzureEmbeddingProvider:
     async def embed(self, request: EmbeddingRequest) -> EmbeddingResult:
         start = time.monotonic()
         texts = [request.input] if isinstance(request.input, str) else request.input
+        await self._fire("before_embed", request=request)
         url = (
             f"{self.endpoint}/openai/deployments/{self.deployment}"
             f"/embeddings?api-version={self.api_version}"
@@ -52,10 +66,12 @@ class AzureEmbeddingProvider:
         duration = (time.monotonic() - start) * 1000
         vectors = [item["embedding"] for item in data["data"]]
         dimensions = len(vectors[0]) if vectors else 0
-        return EmbeddingResult(
+        result = EmbeddingResult(
             vectors=vectors,
             model_ref=data.get("model", self.deployment),
             dimensions=dimensions,
             usage=data.get("usage", {}),
             duration_ms=duration,
         )
+        await self._fire("after_embed", request=request, result=result)
+        return result

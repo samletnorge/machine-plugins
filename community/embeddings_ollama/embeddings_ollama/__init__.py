@@ -19,7 +19,11 @@ class OllamaEmbeddingPlugin:
 
         from .provider import OllamaEmbeddingProvider
 
-        provider = OllamaEmbeddingProvider(base_url=self._base_url, model=self._model)
+        provider = OllamaEmbeddingProvider(
+            base_url=self._base_url,
+            model=self._model,
+            hook_caller=ctx._machine.hooks.call,
+        )
         ctx.register("embedding", "ollama", provider)
 
     async def shutdown(self, **kwargs):

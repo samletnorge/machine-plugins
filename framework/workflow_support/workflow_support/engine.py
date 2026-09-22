@@ -37,6 +37,19 @@ class DefaultExecutionEngine(ExecutionEngine):
     Walks the workflow node list in order. Parallel nodes use asyncio.gather.
     """
 
+    def __init__(self, hook_caller: Any | None = None) -> None:
+        self._hook_caller = hook_caller
+
+    async def _emit(self, hook_name: str, **kwargs: Any) -> None:
+        if self._hook_caller is None:
+            return
+        try:
+            result = self._hook_caller(hook_name, **kwargs)
+            if hasattr(result, "__await__"):
+                await result
+        except Exception:  # noqa: BLE001 - hooks must not break execution
+            pass
+
     async def execute(
         self,
         workflow: Workflow,
@@ -47,6 +60,12 @@ class DefaultExecutionEngine(ExecutionEngine):
         if run is None:
             run = WorkflowRun(workflow_name=workflow.name)
 
+        await self._emit(
+            "hooks/beforeWorkflowRun",
+            workflow=workflow,
+            run=run,
+            input_data=input_data,
+        )
         state = initial_state or {}
         run.start()
 
@@ -70,12 +89,15 @@ class DefaultExecutionEngine(ExecutionEngine):
                         state["last_value"] = result.value
             except _SuspendSignal as sig:
                 run.suspend_at(node_index=i, message=sig.message)
+                await self._emit("hooks/afterWorkflowRun", workflow=workflow, run=run)
                 return run
             except Exception as e:
                 run.fail(error=str(e))
+                await self._emit("hooks/afterWorkflowRun", workflow=workflow, run=run)
                 return run
 
         run.complete(output=previous_output)
+        await self._emit("hooks/afterWorkflowRun", workflow=workflow, run=run)
         return run
 
     async def _execute_node(

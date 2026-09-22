@@ -37,6 +37,14 @@ class WorkflowSupportPlugin:
         for hook_name, opts in HOOKSPECS.items():
             ctx.register_hookspec(hook_name, **opts)
 
+        from .engine import DefaultExecutionEngine
+
+        ctx.register(
+            "execution-engine",
+            "default",
+            DefaultExecutionEngine(hook_caller=ctx._machine.hooks.call),
+        )
+
     async def shutdown(self, **kwargs: Any) -> None:
         """No-op — no resources to release."""
         pass

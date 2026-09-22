@@ -18,6 +18,7 @@ class EmbeddingsSentenceTransformersPlugin:
         self._model = None
         self._model_name: str = "all-MiniLM-L6-v2"
         self._encode_batch_size: int = 256
+        self._hook_caller = None
 
     async def initialize(self, config=None, **kwargs):
         config = config or {}
@@ -27,7 +28,18 @@ class EmbeddingsSentenceTransformersPlugin:
         )
 
     async def setup(self, ctx: PluginContext):
+        self._hook_caller = ctx._machine.hooks.call
         ctx.register("embedding", "sentence_transformers", self)
+
+    async def _fire(self, hook_name: str, **kwargs) -> None:
+        if self._hook_caller is None:
+            return
+        try:
+            result = self._hook_caller(hook_name, **kwargs)
+            if hasattr(result, "__await__"):
+                await result
+        except Exception:  # noqa: BLE001 - hooks must not break embedding
+            pass
 
     async def shutdown(self, **kwargs):
         self._model = None
@@ -54,6 +66,7 @@ class EmbeddingsSentenceTransformersPlugin:
         start = time.monotonic()
         model = self._get_model()
         texts = request.input if isinstance(request.input, list) else [request.input]
+        await self._fire("before_embed", request=request)
         embeddings = model.encode(
             texts,
             batch_size=self._encode_batch_size,
@@ -62,10 +75,12 @@ class EmbeddingsSentenceTransformersPlugin:
         )
         vectors = embeddings.tolist()
         dimensions = len(vectors[0]) if vectors else 0
-        return EmbeddingResult(
+        result = EmbeddingResult(
             vectors=vectors,
             model_ref=request.model_ref or self._model_name,
             dimensions=dimensions,
             usage={"input_count": len(texts)},
             duration_ms=(time.monotonic() - start) * 1000,
         )
+        await self._fire("after_embed", request=request, result=result)
+        return result

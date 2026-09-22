@@ -34,6 +34,7 @@ class AzureEmbeddingPlugin:
             deployment=deployment,
             api_version=api_version,
             use_token_auth=use_token_auth,
+            hook_caller=ctx._machine.hooks.call,
         )
         ctx.register("embedding", "azure", provider)
 
