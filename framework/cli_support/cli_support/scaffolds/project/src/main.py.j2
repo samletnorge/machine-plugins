@@ -10,8 +10,12 @@ machine = Machine(config=config)
 
 @machine.when_ready
 async def _register_project_items() -> None:
-    """Register this project's own tools and agents once plugins have loaded."""
+    """Register this project's own tools, agents, and memory once plugins load."""
+    from memory_support.in_memory_storage import InMemoryStorage
+    from memory_support.manager import MemoryManager
+
     from .agents.example import WORD_COUNT_TOOL, ExampleAgent
 
     machine.register("tool", WORD_COUNT_TOOL.name, WORD_COUNT_TOOL)
     machine.register("agent", "assistant", ExampleAgent(machine))
+    machine.register("memory", "default", MemoryManager(storage=InMemoryStorage()))
