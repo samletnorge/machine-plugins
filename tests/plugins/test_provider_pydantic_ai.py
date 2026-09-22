@@ -19,9 +19,9 @@ class TestGrokProvider:
     @pytest.mark.asyncio
     async def test_generate(self, provider):
         mock_result = MagicMock()
-        mock_result.data = "Grok response"
-        mock_result.usage.return_value = MagicMock(
-            request_tokens=5, response_tokens=3, total_tokens=8
+        mock_result.output = "Grok response"
+        mock_result.usage = MagicMock(
+            input_tokens=5, output_tokens=3, total_tokens=8
         )
         with patch.object(provider, "_agent") as mock_agent:
             mock_agent.run = AsyncMock(return_value=mock_result)
@@ -42,9 +42,9 @@ class TestGroqProvider:
     @pytest.mark.asyncio
     async def test_generate(self, provider):
         mock_result = MagicMock()
-        mock_result.data = "Groq response"
-        mock_result.usage.return_value = MagicMock(
-            request_tokens=5, response_tokens=3, total_tokens=8
+        mock_result.output = "Groq response"
+        mock_result.usage = MagicMock(
+            input_tokens=5, output_tokens=3, total_tokens=8
         )
         with patch.object(provider, "_agent") as mock_agent:
             mock_agent.run = AsyncMock(return_value=mock_result)
@@ -68,9 +68,9 @@ class TestGoogleGeminiProvider:
     @pytest.mark.asyncio
     async def test_generate(self, provider):
         mock_result = MagicMock()
-        mock_result.data = "Gemini response"
-        mock_result.usage.return_value = MagicMock(
-            request_tokens=5, response_tokens=3, total_tokens=8
+        mock_result.output = "Gemini response"
+        mock_result.usage = MagicMock(
+            input_tokens=5, output_tokens=3, total_tokens=8
         )
         with patch.object(provider, "_agent") as mock_agent:
             mock_agent.run = AsyncMock(return_value=mock_result)
@@ -96,9 +96,9 @@ class TestVertexGeminiProvider:
     @pytest.mark.asyncio
     async def test_generate(self, provider):
         mock_result = MagicMock()
-        mock_result.data = "Vertex Gemini response"
-        mock_result.usage.return_value = MagicMock(
-            request_tokens=5, response_tokens=3, total_tokens=8
+        mock_result.output = "Vertex Gemini response"
+        mock_result.usage = MagicMock(
+            input_tokens=5, output_tokens=3, total_tokens=8
         )
         with patch.object(provider, "_agent") as mock_agent:
             mock_agent.run = AsyncMock(return_value=mock_result)
@@ -124,9 +124,9 @@ class TestVertexClaudeProvider:
     @pytest.mark.asyncio
     async def test_generate(self, provider):
         mock_result = MagicMock()
-        mock_result.data = "Claude on Vertex response"
-        mock_result.usage.return_value = MagicMock(
-            request_tokens=5, response_tokens=3, total_tokens=8
+        mock_result.output = "Claude on Vertex response"
+        mock_result.usage = MagicMock(
+            input_tokens=5, output_tokens=3, total_tokens=8
         )
         with patch.object(provider, "_agent") as mock_agent:
             mock_agent.run = AsyncMock(return_value=mock_result)

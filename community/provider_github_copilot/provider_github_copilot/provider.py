@@ -12,6 +12,7 @@ from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
+from model_provider_support.compat import agent_run_output, agent_run_usage
 from model_provider_support.schemas import (
     ModelRequest,
     ModelResponse,
@@ -82,12 +83,14 @@ class CopilotLLMProvider:
         )
 
         provider = OpenAIProvider(openai_client=openai_client)
+        self._provider = provider
         self._model = OpenAIChatModel(model_name=model, provider=provider)
         self._agent = Agent(model=self._model)
 
     def get_pydantic_model(self, model_name: str | None = None) -> Any:
-        """Return the pydantic-ai model used by this provider."""
-        # TODO: if model_name differs from self._model_name, create a new OpenAIChatModel
+        """Return a pydantic-ai model, honouring a requested model name."""
+        if model_name and model_name != self._model_name:
+            return OpenAIChatModel(model_name=model_name, provider=self._provider)
         return self._model
 
     async def invoke(self, request: Any) -> Any:
@@ -99,27 +102,12 @@ class CopilotLLMProvider:
         start = time.monotonic()
         prompt = request.input if isinstance(request.input, str) else str(request.input)
         result = await self._agent.run(prompt)
-        duration = (time.monotonic() - start) * 1000
-
-        usage_data = {}
-        try:
-            # pydantic-ai v1.97+: usage is a property, output is .output
-            usage = result.usage
-            usage_data = {
-                "prompt_tokens": getattr(usage, "request_tokens", 0),
-                "completion_tokens": getattr(usage, "response_tokens", 0),
-                "total_tokens": getattr(usage, "total_tokens", 0),
-            }
-        except Exception:
-            pass
-
-        # pydantic-ai v1.97+: .output instead of .data
-        output = getattr(result, "output", None) or getattr(result, "data", None)
+        output = agent_run_output(result)
 
         return ModelResponse(
             provider=self._provider_name,
             model=self._model_name,
             output=str(output) if output else "",
-            usage=usage_data,
-            duration_ms=duration,
+            usage=agent_run_usage(result),
+            duration_ms=(time.monotonic() - start) * 1000,
         )

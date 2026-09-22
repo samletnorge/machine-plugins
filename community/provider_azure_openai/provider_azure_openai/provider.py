@@ -1,6 +1,7 @@
 """Azure OpenAI LLM provider — pydantic-ai wrapper.
 
-Supports both API key and token-based auth (DefaultAzureCredential).
+Uses the Azure-aware OpenAI client so ``api_version`` and the Azure endpoint are
+honoured, with either API-key or Entra ID (token) authentication.
 """
 
 from __future__ import annotations
@@ -12,10 +13,10 @@ from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
-from model_provider_support.schemas import (
-    ModelRequest,
-    ModelResponse,
-)
+from model_provider_support.compat import agent_run_output, agent_run_usage
+from model_provider_support.schemas import ModelRequest, ModelResponse
+
+_AZURE_SCOPE = "https://cognitiveservices.azure.com/.default"
 
 
 class AzureOpenAILLMProvider:
@@ -27,44 +28,43 @@ class AzureOpenAILLMProvider:
         api_version: str = "2024-12-01-preview",
         use_token_auth: bool = False,
     ) -> None:
+        from openai import AsyncAzureOpenAI
+
         self.endpoint = endpoint
         self.deployment = deployment
+        self.api_version = api_version
 
-        base_url = f"{endpoint}/openai/deployments/{deployment}"
-
+        client_kwargs: dict[str, Any] = {
+            "azure_endpoint": endpoint,
+            "api_version": api_version,
+        }
         if use_token_auth and not api_key:
             try:
                 from azure.identity import (
                     DefaultAzureCredential,
                     get_bearer_token_provider,
                 )
-
-                credential = DefaultAzureCredential()
-                token_provider = get_bearer_token_provider(
-                    credential, "https://cognitiveservices.azure.com/.default"
-                )
-                provider = OpenAIProvider(
-                    base_url=base_url,
-                    api_key="token-auth",
-                )
-                self._token_provider = token_provider
-            except ImportError:
+            except ImportError as exc:  # pragma: no cover - optional dependency
                 raise ImportError(
                     "azure-identity required for token auth. "
                     "Install with: pip install azure-identity"
-                )
-        else:
-            provider = OpenAIProvider(
-                base_url=base_url,
-                api_key=api_key or "",
+                ) from exc
+            credential = DefaultAzureCredential()
+            client_kwargs["azure_ad_token_provider"] = get_bearer_token_provider(
+                credential, _AZURE_SCOPE
             )
-            self._token_provider = None
+        else:
+            client_kwargs["api_key"] = api_key or ""
 
+        client = AsyncAzureOpenAI(**client_kwargs)
+        self._provider = OpenAIProvider(openai_client=client)
         self._model = OpenAIChatModel(
-            model_name=deployment,
-            provider=provider,
+            model_name=deployment, provider=self._provider
         )
         self._agent = Agent(model=self._model)
+
+    def get_pydantic_model(self, model_name: str | None = None) -> Any:
+        return self._model
 
     async def invoke(self, request: Any) -> Any:
         if isinstance(request, ModelRequest):
@@ -75,23 +75,11 @@ class AzureOpenAILLMProvider:
         start = time.monotonic()
         prompt = request.input if isinstance(request.input, str) else str(request.input)
         result = await self._agent.run(prompt)
-        duration = (time.monotonic() - start) * 1000
-
-        usage_data = {}
-        try:
-            usage = result.usage()
-            usage_data = {
-                "prompt_tokens": getattr(usage, "request_tokens", 0),
-                "completion_tokens": getattr(usage, "response_tokens", 0),
-                "total_tokens": getattr(usage, "total_tokens", 0),
-            }
-        except Exception:
-            pass
 
         return ModelResponse(
             provider="azure-openai",
             model=self.deployment,
-            output=result.data,
-            usage=usage_data,
-            duration_ms=duration,
+            output=agent_run_output(result),
+            usage=agent_run_usage(result),
+            duration_ms=(time.monotonic() - start) * 1000,
         )

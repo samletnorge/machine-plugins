@@ -5,15 +5,33 @@ from __future__ import annotations
 import time
 from typing import Any, Callable
 
-from pydantic_ai import Agent
-
-from agent_support.schemas import (
-    AgentDefinition,
-    AgentRunResult,
+from pydantic_ai import Agent, UsageLimits
+from pydantic_ai.messages import (
+    ModelRequest as PydanticModelRequest,
+    ModelResponse as PydanticModelResponse,
+    TextPart,
+    UserPromptPart,
 )
+
+from agent_support.schemas import AgentDefinition, AgentRunResult
 from tool_support.schemas import ToolDefinition
 
 from .converters import pydantic_result_to_agent_run_result, tool_definition_to_pydantic
+
+
+def _build_message_history(context: dict[str, Any] | None) -> list[Any]:
+    """Convert prior {role, content} messages into pydantic-ai messages."""
+    history: list[Any] = []
+    for message in (context or {}).get("messages", []) or []:
+        role = message.get("role")
+        content = message.get("content", "")
+        if role == "user":
+            history.append(
+                PydanticModelRequest(parts=[UserPromptPart(content=content)])
+            )
+        elif role == "assistant":
+            history.append(PydanticModelResponse(parts=[TextPart(content=content)]))
+    return history
 
 
 class PydanticAgentRunner:
@@ -59,8 +77,19 @@ class PydanticAgentRunner:
                 tools=pydantic_tools,
             )
 
+            history = _build_message_history(context)
+            usage_limits = (
+                UsageLimits(request_limit=definition.max_steps)
+                if definition.max_steps
+                else None
+            )
+
             start = time.monotonic()
-            result = await agent.run(input)
+            result = await agent.run(
+                input,
+                message_history=history or None,
+                usage_limits=usage_limits,
+            )
             duration_ms = (time.monotonic() - start) * 1000
 
             run_result = pydantic_result_to_agent_run_result(
@@ -69,6 +98,8 @@ class PydanticAgentRunner:
                 duration_ms=duration_ms,
             )
 
+            for step in run_result.steps:
+                await self._emit("on_agent_step", step=step)
             await self._emit("after_agent_run", result=run_result)
             return run_result
 

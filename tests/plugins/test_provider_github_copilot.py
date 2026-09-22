@@ -122,9 +122,9 @@ class TestCopilotProvider:
     async def test_generate(self, provider):
         mock_result = MagicMock()
         mock_result.output = "Copilot says hello"
-        mock_result.data = "Copilot says hello"  # fallback compat
+        mock_result.output = "Copilot says hello"  # fallback compat
         mock_result.usage = MagicMock(
-            request_tokens=10, response_tokens=5, total_tokens=15
+            input_tokens=10, output_tokens=5, total_tokens=15
         )
 
         provider._agent = MagicMock()

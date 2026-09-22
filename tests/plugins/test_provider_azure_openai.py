@@ -37,9 +37,9 @@ class TestAzureOpenAIProvider:
 
     async def test_generate_returns_model_response(self, provider):
         mock_result = MagicMock()
-        mock_result.data = "Azure says hello"
-        mock_result.usage.return_value = MagicMock(
-            request_tokens=10, response_tokens=5, total_tokens=15
+        mock_result.output = "Azure says hello"
+        mock_result.usage = MagicMock(
+            input_tokens=10, output_tokens=5, total_tokens=15
         )
 
         with patch.object(provider, "_agent") as mock_agent:
