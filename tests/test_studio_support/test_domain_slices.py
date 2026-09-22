@@ -34,11 +34,15 @@ def test_studio_layout_exposes_hub_context_seams():
         ("/api/voice/voices", "voice"),
     ],
 )
-def test_domain_endpoints_return_stub_payloads(studio_client, path: str, domain: str):
+def test_domain_endpoints_return_domain_payloads(studio_client, path: str, domain: str):
     response = studio_client.get(path)
 
     assert response.status_code == 200
-    assert response.json() == {"items": [], "implemented": False, "domain": domain}
+    payload = response.json()
+    assert payload["domain"] == domain
+    assert "installed" in payload
+    assert "categories" in payload
+    assert "items" in payload
 
 
 def test_planned_section_renders_domain_payload(studio_client):
