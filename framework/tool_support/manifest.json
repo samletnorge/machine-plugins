@@ -1,10 +1,15 @@
 {
   "name": "tool_support",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Defines the 'tool' category with ToolDefinition schema and @tool decorator",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["categories:define", "hooks:define", "events:emit", "tool:register"],
+  "capabilities": [
+    "categories:define",
+    "hooks:define",
+    "events:emit",
+    "tool:register"
+  ],
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {

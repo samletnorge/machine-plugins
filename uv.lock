@@ -71,12 +71,12 @@ requires-dist = [
 
 [[package]]
 name = "agent-runtime-basic"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/agent_runtime_basic" }
 
 [[package]]
 name = "agent-runtime-pydantic"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/agent_runtime_pydantic" }
 dependencies = [
     { name = "pydantic-ai" },
@@ -358,7 +358,7 @@ wheels = [
 
 [[package]]
 name = "browser-support"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "community/browser_support" }
 
 [package.optional-dependencies]
@@ -505,7 +505,7 @@ wheels = [
 
 [[package]]
 name = "channel-support"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/channel_support" }
 
 [[package]]
@@ -641,7 +641,7 @@ wheels = [
 
 [[package]]
 name = "cli-support"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "framework/cli_support" }
 dependencies = [
     { name = "httpx" },
@@ -851,7 +851,7 @@ wheels = [
 
 [[package]]
 name = "deployer-support"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/deployer_support" }
 dependencies = [
     { name = "httpx" },
@@ -2155,7 +2155,7 @@ wheels = [
 
 [[package]]
 name = "mcp-support"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "framework/mcp_support" }
 dependencies = [
     { name = "mcp" },
@@ -2200,12 +2200,12 @@ wheels = [
 
 [[package]]
 name = "memory-support"
-version = "0.10.0"
+version = "0.11.0"
 source = { editable = "framework/memory_support" }
 
 [[package]]
 name = "model-provider-support"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "framework/model_provider_support" }
 
 [[package]]
@@ -2638,7 +2638,7 @@ wheels = [
 
 [[package]]
 name = "observability-support"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "community/observability_support" }
 dependencies = [
     { name = "opentelemetry-api" },
@@ -2948,7 +2948,7 @@ requires-dist = [{ name = "tiktoken", specifier = ">=0.7" }]
 
 [[package]]
 name = "prompt-support"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "framework/prompt_support" }
 
 [[package]]
@@ -3103,7 +3103,7 @@ wheels = [
 
 [[package]]
 name = "provider-azure-openai"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/provider_azure_openai" }
 dependencies = [
     { name = "openai" },
@@ -3129,7 +3129,7 @@ requires-dist = [{ name = "httpx", specifier = ">=0.28" }]
 
 [[package]]
 name = "provider-github-copilot"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/provider_github_copilot" }
 dependencies = [
     { name = "httpx" },
@@ -3144,7 +3144,7 @@ requires-dist = [
 
 [[package]]
 name = "provider-google-gemini"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/provider_google_gemini" }
 dependencies = [
     { name = "pydantic-ai" },
@@ -3155,7 +3155,7 @@ requires-dist = [{ name = "pydantic-ai", specifier = ">=0.0.1" }]
 
 [[package]]
 name = "provider-grok"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/provider_grok" }
 dependencies = [
     { name = "pydantic-ai" },
@@ -3166,7 +3166,7 @@ requires-dist = [{ name = "pydantic-ai", specifier = ">=0.0.1" }]
 
 [[package]]
 name = "provider-groq"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/provider_groq" }
 dependencies = [
     { name = "pydantic-ai" },
@@ -3188,7 +3188,7 @@ requires-dist = [{ name = "httpx", specifier = ">=0.28" }]
 
 [[package]]
 name = "provider-vertex-claude"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/provider_vertex_claude" }
 dependencies = [
     { name = "anthropic" },
@@ -3203,7 +3203,7 @@ requires-dist = [
 
 [[package]]
 name = "provider-vertex-gemini"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/provider_vertex_gemini" }
 dependencies = [
     { name = "pydantic-ai" },
@@ -3692,7 +3692,7 @@ wheels = [
 
 [[package]]
 name = "rag-support"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "community/rag_support" }
 
 [package.optional-dependencies]
@@ -4157,7 +4157,7 @@ opentelemetry = [
 
 [[package]]
 name = "server-support"
-version = "0.11.0"
+version = "0.12.0"
 source = { editable = "framework/server_support" }
 dependencies = [
     { name = "agent-runtime-basic" },
@@ -4274,7 +4274,7 @@ wheels = [
 
 [[package]]
 name = "storage-support"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "framework/storage_support" }
 
 [[package]]
@@ -4284,7 +4284,7 @@ source = { editable = "framework/structured_output" }
 
 [[package]]
 name = "studio-support"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "framework/studio_support" }
 dependencies = [
     { name = "jinja2" },
@@ -4454,7 +4454,7 @@ requires-dist = [{ name = "httpx", specifier = ">=0.28" }]
 
 [[package]]
 name = "tool-support"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "framework/tool_support" }
 
 [[package]]
@@ -4734,7 +4734,7 @@ source = { editable = "framework/vectorstore_support" }
 
 [[package]]
 name = "voice-support"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "framework/voice_support" }
 
 [package.optional-dependencies]
@@ -4925,7 +4925,7 @@ source = { editable = "framework/workflow_support" }
 
 [[package]]
 name = "workspace-support"
-version = "0.5.0"
+version = "0.6.0"
 source = { editable = "community/workspace_support" }
 
 [[package]]

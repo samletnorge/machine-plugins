@@ -1,6 +1,6 @@
 [project]
 name = "voice_support"
-version = "0.5.0"
+version = "0.6.0"
 description = "Defines the voice category for TTS/STT providers"
 requires-python = ">=3.12"
 dependencies = []

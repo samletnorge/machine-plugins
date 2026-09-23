@@ -1,10 +1,15 @@
 {
   "name": "prompt_support",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Defines the 'prompt' category with versioned templates, rendering, and composition",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["categories:define", "hooks:define", "events:emit", "prompt:register"],
+  "capabilities": [
+    "categories:define",
+    "hooks:define",
+    "events:emit",
+    "prompt:register"
+  ],
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {

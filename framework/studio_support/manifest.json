@@ -1,6 +1,6 @@
 {
   "name": "studio_support",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Visual studio/playground for testing agents, tools, and workflows",
   "schema_version": "1.0.0",
   "language": "python",

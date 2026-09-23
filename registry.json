@@ -22,7 +22,7 @@
       }
     },
     "cli_support": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "machine CLI \u2014 scaffold, dev, build, deploy, and studio commands",
       "tier": "framework",
       "runtime": "python",
@@ -42,7 +42,7 @@
       }
     },
     "memory_support": {
-      "version": "0.10.0",
+      "version": "0.11.0",
       "description": "Defines the 'memory' and 'storage-backend' categories with thread-based conversation memory, working memory, observational memory, and windowing strategies",
       "tier": "framework",
       "runtime": "python",
@@ -52,7 +52,7 @@
       }
     },
     "mcp_support": {
-      "version": "0.5.0",
+      "version": "0.6.0",
       "description": "Connect to Model Context Protocol servers and expose their tools",
       "tier": "framework",
       "runtime": "python",
@@ -62,7 +62,7 @@
       }
     },
     "model_provider_support": {
-      "version": "0.5.0",
+      "version": "0.6.0",
       "description": "Defines the 'model_provider' category for any model type (LLM, TTS, STT, image, etc.)",
       "tier": "framework",
       "runtime": "python",
@@ -82,7 +82,7 @@
       }
     },
     "prompt_support": {
-      "version": "0.5.0",
+      "version": "0.6.0",
       "description": "Defines the 'prompt' category with versioned templates, rendering, and composition",
       "tier": "framework",
       "runtime": "python",
@@ -92,7 +92,7 @@
       }
     },
     "server_support": {
-      "version": "0.11.0",
+      "version": "0.12.0",
       "description": "Auto-generates FastAPI HTTP endpoints from Machine registry for agents, tools, workflows, and memory",
       "tier": "framework",
       "runtime": "python",
@@ -102,7 +102,7 @@
       }
     },
     "storage_support": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Storage backends: local filesystem and S3-compatible storage",
       "tier": "framework",
       "runtime": "python",
@@ -122,7 +122,7 @@
       }
     },
     "studio_support": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Visual studio/playground for testing agents, tools, and workflows",
       "tier": "framework",
       "runtime": "python",
@@ -132,7 +132,7 @@
       }
     },
     "tool_support": {
-      "version": "0.5.0",
+      "version": "0.6.0",
       "description": "Defines the 'tool' category with ToolDefinition schema and @tool decorator",
       "tier": "framework",
       "runtime": "python",
@@ -152,7 +152,7 @@
       }
     },
     "voice_support": {
-      "version": "0.1.0",
+      "version": "0.6.0",
       "description": "Voice abstraction layer with TTS, STT, and realtime voice providers",
       "tier": "framework",
       "runtime": "python",
@@ -172,7 +172,7 @@
       }
     },
     "agent_runtime_basic": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Basic agent runtime with custom loop, no pydantic-ai dependency",
       "tier": "community",
       "runtime": "python",
@@ -182,7 +182,7 @@
       }
     },
     "agent_runtime_pydantic": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Pydantic-AI based agent runtime with tool-calling loop",
       "tier": "community",
       "runtime": "python",
@@ -192,7 +192,7 @@
       }
     },
     "browser_support": {
-      "version": "0.1.0",
+      "version": "0.6.0",
       "description": "Browser automation with Playwright and AI-driven element selection (Stagehand)",
       "tier": "community",
       "runtime": "python",
@@ -202,7 +202,7 @@
       }
     },
     "channel_support": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Channel integrations: in-memory and WebSocket channels",
       "tier": "community",
       "runtime": "python",
@@ -212,7 +212,7 @@
       }
     },
     "deployer_support": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Deployment target category and built-in deployers (Docker, Dokploy, Vercel, Cloudflare)",
       "tier": "community",
       "runtime": "python",
@@ -262,7 +262,7 @@
       }
     },
     "observability_support": {
-      "version": "0.1.0",
+      "version": "0.6.0",
       "description": "OpenTelemetry-based tracing, cost tracking, and multiple exporter backends",
       "tier": "community",
       "runtime": "python",
@@ -272,7 +272,7 @@
       }
     },
     "provider_azure_openai": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Azure OpenAI LLM provider via pydantic-ai",
       "tier": "community",
       "runtime": "python",
@@ -292,7 +292,7 @@
       }
     },
     "provider_github_copilot": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "GitHub Copilot LLM provider via OAuth device flow + pydantic-ai",
       "tier": "community",
       "runtime": "python",
@@ -302,7 +302,7 @@
       }
     },
     "provider_google_gemini": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Google Gemini LLM provider via pydantic-ai",
       "tier": "community",
       "runtime": "python",
@@ -312,7 +312,7 @@
       }
     },
     "provider_grok": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Grok (xAI) LLM provider via pydantic-ai",
       "tier": "community",
       "runtime": "python",
@@ -322,7 +322,7 @@
       }
     },
     "provider_groq": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Groq LLM provider via pydantic-ai",
       "tier": "community",
       "runtime": "python",
@@ -342,7 +342,7 @@
       }
     },
     "provider_vertex_claude": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Vertex AI Claude LLM provider via pydantic-ai",
       "tier": "community",
       "runtime": "python",
@@ -352,7 +352,7 @@
       }
     },
     "provider_vertex_gemini": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Vertex AI Gemini LLM provider via pydantic-ai",
       "tier": "community",
       "runtime": "python",
@@ -372,7 +372,7 @@
       }
     },
     "rag_support": {
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "RAG pipeline: chunking, metadata extraction, reranking, GraphRAG, and pipeline orchestration",
       "tier": "community",
       "runtime": "python",
@@ -402,7 +402,7 @@
       }
     },
     "workspace_support": {
-      "version": "0.1.0",
+      "version": "0.6.0",
       "description": "Agent workspace with sandboxed execution, filesystem abstraction, and skills system",
       "tier": "community",
       "runtime": "python",

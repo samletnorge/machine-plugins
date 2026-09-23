@@ -1,10 +1,14 @@
 {
   "name": "observability_support",
-  "version": "0.1.0",
+  "version": "0.6.0",
   "description": "OpenTelemetry-based tracing, cost tracking, and multiple exporter backends",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["categories:define", "hooks:define", "events:emit"],
+  "capabilities": [
+    "categories:define",
+    "hooks:define",
+    "events:emit"
+  ],
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {

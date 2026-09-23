@@ -1,6 +1,6 @@
 [project]
 name = "mcp_support"
-version = "0.5.0"
+version = "0.6.0"
 description = "Connect to Model Context Protocol servers and expose their tools"
 requires-python = ">=3.12"
 dependencies = ["mcp>=1.0"]

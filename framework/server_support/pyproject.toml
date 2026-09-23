@@ -1,6 +1,6 @@
 [project]
 name = "server_support"
-version = "0.11.0"
+version = "0.12.0"
 description = "Auto-generated FastAPI HTTP server for machine-core"
 requires-python = ">=3.12"
 dependencies = [

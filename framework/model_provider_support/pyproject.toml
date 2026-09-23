@@ -1,6 +1,6 @@
 [project]
 name = "model_provider_support"
-version = "0.5.0"
+version = "0.6.0"
 description = "Defines the model_provider category for any model type"
 requires-python = ">=3.12"
 dependencies = []

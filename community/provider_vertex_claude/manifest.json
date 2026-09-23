@@ -1,11 +1,16 @@
 {
   "name": "provider_vertex_claude",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Vertex AI Claude LLM provider via pydantic-ai",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["model_provider:register"],
-  "dependencies": ["pydantic-ai>=0.0.1", "anthropic>=0.40"],
+  "capabilities": [
+    "model_provider:register"
+  ],
+  "dependencies": [
+    "pydantic-ai>=0.0.1",
+    "anthropic>=0.40"
+  ],
   "config_schema": {
     "project": {
       "type": "string",

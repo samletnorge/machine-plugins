@@ -1,10 +1,13 @@
 {
   "name": "voice_support",
-  "version": "0.1.0",
+  "version": "0.6.0",
   "description": "Voice abstraction layer with TTS, STT, and realtime voice providers",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["categories:define", "voice_provider:register"],
+  "capabilities": [
+    "categories:define",
+    "voice_provider:register"
+  ],
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {

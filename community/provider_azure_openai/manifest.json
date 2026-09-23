@@ -1,11 +1,16 @@
 {
   "name": "provider_azure_openai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Azure OpenAI LLM provider via pydantic-ai",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["model_provider:register"],
-  "dependencies": ["pydantic-ai>=0.0.1", "openai>=1.0"],
+  "capabilities": [
+    "model_provider:register"
+  ],
+  "dependencies": [
+    "pydantic-ai>=0.0.1",
+    "openai>=1.0"
+  ],
   "config_schema": {
     "endpoint": {
       "type": "string",

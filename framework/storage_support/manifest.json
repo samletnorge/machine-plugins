@@ -1,10 +1,12 @@
 {
   "name": "storage_support",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Storage backends: local filesystem and S3-compatible storage",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["storage-backend:register"],
+  "capabilities": [
+    "storage-backend:register"
+  ],
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {
