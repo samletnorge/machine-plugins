@@ -92,6 +92,18 @@ export interface ContextOption {
 	active: boolean;
 }
 
+export interface ProjectTarget {
+	tenant_slug: string | null;
+	tenant_name: string;
+	project_slug: string;
+	project_name: string;
+	environment: string;
+	environment_status: string;
+	display_status: string;
+	entry: string | null;
+	active: boolean;
+}
+
 export interface Overview {
 	machine_name: string;
 	tenant_slug: string | null;
@@ -109,6 +121,7 @@ export interface Overview {
 	target_count: number;
 	project_count: number;
 	environment_count: number;
+	project_targets: ProjectTarget[];
 	categories: string[];
 	category_counts: Record<string, number>;
 	manifests: PluginManifest[];
