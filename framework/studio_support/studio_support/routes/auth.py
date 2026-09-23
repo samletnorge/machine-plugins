@@ -8,7 +8,13 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, RedirectResponse
 from loguru import logger
 
-from studio_support.oidc import ZitadelOIDC, config_from_env, extract_roles, generate_pkce
+from studio_support.oidc import (
+    ZitadelOIDC,
+    config_from_env,
+    decode_claims,
+    extract_roles,
+    generate_pkce,
+)
 from studio_support.session import (
     SESSION_COOKIE,
     STATE_COOKIE,
@@ -105,15 +111,22 @@ async def callback(
         logger.warning("Zitadel token exchange failed: {}", exc)
         raise HTTPException(status_code=502, detail="Zitadel token exchange failed") from exc
 
+    id_token = tokens.get("id_token")
+    claims = decode_claims(id_token)
     user = {
-        "sub": info.get("sub") or tokens.get("sub"),
-        "email": info.get("email"),
-        "name": info.get("name") or info.get("preferred_username"),
-        "roles": extract_roles(info),
+        "sub": info.get("sub") or claims.get("sub") or tokens.get("sub"),
+        "email": info.get("email") or claims.get("email"),
+        "name": (
+            info.get("name")
+            or info.get("preferred_username")
+            or claims.get("name")
+            or claims.get("preferred_username")
+        ),
+        "roles": sorted(set(extract_roles(info)) | set(extract_roles(claims))),
     }
 
     response = RedirectResponse(payload.get("next") or _app_url(request))
-    _set_cookie(response, SESSION_COOKIE, new_session(user, tokens.get("id_token")), request, 60 * 60 * 8)
+    _set_cookie(response, SESSION_COOKIE, new_session(user, id_token), request, 60 * 60 * 8)
     _delete_cookie(response, STATE_COOKIE, request)
     return response
 

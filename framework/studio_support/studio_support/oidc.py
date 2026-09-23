@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import json
 import os
 import secrets
 from dataclasses import dataclass
@@ -76,6 +77,24 @@ def extract_roles(userinfo: dict[str, Any]) -> list[str]:
     if isinstance(claim, list):
         return sorted(str(role) for role in claim)
     return []
+
+
+def decode_claims(token: str | None) -> dict[str, Any]:
+    """Decode a JWT payload without verifying its signature.
+
+    The token comes straight from the Zitadel token endpoint over TLS, so the
+    claims are used only for mapping user info/roles, not for trust decisions.
+    """
+    if not token or token.count(".") < 2:
+        return {}
+    payload = token.split(".")[1]
+    padding = "=" * (-len(payload) % 4)
+    try:
+        raw = base64.urlsafe_b64decode(payload + padding)
+        data = json.loads(raw)
+    except (ValueError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
 
 
 class ZitadelOIDC:

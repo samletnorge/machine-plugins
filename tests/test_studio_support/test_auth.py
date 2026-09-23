@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import base64
+import json
 from urllib.parse import parse_qs, urlparse
 
 import pytest
 
-from studio_support.oidc import ZitadelOIDC, extract_roles
+from studio_support.oidc import ZitadelOIDC, decode_claims, extract_roles
 
 _DISCOVERY = {
     "authorization_endpoint": "https://zitadel.test/oauth/v2/authorize",
@@ -53,6 +55,19 @@ def test_extract_roles():
     assert extract_roles({}) == []
 
 
+def _jwt(payload: dict) -> str:
+    def seg(data: dict) -> str:
+        raw = json.dumps(data).encode()
+        return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
+
+    return f"{seg({'alg': 'none'})}.{seg(payload)}.sig"
+
+
+def test_decode_claims():
+    assert decode_claims(_jwt({"sub": "x"})) == {"sub": "x"}
+    assert decode_claims("not-a-jwt") == {}
+
+
 def test_login_redirects_to_zitadel(studio_client, auth_env):
     response = studio_client.get("/auth/login", follow_redirects=False)
 
@@ -92,6 +107,28 @@ def test_callback_rejects_bad_state(studio_client, auth_env):
         "/auth/callback?code=abc&state=tampered", follow_redirects=False
     )
     assert response.status_code == 400
+
+
+def test_roles_merge_from_id_token(studio_client, auth_env, monkeypatch):
+    roles_claim = "urn:zitadel:iam:org:project:roles"
+    token = _jwt({"sub": "user-1", roles_claim: {"editor": {"acme": "org"}}})
+
+    async def exchange(self, code, code_verifier=None):
+        return {"access_token": "access-token", "id_token": token}
+
+    async def userinfo(self, access_token):
+        return {"sub": "user-1", "email": "ada@example.com", "name": "Ada"}
+
+    monkeypatch.setattr(ZitadelOIDC, "exchange_code", exchange)
+    monkeypatch.setattr(ZitadelOIDC, "userinfo", userinfo)
+
+    login = studio_client.get("/auth/login", follow_redirects=False)
+    state, _ = _state_from(login)
+    studio_client.get(
+        f"/auth/callback?code=auth-code&state={state}", follow_redirects=False
+    )
+
+    assert studio_client.get("/auth/me").json()["user"]["roles"] == ["editor"]
 
 
 def test_logout_clears_session(studio_client, auth_env):
