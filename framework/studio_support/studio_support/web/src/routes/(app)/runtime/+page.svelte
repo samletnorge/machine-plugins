@@ -7,6 +7,7 @@
 	import DataState from "$lib/components/studio/data-state.svelte";
 	import Metric from "$lib/components/studio/metric.svelte";
 	import PageHeader from "$lib/components/studio/page-header.svelte";
+	import ToolRunner from "$lib/components/studio/tool-runner.svelte";
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { Button } from "$lib/components/ui/button/index.js";
 	import * as Card from "$lib/components/ui/card/index.js";
@@ -100,6 +101,11 @@
 														{#each item.operations as operation (operation)}
 															<Badge variant="secondary" class="text-xs">{operation}</Badge>
 														{/each}
+													</div>
+												{/if}
+												{#if tab.value === "tools"}
+													<div class="mt-2">
+														<ToolRunner toolName={item.name} />
 													</div>
 												{/if}
 											</div>

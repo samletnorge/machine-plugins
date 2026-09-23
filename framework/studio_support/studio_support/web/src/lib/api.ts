@@ -190,3 +190,66 @@ export function getServicesStatus() {
 export function getDomain(endpoint: string) {
 	return api<DomainPayload>(endpoint);
 }
+
+export interface ChatMessage {
+	role: string;
+	content: string;
+}
+
+export interface ChatThread {
+	thread_id: string;
+	agent: string;
+	messages: ChatMessage[];
+}
+
+export interface ChatThreadsResponse {
+	catalog: { agents: string[]; runtimes: string[] };
+	threads: ChatThread[];
+}
+
+export interface ToolDetail {
+	name: string;
+	description: string;
+	owner: string | null;
+	operations: string[];
+	input_schema: { type?: string; properties?: Record<string, unknown>; required?: string[] };
+}
+
+export interface WorkflowGraph {
+	nodes: { id: string; label: string; kind: string }[];
+	edges: { source: string; target: string }[];
+}
+
+export function getChatThreads() {
+	return api<ChatThreadsResponse>("/api/chat/threads");
+}
+
+export function createChatSession() {
+	return api<{ thread_id: string }>("/api/chat/sessions", { method: "POST" });
+}
+
+export function sendChatMessage(threadId: string, agent: string, message: string) {
+	return api<{ thread_id: string; messages: ChatMessage[] }>(
+		`/api/chat/threads/${threadId}/messages`,
+		{ method: "POST", body: JSON.stringify({ agent, message }) }
+	);
+}
+
+export function getToolDetail(name: string) {
+	return api<ToolDetail>(`/api/tools/${name}`);
+}
+
+export function executeTool(name: string, body: Record<string, unknown>) {
+	return api<{ result: unknown }>(`/tools/${name}/execute`, {
+		method: "POST",
+		body: JSON.stringify(body),
+	});
+}
+
+export function getWorkflowDetail(name: string) {
+	return api<{ name: string; graph: WorkflowGraph }>(`/api/workflows/${name}`);
+}
+
+export function getWorkflowRuns(name: string) {
+	return api<{ runs: Record<string, unknown>[] }>(`/api/workflows/${name}/runs`);
+}

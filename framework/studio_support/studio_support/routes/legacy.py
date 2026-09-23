@@ -24,7 +24,7 @@ _PAGE_REDIRECTS: dict[str, str] = {
     "/agents": "/runtime",
     "/tools": "/runtime",
     "/workflows": "/runtime",
-    "/chat": "/runtime",
+    "/chat": "/chat",
     "/docs": "/",
 }
 
@@ -104,7 +104,7 @@ async def legacy_workflows(request: Request) -> RedirectResponse:
 
 @router.get("/chat")
 async def legacy_chat(request: Request) -> RedirectResponse:
-    return _redirect(request, "/runtime")
+    return _redirect(request, "/chat")
 
 
 @router.get("/sections/{section_key}")

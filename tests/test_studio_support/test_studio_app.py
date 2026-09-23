@@ -53,7 +53,7 @@ def test_create_studio_app_returns_fastapi(fake_machine):
         ("/agents", "/app/runtime"),
         ("/tools", "/app/runtime"),
         ("/workflows", "/app/runtime"),
-        ("/chat", "/app/runtime"),
+        ("/chat", "/app/chat"),
         ("/sections/deploy", "/app/domain/deploy"),
         ("/islands/memory", "/app/domain/memory"),
         ("/docs", "/app/"),

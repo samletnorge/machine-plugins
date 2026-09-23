@@ -11,12 +11,12 @@
 	import WrenchIcon from "@lucide/svelte/icons/wrench";
 	import { toast } from "svelte-sonner";
 	import CategoryChart from "$lib/components/studio/category-chart.svelte";
+	import CategoryDonut from "$lib/components/studio/category-donut.svelte";
 	import DataState from "$lib/components/studio/data-state.svelte";
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { Button } from "$lib/components/ui/button/index.js";
 	import * as Card from "$lib/components/ui/card/index.js";
 	import * as Empty from "$lib/components/ui/empty/index.js";
-	import { Progress } from "$lib/components/ui/progress/index.js";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { countUp, reveal } from "$lib/motion";
 	import { loadStudio, studio } from "$lib/store.svelte";
@@ -33,9 +33,7 @@
 			.map(([category, count]) => ({ category, count }))
 			.sort((a, b) => b.count - a.count)
 	);
-	const maxCount = $derived(Math.max(1, ...Object.values(counts)));
 	const topPlugins = $derived((overview?.manifests ?? []).slice(0, 5));
-
 	const stats = $derived([
 		{ label: "Agents", value: overview?.runtime_agents.length ?? 0, icon: BotIcon },
 		{ label: "Tools", value: overview?.runtime_tools.length ?? 0, icon: WrenchIcon },
@@ -147,16 +145,16 @@
 						<Card.Description>Share by category</Card.Description>
 					</Card.Header>
 					<Card.Content class="flex flex-col gap-4">
+						<CategoryDonut {counts} class="h-52" />
 						{#if distribution.length}
-							{#each distribution as row (row.category)}
-								<div class="flex flex-col gap-1.5">
+							<div class="flex flex-col gap-1.5">
+								{#each distribution as row (row.category)}
 									<div class="flex items-center justify-between text-sm">
 										<span class="capitalize">{row.category.replace(/_/g, " ")}</span>
 										<span class="text-muted-foreground tabular-nums">{row.count}</span>
 									</div>
-									<Progress value={(row.count / maxCount) * 100} />
-								</div>
-							{/each}
+								{/each}
+							</div>
 						{:else}
 							<p class="text-muted-foreground text-sm">No categories registered.</p>
 						{/if}

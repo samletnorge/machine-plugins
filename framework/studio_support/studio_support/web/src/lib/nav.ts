@@ -7,6 +7,7 @@ import EyeIcon from "@lucide/svelte/icons/eye";
 import FolderIcon from "@lucide/svelte/icons/folder";
 import GlobeIcon from "@lucide/svelte/icons/globe";
 import LayoutDashboardIcon from "@lucide/svelte/icons/layout-dashboard";
+import MessagesSquareIcon from "@lucide/svelte/icons/messages-square";
 import MicIcon from "@lucide/svelte/icons/mic";
 import PackageIcon from "@lucide/svelte/icons/package";
 import RadioIcon from "@lucide/svelte/icons/radio";
@@ -46,6 +47,7 @@ export const NAV_SECTIONS: NavSection[] = [
 		section: "Build",
 		items: [
 			{ key: "runtime", label: "Agents & Tools", href: "/runtime", icon: BotIcon },
+			{ key: "chat", label: "Chat", href: "/chat", icon: MessagesSquareIcon },
 		],
 	},
 	{
