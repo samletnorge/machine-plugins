@@ -1,0 +1,37 @@
+{
+  "name": "agent_assistant",
+  "version": "0.1.0",
+  "description": "General chat agent backed by a model provider (DeepSeek by default)",
+  "schema_version": "1.0.0",
+  "language": "python",
+  "capabilities": ["agent:register"],
+  "dependencies": ["model_provider_support"],
+  "config_schema": {
+    "provider": {
+      "type": "string",
+      "default": "deepseek",
+      "description": "Registered model_provider to use"
+    },
+    "model": {
+      "type": "string",
+      "default": "",
+      "description": "Override the provider's default model"
+    },
+    "system_prompt": {
+      "type": "string",
+      "default": "You are Machine Assistant, a capable general-purpose AI assistant embedded in Machine Studio. Answer complex questions thoughtfully and concisely.",
+      "description": "System prompt for the assistant"
+    },
+    "temperature": {
+      "type": "number",
+      "default": 0.7,
+      "description": "Sampling temperature"
+    }
+  },
+  "hooks_subscribed": {},
+  "events_subscribed": [],
+  "transport": {
+    "type": "in-process",
+    "entry_point": "agent_assistant:AgentAssistantPlugin"
+  }
+}

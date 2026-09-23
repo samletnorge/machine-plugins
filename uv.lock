@@ -9,6 +9,7 @@ resolution-markers = [
 
 [manifest]
 members = [
+    "agent-assistant",
     "agent-brreg-expert",
     "agent-runtime-basic",
     "agent-runtime-pydantic",
@@ -53,6 +54,17 @@ members = [
     "workflow-support",
     "workspace-support",
 ]
+
+[[package]]
+name = "agent-assistant"
+version = "0.1.0"
+source = { editable = "framework/agent_assistant" }
+dependencies = [
+    { name = "model-provider-support" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "model-provider-support", editable = "framework/model_provider_support" }]
 
 [[package]]
 name = "agent-brreg-expert"
@@ -2010,7 +2022,7 @@ wheels = [
 [[package]]
 name = "machine-core"
 version = "0.12.0"
-source = { git = "ssh://git@github.com/samletnorge/machine-core.git#3bd7e862e8dfc4d0d316dd31f5010fe87f4abe45" }
+source = { git = "ssh://git@github.com/samletnorge/machine-core.git#ae43bae51d668c11e2621290f4041d4a42291388" }
 dependencies = [
     { name = "fastapi" },
     { name = "httpx" },

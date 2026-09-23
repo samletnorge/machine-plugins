@@ -1,6 +1,16 @@
 {
   "version": "1.0.0",
   "plugins": {
+    "agent_assistant": {
+      "version": "0.1.0",
+      "description": "General chat agent backed by a model provider (DeepSeek by default)",
+      "tier": "framework",
+      "runtime": "python",
+      "source": {
+        "type": "registry",
+        "path": "framework/agent_assistant"
+      }
+    },
     "agent_support": {
       "version": "0.5.0",
       "description": "Defines the 'agent' category with AgentDefinition, handoff protocol, and agent lifecycle hooks",

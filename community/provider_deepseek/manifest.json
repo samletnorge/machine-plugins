@@ -16,6 +16,7 @@
     "api_key": {
       "type": "string",
       "env": "DEEPSEEK_API_KEY",
+      "secret": true,
       "description": "DeepSeek API key"
     },
     "model": {
