@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from studio_support.dependencies import (
@@ -890,6 +890,7 @@ def create_studio_app(
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
     from studio_support.routes import (
+        auth as auth_routes,
         chat,
         config,
         dashboard,
@@ -916,6 +917,7 @@ def create_studio_app(
     from studio_support.control import voice as control_voice
     from studio_support.control import workspace as control_workspace
 
+    app.include_router(auth_routes.router)
     app.include_router(dashboard.router)
     app.include_router(registry.router)
     app.include_router(config.router)
@@ -940,5 +942,27 @@ def create_studio_app(
     app.include_router(control_workspace.router)
     app.include_router(control_browser.router)
     app.include_router(control_voice.router)
+
+    # New SvelteKit Studio build (static SPA) served under /_studio/app.
+    studio_build = Path(__file__).parent / "web" / "build"
+    if studio_build.is_dir():
+        assets_dir = studio_build / "_app"
+        if assets_dir.is_dir():
+            app.mount(
+                "/app/_app",
+                StaticFiles(directory=str(assets_dir)),
+                name="studio-app-assets",
+            )
+
+        build_root = studio_build.resolve()
+
+        @app.get("/app")
+        @app.get("/app/{path:path}")
+        async def studio_spa(path: str = "") -> Response:
+            if path:
+                candidate = (studio_build / path).resolve()
+                if candidate.is_file() and build_root in candidate.parents:
+                    return FileResponse(candidate)
+            return FileResponse(studio_build / "index.html")
 
     return app

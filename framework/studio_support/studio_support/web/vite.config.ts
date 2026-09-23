@@ -7,6 +7,8 @@ export default defineConfig({
 	plugins: [
 		tailwindcss(),
 		sveltekit({
+			// Served by the FastAPI studio_support host at /_studio/app.
+			paths: { base: '/_studio/app' },
 			compilerOptions: {
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
 				runes: ({ filename }) => filename.split(/[/\\]/).includes('node_modules') ? undefined : true

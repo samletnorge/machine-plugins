@@ -1,0 +1,1 @@
+import{s as e}from"./ChqGm7gM.js";function t(t,n,r={}){let{priority:i,padding:a=0}=r,o=i?[...t].sort(e(i,`desc`)):t,s=[],c=[];for(let e of o){let t=n(e),r=!1;for(let e of c)if(t.x-a<e.x+e.width&&t.x+t.width+a>e.x&&t.y-a<e.y+e.height&&t.y+t.height+a>e.y){r=!0;break}r||(s.push(e),c.push(t))}return s}export{t};

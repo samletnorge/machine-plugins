@@ -4281,6 +4281,7 @@ name = "studio-support"
 version = "0.2.0"
 source = { editable = "framework/studio_support" }
 dependencies = [
+    { name = "httpx" },
     { name = "jinja2" },
     { name = "markdown-it-py" },
     { name = "python-multipart" },
@@ -4288,6 +4289,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "httpx", specifier = ">=0.28" },
     { name = "jinja2", specifier = ">=3.1.0" },
     { name = "markdown-it-py", specifier = ">=3.0" },
     { name = "python-multipart", specifier = ">=0.0.9" },

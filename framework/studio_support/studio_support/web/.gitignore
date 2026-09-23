@@ -6,7 +6,7 @@ node_modules
 .netlify
 .wrangler
 /.svelte-kit
-/build
+# build/ is committed so the packaged Studio can be served from a git install.
 
 # OS
 .DS_Store
