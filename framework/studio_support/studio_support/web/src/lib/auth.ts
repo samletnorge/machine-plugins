@@ -22,7 +22,7 @@ export async function getUser(): Promise<StudioUser | null> {
 }
 
 export function login(next?: string): void {
-	const target = next ?? window.location.href;
+	const target = next ?? `${API_ROOT}/app/`;
 	window.location.href = `${API_ROOT}/auth/login?next=${encodeURIComponent(target)}`;
 }
 
