@@ -21,6 +21,7 @@
 		type ChatThread,
 	} from "$lib/api";
 	import { reveal } from "$lib/motion";
+	import { renderMarkdown } from "$lib/markdown";
 
 	let loading = $state(true);
 	let error = $state<string | null>(null);
@@ -202,14 +203,18 @@
 											class="flex"
 											class:justify-end={message.role === "user"}
 										>
-											<div
-												class="max-w-[80%] rounded-2xl px-4 py-2 text-sm whitespace-pre-wrap {message.role ===
-												'user'
-													? 'bg-primary text-primary-foreground'
-													: 'bg-muted'}"
-											>
+										<div
+											class="max-w-[80%] rounded-2xl px-4 py-2 text-sm {message.role ===
+											'user'
+												? 'bg-primary text-primary-foreground whitespace-pre-wrap'
+												: 'bg-muted'}"
+										>
+											{#if message.role === "user"}
 												{message.content}
-											</div>
+											{:else}
+												<div class="chat-md">{@html renderMarkdown(message.content)}</div>
+											{/if}
+										</div>
 										</div>
 									{/each}
 								</div>

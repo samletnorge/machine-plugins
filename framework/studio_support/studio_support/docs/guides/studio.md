@@ -165,6 +165,30 @@ Installed plugins are discovered from their wheel's bundled `manifest.json`
 (via `importlib.metadata`), so a plain `uv add` plus a declaration is enough —
 no manual copying.
 
+## Chat
+
+The Chat page talks to agents registered in the runtime. For real LLM answers,
+install the general assistant agent plus a model provider:
+
+```bash
+machine plugin add agent_assistant
+machine plugin add provider_deepseek      # then set DEEPSEEK_API_KEY
+```
+
+Restart the runtime; the chat agent list will include `assistant`, which answers
+complex questions through the configured `model_provider` (DeepSeek by default).
+Configure it in `pyproject.toml`:
+
+```toml
+[tool.machine-core.plugin_configs.agent_assistant]
+provider = "deepseek"        # or "ollama", "google-gemini", ...
+model = "deepseek-chat"
+system_prompt = "You are Machine Assistant."
+temperature = 0.7
+```
+
+Assistant replies are rendered as sanitized markdown (code blocks, tables, lists).
+
 ## Domains
 
 Each domain page renders live control-plane data from a JSON endpoint:
