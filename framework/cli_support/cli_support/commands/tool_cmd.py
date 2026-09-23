@@ -8,7 +8,7 @@ import typer
 from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 
-from cli_support.utils import find_project_root
+from cli_support.utils import find_project_root, to_const_name, to_identifier
 
 console = Console()
 
@@ -34,12 +34,18 @@ def tool_add(
     tools_dir = root / "src" / "tools"
     tools_dir.mkdir(parents=True, exist_ok=True)
 
-    tool_file = tools_dir / f"{name}.py"
+    tool_file = tools_dir / f"{to_identifier(name)}.py"
     if tool_file.exists():
         console.print(f"[red]Tool {name} already exists at {tool_file}[/red]")
         raise typer.Exit(code=1)
 
     template = env.get_template("tool.py.j2")
-    tool_file.write_text(template.render(tool_name=name))
+    tool_file.write_text(
+        template.render(
+            tool_name=name,
+            tool_func=to_identifier(name),
+            tool_const=f"{to_const_name(name)}_TOOL",
+        )
+    )
 
     console.print(f"[green]✓[/green] Created tool [bold]{name}[/bold] at {tool_file}")

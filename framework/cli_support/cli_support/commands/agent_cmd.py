@@ -8,7 +8,12 @@ import typer
 from jinja2 import Environment, PackageLoader, select_autoescape
 from rich.console import Console
 
-from cli_support.utils import find_project_root
+from cli_support.utils import (
+    find_project_root,
+    to_class_name,
+    to_const_name,
+    to_identifier,
+)
 
 console = Console()
 
@@ -34,12 +39,22 @@ def agent_add(
     agents_dir = root / "src" / "agents"
     agents_dir.mkdir(parents=True, exist_ok=True)
 
-    agent_file = agents_dir / f"{name}.py"
+    agent_file = agents_dir / f"{to_identifier(name)}.py"
     if agent_file.exists():
         console.print(f"[red]Agent {name} already exists at {agent_file}[/red]")
         raise typer.Exit(code=1)
 
+    class_name = to_class_name(name)
+    if not class_name.lower().endswith("agent"):
+        class_name = f"{class_name}Agent"
+
     template = env.get_template("agent.py.j2")
-    agent_file.write_text(template.render(agent_name=name))
+    agent_file.write_text(
+        template.render(
+            agent_name=name,
+            agent_class=class_name,
+            agent_const=f"{to_const_name(name)}_DEFINITION",
+        )
+    )
 
     console.print(f"[green]✓[/green] Created agent [bold]{name}[/bold] at {agent_file}")
