@@ -906,6 +906,7 @@ def create_studio_app(
     from studio_support.control import runtime as control_runtime
     from studio_support.control import services as control_services
     from studio_support.control import storage as control_storage
+    from studio_support.control import store as control_store
     from studio_support.control import voice as control_voice
     from studio_support.control import workspace as control_workspace
 
@@ -925,6 +926,7 @@ def create_studio_app(
     app.include_router(control_evals.router)
     app.include_router(control_pubsub.router)
     app.include_router(control_storage.router)
+    app.include_router(control_store.router)
     app.include_router(control_workspace.router)
     app.include_router(control_browser.router)
     app.include_router(control_voice.router)

@@ -2010,9 +2010,10 @@ wheels = [
 [[package]]
 name = "machine-core"
 version = "0.12.0"
-source = { git = "ssh://git@github.com/samletnorge/machine-core.git#56bd1cb54f23c9542fe3e760595a613bd60d95f1" }
+source = { git = "ssh://git@github.com/samletnorge/machine-core.git#3bd7e862e8dfc4d0d316dd31f5010fe87f4abe45" }
 dependencies = [
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "jinja2" },
     { name = "loguru" },
     { name = "pydantic" },

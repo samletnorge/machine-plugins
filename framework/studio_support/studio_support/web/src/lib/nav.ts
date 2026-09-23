@@ -16,6 +16,7 @@ import SearchIcon from "@lucide/svelte/icons/search";
 import SettingsIcon from "@lucide/svelte/icons/settings";
 import ShieldCheckIcon from "@lucide/svelte/icons/shield-check";
 import SlidersHorizontalIcon from "@lucide/svelte/icons/sliders-horizontal";
+import StoreIcon from "@lucide/svelte/icons/store";
 import type { Component } from "svelte";
 
 export type IconComponent = Component;
@@ -40,6 +41,7 @@ export const NAV_SECTIONS: NavSection[] = [
 		items: [
 			{ key: "dashboard", label: "Overview", href: "/", icon: LayoutDashboardIcon },
 			{ key: "registry", label: "Registry", href: "/registry", icon: PackageIcon },
+			{ key: "store", label: "Store", href: "/store", icon: StoreIcon },
 			{ key: "services", label: "Services", href: "/services", icon: ActivityIcon },
 		],
 	},

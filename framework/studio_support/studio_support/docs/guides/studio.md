@@ -47,6 +47,7 @@ The host app starts the machine in its lifespan (if it has not been started), so
 |------|---------|
 | `/_studio/app/` | Overview dashboard. |
 | `/_studio/app/registry` | Registry browser. |
+| `/_studio/app/store` | Plugin store (install into the project). |
 | `/_studio/app/services` | Control-plane endpoints and service actions. |
 | `/_studio/app/runtime` | Agents, tools and workflows. |
 | `/_studio/app/domain/{key}` | A domain page (`memory`, `rag`, `evals`, `storage`, `deploy`, `observe`, `auth`, `workspace`, `browser`, `voice`, `pubsub`). |
@@ -134,6 +135,35 @@ This is how Studio scales from one project to many without changing the underlyi
 `GET /_studio/api/overview` returns the full machine/context snapshot the SPA dashboard uses:
 machine and context names, category counts, plugin manifests, project targets, and the
 registered agents, tools and workflows.
+
+## Plugin store
+
+The store installs plugins **into the project** (not just the machine data dir):
+
+1. resolves the plugin from the registry (`registry.json`),
+2. runs `uv add "<package> @ <git url>#subdirectory=<path>"`,
+3. declares the name in `[tool.machine-core].plugins`,
+4. syncs the plugin's bundled manifest so the runtime loads it on restart.
+
+Use it from the CLI or the Studio:
+
+```bash
+machine plugin available          # list the registry
+machine plugin search brreg       # search
+machine plugin add auth_support   # install + declare in this project
+machine plugin list               # declared vs installed
+machine plugin remove auth_support
+```
+
+| Method | Path | Body |
+|--------|------|------|
+| `GET` | `/_studio/api/store` | Catalog with `declared`/`installed` status. |
+| `POST` | `/_studio/api/store/install` | `{"name": "...", "dev": false}` |
+| `POST` | `/_studio/api/store/uninstall` | `{"name": "..."}` |
+
+Installed plugins are discovered from their wheel's bundled `manifest.json`
+(via `importlib.metadata`), so a plain `uv add` plus a declaration is enough —
+no manual copying.
 
 ## Domains
 

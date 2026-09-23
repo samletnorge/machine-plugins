@@ -253,3 +253,48 @@ export function getWorkflowDetail(name: string) {
 export function getWorkflowRuns(name: string) {
 	return api<{ runs: Record<string, unknown>[] }>(`/api/workflows/${name}/runs`);
 }
+
+export interface StorePlugin {
+	name: string;
+	version: string;
+	description: string;
+	tier: string;
+	runtime: string;
+	source: Record<string, string>;
+	declared: boolean;
+	installed: boolean;
+}
+
+export interface StoreCatalog {
+	project_root: string;
+	has_pyproject: boolean;
+	declared: string[];
+	installed: string[];
+	plugins: StorePlugin[];
+}
+
+export interface StoreActionResult {
+	name: string;
+	declared: boolean;
+	installed: boolean;
+	commands: string[][];
+	output: string;
+}
+
+export function getStore() {
+	return api<StoreCatalog>("/api/store");
+}
+
+export function installPlugin(name: string, dev = false) {
+	return api<StoreActionResult>("/api/store/install", {
+		method: "POST",
+		body: JSON.stringify({ name, dev }),
+	});
+}
+
+export function uninstallPlugin(name: string) {
+	return api<StoreActionResult>("/api/store/uninstall", {
+		method: "POST",
+		body: JSON.stringify({ name }),
+	});
+}
