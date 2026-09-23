@@ -20,6 +20,8 @@
   interface LayoutEdge {
     id: string;
     d: string;
+    source: string;
+    target: string;
   }
 
   interface DagLayout {
@@ -43,6 +45,7 @@
   let loadError = $state('');
   let loading = $state(true);
   let reloadToken = $state(0);
+  let hoveredNode = $state<string | null>(null);
 
   let nodes = $derived(graph?.graph.nodes ?? []);
   let edges = $derived(graph?.graph.edges ?? []);
@@ -161,7 +164,9 @@
         const curve = Math.max(26, (tx - sx) * 0.5);
         return {
           id: `${edge.source}->${edge.target}`,
-          d: `M ${sx} ${sy} C ${sx + curve} ${sy}, ${tx - curve} ${ty}, ${tx} ${ty}`
+          d: `M ${sx} ${sy} C ${sx + curve} ${sy}, ${tx - curve} ${ty}, ${tx} ${ty}`,
+          source: edge.source,
+          target: edge.target
         };
       });
 
@@ -248,20 +253,38 @@
         </defs>
 
         <g class="dag-edges">
-          {#each layout.edges as edge (edge.id)}
-            <path class="dag-edge" d={edge.d} marker-end={`url(#${uid}-arrow)`}></path>
+          {#each layout.edges as edge, edgeIndex (edge.id)}
+            <path
+              class="dag-edge"
+              class:highlight={Boolean(hoveredNode) && (edge.source === hoveredNode || edge.target === hoveredNode)}
+              class:dimmed={Boolean(hoveredNode) && edge.source !== hoveredNode && edge.target !== hoveredNode}
+              d={edge.d}
+              pathLength={1}
+              style={`--edge-index:${edgeIndex}`}
+              marker-end={`url(#${uid}-arrow)`}
+            ></path>
           {/each}
         </g>
 
         <g class="dag-nodes">
-          {#each layout.nodes as node (node.id)}
-            <g class={`dag-node ${node.cls}`} transform={`translate(${node.x} ${node.y})`}>
+          {#each layout.nodes as node, nodeIndex (node.id)}
+            <g
+              class={`dag-node ${node.cls}`}
+              class:dimmed={Boolean(hoveredNode) && hoveredNode !== node.id}
+              transform={`translate(${node.x} ${node.y})`}
+              style={`--node-index:${nodeIndex}`}
+              role="img"
+              aria-label={`${node.label} · ${node.kind}`}
+              onpointerenter={() => (hoveredNode = node.id)}
+              onpointerleave={() => (hoveredNode = null)}
+            >
               <title>{node.label} · {node.kind}</title>
-              <rect class="dag-node-rect" width={NODE_W} height={NODE_H} rx="9" ry="9"></rect>
-              <text class="dag-node-label" x={NODE_W / 2} y={NODE_H / 2 - 5} text-anchor="middle" dominant-baseline="middle">
+              <rect class="dag-node-rect" width={NODE_W} height={NODE_H} rx="8" ry="8"></rect>
+              <circle class={`dag-node-dot ${node.cls}`} cx="14" cy="14" r="3.5"></circle>
+              <text class="dag-node-label" x={NODE_W / 2 + 6} y={NODE_H / 2 - 5} text-anchor="middle" dominant-baseline="middle">
                 {truncate(node.label)}
               </text>
-              <text class="dag-node-kind" x={NODE_W / 2} y={NODE_H / 2 + 13} text-anchor="middle" dominant-baseline="middle">
+              <text class="dag-node-kind" x={NODE_W / 2 + 6} y={NODE_H / 2 + 13} text-anchor="middle" dominant-baseline="middle">
                 {node.kind}
               </text>
             </g>
@@ -305,38 +328,54 @@
 
 <style>
   .dag-panel {
+    --hair: color-mix(in oklab, var(--border) 100%, transparent);
+    --r: var(--radius);
+    --mono: var(--font-mono, ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, Consolas, monospace);
     display: grid;
     gap: 1rem;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .dag-panel > :not(.dag-header) {
+    margin-inline: 18px;
+  }
+
+  .dag-panel > :last-child {
+    margin-bottom: 18px;
   }
 
   .dag-header {
     align-items: flex-start;
     margin-bottom: 0;
-    padding-bottom: 0.9rem;
-    border-bottom: 1px solid color-mix(in oklab, var(--border) 82%, transparent);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--hair);
   }
 
   .dag-heading {
     display: grid;
-    gap: 0.2rem;
+    gap: 0.25rem;
     min-width: 0;
   }
 
   .dag-heading h3 {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   .dag-subtitle {
     margin: 0;
-    font-size: 0.86rem;
+    font-size: 0.8125rem;
     color: var(--muted-foreground);
   }
 
   .dag-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6rem;
+    gap: 0.75rem;
     align-items: center;
   }
 
@@ -344,42 +383,42 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    font-size: 0.72rem;
+    font-family: var(--mono);
+    font-size: 11px;
     color: var(--muted-foreground);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
   }
 
   .legend-swatch {
-    width: 0.6rem;
-    height: 0.6rem;
-    border-radius: 0.2rem;
-    border: 1px solid var(--border);
-    background: var(--accent);
-  }
-
-  .legend-swatch.kind-0 {
-    background: color-mix(in oklab, var(--primary) 45%, var(--accent));
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
   }
 
   .legend-swatch.kind-1 {
-    background: color-mix(in oklab, var(--ring) 45%, var(--accent));
+    background: var(--ring);
   }
 
   .legend-swatch.kind-2 {
-    background: color-mix(in oklab, oklch(0.7 0.14 300) 42%, var(--accent));
+    background: var(--foreground);
   }
 
   .legend-swatch.kind-3 {
-    background: color-mix(in oklab, oklch(0.78 0.14 70) 42%, var(--accent));
+    background: var(--muted-foreground);
   }
 
   .dag-canvas-wrap {
-    padding: 0.85rem;
+    padding: 1rem;
     overflow-x: auto;
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) + 0.25rem);
-    background: color-mix(in oklab, var(--card) 68%, transparent);
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    background-color: color-mix(in oklab, var(--background) 100%, transparent);
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--border) 42%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--border) 42%, transparent) 1px, transparent 1px);
+    background-size: 28px 28px;
   }
 
   .dag-canvas {
@@ -391,38 +430,58 @@
 
   .dag-edge {
     fill: none;
-    stroke: color-mix(in oklab, var(--muted-foreground) 52%, transparent);
-    stroke-width: 1.6;
+    stroke: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
+    stroke-width: 1.2;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: dag-draw 220ms ease-out forwards;
+    animation-delay: calc(var(--edge-index, 0) * 28ms);
+    transition: stroke 140ms ease, stroke-width 140ms ease, opacity 140ms ease;
+  }
+
+  .dag-edge.highlight {
+    stroke: var(--primary);
+    stroke-width: 1.8;
+  }
+
+  .dag-edge.dimmed {
+    opacity: 0.15;
+  }
+
+  .dag-node {
+    animation: dag-node-in 200ms ease-out backwards;
+    animation-delay: calc(var(--node-index, 0) * 36ms);
+    transition: opacity 140ms ease;
+  }
+
+  .dag-node.dimmed {
+    opacity: 0.25;
   }
 
   .dag-arrow {
-    fill: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+    fill: color-mix(in oklab, var(--muted-foreground) 72%, transparent);
   }
 
   .dag-node-rect {
-    fill: color-mix(in oklab, var(--accent) 84%, transparent);
-    stroke: var(--border);
+    fill: color-mix(in oklab, var(--card) 96%, transparent);
+    stroke: var(--hair);
     stroke-width: 1;
   }
 
-  .dag-node.kind-0 .dag-node-rect {
-    fill: color-mix(in oklab, var(--primary) 14%, var(--card));
-    stroke: color-mix(in oklab, var(--primary) 52%, var(--border));
+  .dag-node-dot {
+    fill: var(--primary);
   }
 
-  .dag-node.kind-1 .dag-node-rect {
-    fill: color-mix(in oklab, var(--ring) 14%, var(--card));
-    stroke: color-mix(in oklab, var(--ring) 52%, var(--border));
+  .dag-node-dot.kind-1 {
+    fill: var(--ring);
   }
 
-  .dag-node.kind-2 .dag-node-rect {
-    fill: color-mix(in oklab, oklch(0.7 0.14 300) 12%, var(--card));
-    stroke: color-mix(in oklab, oklch(0.7 0.14 300) 48%, var(--border));
+  .dag-node-dot.kind-2 {
+    fill: var(--foreground);
   }
 
-  .dag-node.kind-3 .dag-node-rect {
-    fill: color-mix(in oklab, oklch(0.78 0.14 70) 14%, var(--card));
-    stroke: color-mix(in oklab, oklch(0.78 0.14 70) 48%, var(--border));
+  .dag-node-dot.kind-3 {
+    fill: var(--muted-foreground);
   }
 
   .dag-node-label {
@@ -434,7 +493,7 @@
 
   .dag-node-kind {
     fill: var(--muted-foreground);
-    font-family: var(--font-sans);
+    font-family: var(--mono);
     font-size: 9.5px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -443,29 +502,38 @@
   .dag-stats {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.7rem;
+    gap: 0;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    overflow: hidden;
   }
 
   .dag-stat {
     display: grid;
-    gap: 0.15rem;
-    padding: 0.7rem 0.8rem;
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) + 0.15rem);
-    background: color-mix(in oklab, var(--card) 82%, transparent);
+    gap: 0.125rem;
+    padding: 0.625rem 0.75rem;
+    border-left: 1px solid var(--hair);
+  }
+
+  .dag-stat:first-child {
+    border-left: 0;
   }
 
   .stat-label {
-    font-size: 0.67rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--muted-foreground);
   }
 
   .dag-stat strong {
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-family: var(--mono);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    font-variant-numeric: tabular-nums;
   }
 
   .dag-runs {
@@ -475,15 +543,18 @@
 
   .dag-runs-empty {
     margin: 0;
-    font-size: 0.88rem;
+    font-size: 0.8125rem;
   }
 
   .dag-run-list {
     display: grid;
-    gap: 0.45rem;
+    gap: 0;
     margin: 0;
     padding: 0;
     list-style: none;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    overflow: hidden;
   }
 
   .dag-run {
@@ -491,116 +562,127 @@
     justify-content: space-between;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.55rem 0.7rem;
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) + 0.1rem);
-    background: color-mix(in oklab, var(--card) 80%, transparent);
-    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--hair);
+    font-size: 0.8125rem;
+  }
+
+  .dag-run:first-child {
+    border-top: 0;
   }
 
   .run-id {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.8rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
   }
 
   .run-status {
     flex: none;
-    padding: 0.18rem 0.55rem;
+    padding: 0.1rem 0.45rem;
     border-radius: 999px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--accent) 75%, transparent);
+    border: 1px solid var(--hair);
+    background: transparent;
     color: var(--muted-foreground);
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
     text-transform: lowercase;
+    letter-spacing: 0.02em;
   }
 
   .run-status.ok {
-    color: var(--foreground);
-    border-color: color-mix(in oklab, var(--primary) 42%, var(--border));
-    background: color-mix(in oklab, var(--primary) 16%, var(--accent));
+    color: color-mix(in oklab, var(--success) 82%, var(--foreground));
+    border-color: color-mix(in oklab, var(--success) 45%, var(--border));
   }
 
   .run-status.running {
-    color: var(--foreground);
-    border-color: color-mix(in oklab, var(--ring) 42%, var(--border));
-    background: color-mix(in oklab, var(--ring) 14%, var(--accent));
+    color: color-mix(in oklab, var(--warning) 82%, var(--foreground));
+    border-color: color-mix(in oklab, var(--warning) 45%, var(--border));
   }
 
   .run-status.error {
-    color: var(--foreground);
-    border-color: color-mix(in oklab, oklch(0.65 0.19 25) 50%, var(--border));
-    background: color-mix(in oklab, oklch(0.65 0.19 25) 16%, var(--accent));
+    color: color-mix(in oklab, var(--danger) 88%, var(--foreground));
+    border-color: color-mix(in oklab, var(--danger) 52%, var(--border));
   }
 
   .dag-state {
     display: grid;
     gap: 0.5rem;
     justify-items: start;
-    padding: 1.4rem;
-    border: 1px dashed var(--border);
-    border-radius: calc(var(--radius) + 0.25rem);
-    background: color-mix(in oklab, var(--card) 60%, transparent);
+    padding: 1rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
   }
 
   .dag-state h4 {
     margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
   }
 
   .dag-state p {
     margin: 0;
     color: var(--muted-foreground);
+    line-height: 1.55;
   }
 
   .dag-state.error {
-    border-style: solid;
-    border-color: color-mix(in oklab, oklch(0.65 0.19 25) 46%, var(--border));
-    background: color-mix(in oklab, oklch(0.65 0.19 25) 9%, var(--card));
+    border-color: color-mix(in oklab, var(--danger) 52%, var(--border));
+    background: color-mix(in oklab, var(--danger) 8%, transparent);
   }
 
   .dag-retry {
-    margin-top: 0.3rem;
-    padding: 0.5rem 0.9rem;
-    border: 1px solid color-mix(in oklab, var(--primary) 34%, var(--border));
-    border-radius: calc(var(--radius) + 0.15rem);
-    background: color-mix(in oklab, var(--primary) 14%, var(--accent));
+    margin-top: 0.25rem;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid color-mix(in oklab, var(--primary) 48%, var(--border));
+    border-radius: var(--r);
+    background: transparent;
     color: var(--foreground);
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     cursor: pointer;
+    transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+  }
+
+  .dag-retry:hover {
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+  }
+
+  .dag-retry:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent);
   }
 
   .dag-skeleton {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.6rem;
-    padding: 1.2rem;
-    border: 1px dashed var(--border);
-    border-radius: calc(var(--radius) + 0.25rem);
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
   }
 
   .skeleton-node {
     width: 8.5rem;
     height: 3rem;
-    border-radius: calc(var(--radius) + 0.2rem);
-    background: linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--muted) 70%, transparent) 0%,
-      color-mix(in oklab, var(--foreground) 12%, var(--muted)) 50%,
-      color-mix(in oklab, var(--muted) 70%, transparent) 100%
-    );
-    background-size: 200% 100%;
-    animation: dag-shimmer 1.5s ease-in-out infinite;
+    border-radius: var(--r);
+    background: color-mix(in oklab, var(--muted) 82%, transparent);
+    animation: dag-pulse 1.4s ease-in-out infinite;
   }
 
   .skeleton-edge {
     width: 3.5rem;
-    height: 2px;
-    background: color-mix(in oklab, var(--muted-foreground) 40%, transparent);
+    height: 1px;
+    background: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
   }
 
   .sr-only {
@@ -615,12 +697,28 @@
     border: 0;
   }
 
-  @keyframes dag-shimmer {
-    0% {
-      background-position: 200% 0;
-    }
+  @keyframes dag-pulse {
+    0%,
     100% {
-      background-position: -200% 0;
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes dag-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes dag-node-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
     }
   }
 
@@ -628,11 +726,35 @@
     .skeleton-node {
       animation: none;
     }
+
+    .dag-edge {
+      animation: none;
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+
+    .dag-node {
+      animation: none;
+      transition: none;
+    }
+
+    .dag-retry {
+      transition: none;
+    }
   }
 
   @media (max-width: 560px) {
     .dag-stats {
       grid-template-columns: 1fr;
+    }
+
+    .dag-stat {
+      border-left: 0;
+      border-top: 1px solid var(--hair);
+    }
+
+    .dag-stat:first-child {
+      border-top: 0;
     }
   }
 </style>

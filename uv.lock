@@ -4288,12 +4288,14 @@ version = "0.1.0"
 source = { editable = "framework/studio_support" }
 dependencies = [
     { name = "jinja2" },
+    { name = "markdown-it-py" },
     { name = "python-multipart" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "jinja2", specifier = ">=3.1.0" },
+    { name = "markdown-it-py", specifier = ">=3.0" },
     { name = "python-multipart", specifier = ">=0.0.9" },
 ]
 

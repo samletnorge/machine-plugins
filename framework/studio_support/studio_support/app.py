@@ -80,11 +80,11 @@ def _landing_page_html(state: StudioState) -> str:
     def _icon(path: str) -> str:
         return (
             "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' "
-            "stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round' "
+            "stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' "
             f"aria-hidden='true'>{path}</svg>"
         )
 
-    build_items = [
+    capabilities = [
         (
             "Agents",
             "Register user-facing agents with tools, memory, and their own run loop.",
@@ -127,428 +127,523 @@ def _landing_page_html(state: StudioState) -> str:
         ),
     ]
 
-    build_cards = "".join(
+    feature_classes = {"Agents": "cell-wide", "Studio": "cell-feature"}
+    capability_cells = "".join(
         (
-            "<article class='build-card reveal'>"
-            f"<span class='build-icon'>{_icon(path)}</span>"
+            f"<article class='cell {feature_classes.get(title, '')} reveal' "
+            f"style='--reveal-delay:{index * 40}ms'>"
+            f"<span class='cell-index'>{index:02d}</span>"
+            f"<span class='cell-icon'>{_icon(path)}</span>"
             f"<h3>{title}</h3>"
             f"<p>{copy}</p>"
             "</article>"
         )
-        for title, copy, path in build_items
+        for index, (title, copy, path) in enumerate(capabilities, start=1)
     )
 
-    feature_items = [
-        (
-            "Project-scoped",
-            "Everything is scoped to a project and environment, so growing to many projects never means starting over.",
-        ),
-        (
-            "Composable plugins",
-            "Add agents, tools, workflows, and storage as plugins instead of rewriting the core system.",
-        ),
-        (
-            "Model gateway",
-            "Put OpenAI, Anthropic, Google, Groq, and local models behind one provider contract.",
-        ),
-        (
-            "Stable runtime API",
-            "A generated /api/* data plane that stays consistent as your registry changes.",
-        ),
-        (
-            "Operator control plane",
-            "Studio inspects the fleet, switches contexts, and tests tools without leaving the browser.",
-        ),
-        (
-            "Observable by default",
-            "Traces, evaluations, and memory inspection live next to the code that produces them.",
-        ),
-    ]
+    headline_words = "Build, run, and manage AI projects on one system.".split()
+    headline_html = " ".join(
+        f"<span class='word' style='--d:{index * 40}ms'>{escape(word)}</span>"
+        for index, word in enumerate(headline_words)
+    )
 
-    feature_cards = "".join(
-        (
-            "<article class='feature-card reveal'>"
-            f"<span class='feature-index'>{index:02d}</span>"
-            f"<h3>{title}</h3>"
-            f"<p>{copy}</p>"
-            "</article>"
-        )
-        for index, (title, copy) in enumerate(feature_items, start=1)
+    marquee_keywords = [
+        "Agents",
+        "Tools",
+        "RAG",
+        "Memory",
+        "Workflows",
+        "Evals",
+        "MCP",
+        "Studio",
+    ]
+    marquee_items = "".join(
+        f"<span class='word'>{keyword}</span><span class='dot'>·</span>"
+        for keyword in marquee_keywords
+    )
+    marquee_sets = (
+        f"<div class='marquee-set'>{marquee_items}</div>"
+        f"<div class='marquee-set' aria-hidden='true'>{marquee_items}</div>"
     )
 
     stats = [
         (len(tenants), "Tenants"),
         (len(projects), "Projects"),
         (len(environments), "Environments"),
-        (len(build_items), "Capability areas"),
+        (len(capabilities), "Capability areas"),
     ]
     stat_cells = "".join(
-        f"<div class='stat'><strong>{value}</strong><span>{label}</span></div>"
-        for value, label in stats
+        f"<div class='stat reveal' style='--reveal-delay:{index * 60}ms'>"
+        f"<strong data-count='{value}'>{value}</strong>"
+        f"<span>{label}</span></div>"
+        for index, (value, label) in enumerate(stats)
     )
 
     style = """
     * { box-sizing: border-box; }
     :root {
         color-scheme: dark;
-        --bg: #060d16;
-        --bg-soft: #0a1622;
-        --panel: rgba(15, 27, 42, 0.68);
-        --panel-strong: rgba(11, 21, 33, 0.92);
-        --text: #eaf2fb;
-        --muted: #93a7bd;
-        --line: rgba(148, 172, 198, 0.16);
-        --line-strong: rgba(148, 172, 198, 0.28);
-        --teal: #7dd3c7;
-        --cyan: #67e8f9;
-        --violet: #a78bfa;
-        --amber: #fbbf24;
-        --grad: linear-gradient(135deg, #7dd3c7, #67e8f9);
-        --radius: 18px;
-        --shadow: 0 30px 90px rgba(2, 8, 23, 0.55);
-        --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-        --font-display: 'Sora', 'Inter', sans-serif;
+        --bg: #0B0B0C;
+        --panel: #101012;
+        --elevated: #151517;
+        --text: #EDEDED;
+        --muted: #9B9CA3;
+        --line: rgba(255, 255, 255, 0.08);
+        --line-strong: rgba(255, 255, 255, 0.16);
+        --accent: #FF5C38;
+        --accent-hover: #FF7355;
+        --accent-contrast: #0B0B0C;
+        --radius: 10px;
+        --radius-sm: 8px;
+        --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+        --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
     }
     html { scroll-behavior: smooth; }
     body {
         margin: 0;
         min-height: 100vh;
-        font-family: var(--font-sans);
+        background: var(--bg);
         color: var(--text);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        line-height: 1.55;
         -webkit-font-smoothing: antialiased;
-        background:
-            radial-gradient(60rem 40rem at 12% -8%, rgba(125, 211, 199, 0.2), transparent 55%),
-            radial-gradient(50rem 36rem at 92% 4%, rgba(103, 232, 249, 0.14), transparent 55%),
-            radial-gradient(46rem 34rem at 50% 120%, rgba(167, 139, 250, 0.12), transparent 58%),
-            linear-gradient(180deg, #08121d 0%, #060d16 46%, #04090f 100%);
-        background-attachment: fixed;
+        text-rendering: optimizeLegibility;
     }
     a { color: inherit; text-decoration: none; }
-    h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.035em; margin: 0; }
+    h1, h2, h3 { margin: 0; font-weight: 650; letter-spacing: -0.02em; line-height: 1.15; }
     p { margin: 0; }
-    img, svg { display: block; }
-    .container { width: min(1180px, calc(100% - 44px)); margin: 0 auto; }
+    svg { display: block; }
+    .container { width: min(1120px, calc(100% - 48px)); margin: 0 auto; }
+    .scroll-progress {
+        position: fixed; top: 0; left: 0; z-index: 90;
+        width: 100%; height: 2px;
+        background: var(--accent);
+        transform: scaleX(0); transform-origin: 0 50%;
+        will-change: transform;
+    }
+    html.js .reveal { opacity: 0; transform: translateY(14px); }
+    html.js .reveal.is-visible {
+        animation: reveal-up 260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+        animation-delay: var(--reveal-delay, 0ms);
+    }
+    @keyframes reveal-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
     .nav {
         position: sticky;
         top: 0;
-        z-index: 60;
-        backdrop-filter: blur(18px);
-        background: rgba(7, 15, 25, 0.72);
+        z-index: 50;
+        background: var(--bg);
         border-bottom: 1px solid var(--line);
     }
     .nav-inner {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 20px;
-        min-height: 68px;
+        gap: 24px;
+        min-height: 64px;
     }
-    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
     .brand-mark {
-        width: 40px; height: 40px;
         display: inline-flex; align-items: center; justify-content: center;
-        border-radius: 12px;
-        background: linear-gradient(180deg, rgba(12, 24, 38, 0.96), rgba(9, 18, 29, 0.9));
-        border: 1px solid rgba(125, 211, 199, 0.26);
-        box-shadow: 0 14px 34px rgba(3, 10, 18, 0.4);
+        width: 30px; height: 30px;
+        color: var(--accent);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
     }
-    .brand-mark svg { width: 26px; height: 26px; }
-    .brand-copy strong { font-family: var(--font-display); font-size: 1.02rem; letter-spacing: -0.02em; display: block; }
-    .brand-copy small { color: var(--muted); font-size: 0.76rem; }
-    .nav-links { display: flex; align-items: center; gap: 26px; }
-    .nav-links a { color: var(--muted); font-size: 0.92rem; font-weight: 500; transition: color 160ms ease; }
+    .brand-mark svg { width: 18px; height: 18px; }
+    .brand-copy strong { display: block; font-size: 14px; font-weight: 650; letter-spacing: -0.02em; }
+    .brand-copy small {
+        display: block; margin-top: 1px;
+        font-family: var(--font-mono); font-size: 10.5px;
+        text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+    }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a { font-size: 13px; color: var(--muted); transition: color 120ms ease; }
     .nav-links a:hover { color: var(--text); }
     .nav-cta {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 10px 16px;
-        border-radius: 999px;
-        border: 1px solid rgba(125, 211, 199, 0.3);
-        background: linear-gradient(135deg, rgba(125, 211, 199, 0.18), rgba(103, 232, 249, 0.1));
-        font-size: 0.9rem; font-weight: 600;
-        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+        display: inline-flex; align-items: center; height: 34px; padding: 0 14px;
+        border: 1px solid var(--line-strong); border-radius: 8px;
+        font-size: 13px; font-weight: 550;
+        transition: border-color 120ms ease, color 120ms ease;
     }
-    .nav-cta:hover { transform: translateY(-1px); border-color: rgba(125, 211, 199, 0.5); }
+    .nav-cta:hover { border-color: var(--accent); color: var(--accent); }
 
-    .hero { position: relative; padding: 96px 0 64px; text-align: center; overflow: hidden; }
+    .hero { position: relative; isolation: isolate; padding: 68px 0 36px; }
     .hero::before {
         content: "";
-        position: absolute; inset: -20% 10% auto 10%; height: 480px;
-        background: radial-gradient(circle at center, rgba(125, 211, 199, 0.16), transparent 62%);
+        position: absolute;
+        inset: 0;
+        z-index: -1;
         pointer-events: none;
+        opacity: 0.55;
+        background-image:
+            linear-gradient(to right, var(--line) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+        background-size: 68px 68px;
+        background-position: center top;
     }
     .badge {
-        display: inline-flex; align-items: center; gap: 10px;
-        padding: 8px 15px;
-        border-radius: 999px;
-        border: 1px solid var(--line-strong);
-        background: rgba(9, 19, 31, 0.7);
-        color: var(--muted);
-        font-size: 0.82rem;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 5px 11px;
+        border: 1px solid var(--line); border-radius: 999px;
+        font-family: var(--font-mono); font-size: 11px;
+        text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
     }
-    .badge .dot {
-        width: 8px; height: 8px; border-radius: 999px;
-        background: var(--grad);
-        box-shadow: 0 0 16px rgba(125, 211, 199, 0.9);
-    }
+    .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
     .hero h1 {
-        max-width: 17ch;
-        margin: 22px auto 20px;
-        font-size: clamp(2.7rem, 6.4vw, 4.7rem);
+        max-width: 18ch;
+        margin: 20px 0 16px;
+        font-size: clamp(2.5rem, 6vw, 4.2rem);
         line-height: 1.02;
-        letter-spacing: -0.045em;
+        letter-spacing: -0.035em;
     }
-    .hero h1 .grad {
-        background: var(--grad);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+    .hero h1 .word { display: inline-block; }
+    html.js .hero h1 .word {
+        opacity: 0;
+        transform: translateY(14px);
+        animation: word-up 240ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+        animation-delay: var(--d, 0ms);
     }
-    .hero-sub {
-        max-width: 62ch;
-        margin: 0 auto;
-        color: var(--muted);
-        font-size: clamp(1rem, 1.6vw, 1.16rem);
-        line-height: 1.65;
-    }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin: 30px 0 8px; }
+    @keyframes word-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .hero-sub { max-width: 52ch; color: var(--muted); font-size: clamp(1rem, 1.5vw, 1.12rem); line-height: 1.6; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
     .btn {
-        display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-        padding: 14px 24px;
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: 0.98rem;
-        transition: transform 160ms ease, filter 160ms ease, border-color 160ms ease;
+        display: inline-flex; align-items: center; justify-content: center;
+        height: 42px; padding: 0 20px;
+        border: 1px solid transparent; border-radius: 8px;
+        font-size: 14px; font-weight: 550;
+        transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
     }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-primary { background: var(--grad); color: #04202c; box-shadow: 0 16px 40px rgba(125, 211, 199, 0.28); }
-    .btn-primary:hover { filter: brightness(1.04); }
-    .btn-ghost { border: 1px solid var(--line-strong); background: rgba(8, 18, 29, 0.6); }
-    .btn-ghost:hover { border-color: rgba(125, 211, 199, 0.44); }
-    .hero-chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 26px; }
-    .chip {
-        padding: 7px 13px;
-        border-radius: 999px;
-        border: 1px solid var(--line);
-        background: rgba(9, 19, 31, 0.55);
-        color: var(--muted);
-        font-size: 0.8rem;
-    }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-ghost { border-color: var(--line-strong); color: var(--text); }
+    .btn-ghost:hover { background: var(--elevated); }
 
-    .install { padding: 18px 0 72px; }
+    .install { padding: 8px 0 44px; }
     .terminal {
-        position: relative;
         max-width: 860px;
-        margin: 0 auto;
-        border: 1px solid var(--line-strong);
-        border-radius: var(--radius);
-        background: linear-gradient(180deg, rgba(12, 24, 38, 0.92), rgba(7, 14, 23, 0.96));
-        box-shadow: var(--shadow);
+        border: 1px solid var(--line); border-radius: var(--radius);
+        background: var(--panel);
         overflow: hidden;
     }
     .terminal-bar {
-        display: flex; align-items: center; gap: 8px;
-        padding: 14px 18px;
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        padding: 10px 14px;
         border-bottom: 1px solid var(--line);
-        background: rgba(6, 12, 20, 0.7);
+        background: var(--elevated);
     }
-    .terminal-bar .dot { width: 11px; height: 11px; border-radius: 999px; }
-    .dot-red { background: #f87171; } .dot-amber { background: #fbbf24; } .dot-green { background: #34d399; }
-    .terminal-title { margin-left: 10px; color: var(--muted); font-size: 0.82rem; }
-    .terminal-body {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 14px;
-        align-items: center;
-        padding: 22px 20px;
+    .terminal-title {
+        font-family: var(--font-mono); font-size: 11px;
+        text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
     }
+    .terminal-body { padding: 18px; }
     .terminal-body code {
         display: block;
-        text-align: left;
-        font-family: 'SFMono-Regular', 'JetBrains Mono', 'Consolas', monospace;
-        font-size: clamp(0.84rem, 1.3vw, 0.98rem);
+        font-family: var(--font-mono);
+        font-size: clamp(0.82rem, 1.3vw, 0.95rem);
         line-height: 1.7;
-        color: #d8ecf5;
+        color: var(--text);
         word-break: break-word;
     }
-    .terminal-body code .prompt { color: var(--teal); margin-right: 8px; user-select: none; }
-    .copy-button {
-        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        height: 46px;
-        padding: 0 18px;
-        border-radius: 12px;
-        border: 1px solid rgba(125, 211, 199, 0.24);
-        background: linear-gradient(135deg, rgba(125, 211, 199, 0.16), rgba(103, 232, 249, 0.1));
-        color: var(--text);
-        font: inherit; font-weight: 600; cursor: pointer;
-        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-    }
-    .copy-button:hover { transform: translateY(-1px); border-color: rgba(125, 211, 199, 0.48); }
-    .copy-button.copied { border-color: rgba(125, 211, 199, 0.6); box-shadow: 0 0 0 8px rgba(125, 211, 199, 0.08); }
-    .terminal-caption { padding: 0 20px 20px; color: var(--muted); font-size: 0.9rem; }
-
-    section.block { padding: 72px 0; }
-    .section-head { max-width: 60ch; margin-bottom: 40px; }
-    .eyebrow {
+    .terminal-body code .prompt { color: var(--accent); margin-right: 8px; user-select: none; }
+    .terminal-body code .cursor {
         display: inline-block;
-        color: var(--cyan);
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        font-size: 0.74rem;
-        font-weight: 600;
-        margin-bottom: 14px;
+        width: 8px; height: 1.02em;
+        margin-left: 2px;
+        vertical-align: text-bottom;
+        background: var(--accent);
+        animation: cursor-blink 1s steps(1, end) infinite;
     }
-    .section-head h2 { font-size: clamp(1.9rem, 3.6vw, 2.8rem); line-height: 1.08; }
-    .section-head p { margin-top: 14px; color: var(--muted); font-size: 1.04rem; line-height: 1.65; }
+    .terminal-body code .cursor.cursor-done { animation: none; opacity: 1; }
+    @keyframes cursor-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+    .copy-button {
+        display: inline-flex; align-items: center; gap: 8px;
+        height: 30px; padding: 0 12px;
+        border: 1px solid var(--line); border-radius: 6px;
+        background: transparent; color: var(--muted);
+        font-family: var(--font-mono); font-size: 11px;
+        text-transform: uppercase; letter-spacing: 0.06em;
+        cursor: pointer;
+        transition: color 120ms ease, border-color 120ms ease;
+    }
+    .copy-button:hover { color: var(--text); border-color: var(--line-strong); }
+    .copy-button.copied { color: var(--accent); border-color: var(--accent); }
+    .terminal-caption { padding: 0 18px 18px; color: var(--muted); font-size: 12.5px; }
 
-    .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
-    .feature-card {
-        position: relative;
-        padding: 26px 24px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: linear-gradient(180deg, rgba(13, 25, 39, 0.7), rgba(9, 18, 29, 0.82));
-        overflow: hidden;
-        transition: transform 180ms ease, border-color 180ms ease;
+    section.block { padding: 48px 0; }
+    .section-head { max-width: 56ch; margin-bottom: 26px; }
+    .eyebrow {
+        display: inline-block; margin-bottom: 12px;
+        font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+        text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
     }
-    .feature-card:hover { transform: translateY(-3px); border-color: var(--line-strong); }
-    .feature-card::after {
-        content: "";
-        position: absolute; inset: auto -30% -60% 30%; height: 180px;
-        background: radial-gradient(circle, rgba(125, 211, 199, 0.14), transparent 65%);
-        pointer-events: none;
-    }
-    .feature-index {
-        display: inline-flex;
-        font-family: var(--font-display);
-        font-size: 0.82rem;
-        color: var(--teal);
-        letter-spacing: 0.08em;
-        margin-bottom: 14px;
-    }
-    .feature-card h3 { font-size: 1.16rem; }
-    .feature-card p { margin-top: 10px; color: var(--muted); font-size: 0.94rem; line-height: 1.6; }
-
-    .build-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-    .build-card {
+    .section-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); }
+    .cell-grid {
         display: grid;
-        gap: 12px;
-        padding: 22px;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-auto-rows: minmax(148px, auto);
+        gap: 1px;
+        background: var(--line);
         border: 1px solid var(--line);
         border-radius: var(--radius);
-        background: linear-gradient(180deg, rgba(13, 25, 39, 0.66), rgba(8, 16, 26, 0.82));
-        transition: transform 180ms ease, border-color 180ms ease;
+        overflow: hidden;
     }
-    .build-card:hover { transform: translateY(-3px); border-color: rgba(125, 211, 199, 0.4); }
-    .build-icon {
-        width: 46px; height: 46px;
+    .cell {
+        position: relative;
+        display: flex; flex-direction: column;
+        min-width: 0;
+        padding: 20px;
+        background: var(--bg);
+        overflow: hidden;
+        transition: transform 200ms ease, background-color 200ms ease;
+    }
+    .cell::before {
+        content: "";
+        position: absolute; left: 0; top: 0; bottom: 0;
+        width: 2px;
+        background: var(--accent);
+        transform: translateX(-100%);
+        transition: transform 200ms ease;
+    }
+    .cell:hover { transform: translateY(-1px); background: var(--panel); }
+    .cell:hover::before { transform: translateX(0); }
+    .cell-wide { grid-column: 3 / span 2; grid-row: 1; }
+    .cell-feature { grid-column: 1 / span 2; grid-row: 1 / span 2; }
+    .cell-feature h3 { margin-top: auto; font-size: 20px; }
+    .cell-feature .cell-icon { width: 34px; height: 34px; margin-top: 18px; }
+    .cell-feature .cell-icon svg { width: 26px; height: 26px; }
+    .cell-index { font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
+    .cell-icon {
         display: inline-flex; align-items: center; justify-content: center;
-        border-radius: 13px;
-        color: var(--teal);
-        background: rgba(125, 211, 199, 0.12);
-        border: 1px solid rgba(125, 211, 199, 0.22);
+        width: 26px; height: 26px;
+        margin: 14px 0 12px;
+        color: var(--muted);
     }
-    .build-icon svg { width: 24px; height: 24px; }
-    .build-card h3 { font-size: 1.06rem; }
-    .build-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.58; }
+    .cell-icon svg { width: 20px; height: 20px; }
+    .cell h3 { font-size: 15px; }
+    .cell p { margin-top: 8px; color: var(--muted); font-size: 13px; }
+
+    .marquee {
+        overflow: hidden;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        background: var(--panel);
+    }
+    .marquee-track {
+        display: flex;
+        width: max-content;
+        animation: marquee-scroll 46s linear infinite;
+        will-change: transform;
+    }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    .marquee-set { display: flex; align-items: center; gap: 26px; padding: 13px 26px 13px 0; }
+    .marquee-set span {
+        font-family: var(--font-mono); font-size: 12px;
+        text-transform: uppercase; letter-spacing: 0.16em;
+        color: var(--muted); white-space: nowrap;
+    }
+    .marquee-set span.word { color: var(--text); }
+    .marquee-set span.dot { color: var(--accent); }
+    @keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    .steps {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+        margin: 0; padding: 0;
+        list-style: none;
+    }
+    .steps::before {
+        content: "";
+        position: absolute; left: 0; right: 0; top: 33px;
+        height: 1px; background: var(--line);
+    }
+    .step { position: relative; display: grid; align-content: start; gap: 10px; padding-right: 14px; }
+    .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 66px; height: 66px;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        font-family: var(--font-mono); font-size: 22px; font-weight: 500;
+        color: var(--accent);
+    }
+    .step h3 { font-size: 17px; }
+    .step p { color: var(--muted); font-size: 13px; }
 
     .stats-band {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 1px;
-        margin: 0 auto;
-        padding: 1px;
-        border-radius: var(--radius);
-        overflow: hidden;
-        background: var(--line);
-    }
-    .stat { padding: 26px 22px; background: linear-gradient(180deg, rgba(13, 25, 39, 0.9), rgba(8, 16, 26, 0.94)); }
-    .stat strong { display: block; font-family: var(--font-display); font-size: 2.3rem; letter-spacing: -0.05em; }
-    .stat span { display: block; margin-top: 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.72rem; }
-
-    .context-strip {
-        display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
-        margin-top: 26px;
-        padding: 16px 20px;
         border: 1px solid var(--line);
         border-radius: var(--radius);
-        background: rgba(9, 19, 31, 0.55);
-        color: var(--muted);
-        font-size: 0.92rem;
+        overflow: hidden;
+    }
+    .stat { padding: 22px; border-right: 1px solid var(--line); }
+    .stat:last-child { border-right: 0; }
+    .stat strong { display: block; font-size: 28px; font-weight: 650; letter-spacing: -0.02em; }
+    .stat span {
+        display: block; margin-top: 4px;
+        font-family: var(--font-mono); font-size: 10.5px;
+        text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+    }
+    .context-strip {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+        margin-top: 14px; padding: 12px 16px;
+        border: 1px solid var(--line); border-radius: var(--radius-sm);
+        color: var(--muted); font-size: 12.5px;
     }
     .context-strip .tag {
-        padding: 5px 11px;
-        border-radius: 999px;
-        border: 1px solid rgba(125, 211, 199, 0.24);
-        background: rgba(125, 211, 199, 0.1);
-        color: var(--teal);
-        font-size: 0.76rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
+        font-family: var(--font-mono); font-size: 10.5px;
+        text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent);
     }
     .context-strip strong { color: var(--text); }
 
-    .cta-band {
-        margin: 24px 0 0;
-        padding: 54px 40px;
-        border: 1px solid rgba(125, 211, 199, 0.22);
-        border-radius: calc(var(--radius) + 6px);
-        text-align: center;
-        background:
-            radial-gradient(circle at 20% 20%, rgba(125, 211, 199, 0.16), transparent 42%),
-            radial-gradient(circle at 84% 30%, rgba(167, 139, 250, 0.14), transparent 44%),
-            linear-gradient(180deg, rgba(12, 24, 38, 0.9), rgba(7, 14, 23, 0.95));
-        box-shadow: var(--shadow);
+    footer.footer { margin-top: 48px; border-top: 1px solid var(--line); padding: 48px 0 32px; }
+    .footer-inner { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px; }
+    .footer-brand p { margin-top: 14px; max-width: 34ch; color: var(--muted); font-size: 13px; }
+    .footer-col h4 {
+        margin: 0 0 12px;
+        font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+        text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
     }
-    .cta-band h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
-    .cta-band p { margin: 14px auto 26px; max-width: 52ch; color: var(--muted); line-height: 1.6; }
-    .cta-band .hero-actions { margin: 0; }
-
-    .reveal { opacity: 1; transform: none; }
-    html.js .reveal { opacity: 0; transform: translateY(22px); transition: opacity 520ms ease, transform 520ms ease; }
-    html.js .reveal.reveal-visible { opacity: 1; transform: translateY(0); }
-
-    footer.footer {
-        margin-top: 72px;
-        border-top: 1px solid var(--line);
-        background: rgba(5, 11, 18, 0.7);
-        padding: 52px 0 40px;
-    }
-    .footer-grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px; }
-    .footer-brand p { margin-top: 14px; max-width: 34ch; color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
-    .footer-col h4 { margin: 0 0 14px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
-    .footer-col a { display: block; margin-bottom: 10px; color: var(--text); font-size: 0.92rem; opacity: 0.86; transition: opacity 140ms ease, color 140ms ease; }
-    .footer-col a:hover { opacity: 1; color: var(--teal); }
+    .footer-col a { display: block; margin-bottom: 9px; color: var(--text); font-size: 13px; transition: color 120ms ease; }
+    .footer-col a:hover { color: var(--accent); }
     .footer-bottom {
-        display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px;
-        margin-top: 42px; padding-top: 22px;
+        display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+        margin-top: 40px; padding-top: 20px;
         border-top: 1px solid var(--line);
-        color: var(--muted); font-size: 0.86rem;
+        color: var(--muted); font-size: 12px;
     }
 
-    @media (max-width: 980px) {
-        .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .build-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .footer-grid { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 900px) {
+        .cell-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(132px, auto); }
+        .cell-wide, .cell-feature { grid-column: auto; grid-row: auto; }
+        .steps { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+        .steps::before { display: none; }
+        .footer-inner { grid-template-columns: 1fr 1fr; }
         .nav-links { display: none; }
     }
     @media (max-width: 640px) {
-        .feature-grid, .build-grid, .stats-band, .footer-grid { grid-template-columns: 1fr; }
-        .terminal-body { grid-template-columns: 1fr; }
-        .copy-button { width: 100%; }
-        .hero { padding: 72px 0 48px; }
-        .cta-band { padding: 40px 22px; }
+        .cell-grid, .stats-band, .footer-inner { grid-template-columns: minmax(0, 1fr); }
+        .stat { border-right: 0; border-bottom: 1px solid var(--line); }
+        .stat:last-child { border-bottom: 0; }
+        .hero { padding: 52px 0 30px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        html.js .reveal,
+        html.js .hero h1 .word {
+            opacity: 1 !important;
+            transform: none !important;
+            animation: none !important;
+        }
+        .marquee-track { animation: none !important; }
+        .terminal-body code .cursor { animation: none !important; opacity: 1 !important; }
+        .cell, .cell::before { transition: none !important; }
+        html { scroll-behavior: auto; }
     }
     """
 
     script = """
     (() => {
-        document.documentElement.classList.add('js');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const progress = document.getElementById('scroll-progress');
+        if (progress) {
+            if (reduceMotion) {
+                progress.style.display = 'none';
+            } else {
+                const updateProgress = () => {
+                    const doc = document.documentElement;
+                    const max = doc.scrollHeight - doc.clientHeight;
+                    const ratio = max > 0 ? doc.scrollTop / max : 0;
+                    progress.style.transform = `scaleX(${ratio})`;
+                };
+                window.addEventListener('scroll', updateProgress, { passive: true });
+                window.addEventListener('resize', updateProgress, { passive: true });
+                updateProgress();
+            }
+        }
+
+        const revealTargets = document.querySelectorAll('.reveal');
+        if (revealTargets.length) {
+            if (!reduceMotion && 'IntersectionObserver' in window) {
+                const revealObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+                revealTargets.forEach((target) => revealObserver.observe(target));
+            } else {
+                revealTargets.forEach((target) => target.classList.add('is-visible'));
+            }
+        }
+
+        const countTargets = document.querySelectorAll('[data-count]');
+        const runCount = (element) => {
+            const target = Number(element.dataset.count);
+            if (!Number.isFinite(target)) return;
+            if (reduceMotion) {
+                element.textContent = String(target);
+                return;
+            }
+            const duration = 720;
+            const start = performance.now();
+            const tick = (now) => {
+                const ratio = Math.min(1, (now - start) / duration);
+                const eased = 1 - Math.pow(1 - ratio, 3);
+                element.textContent = String(Math.round(target * eased));
+                if (ratio < 1) window.requestAnimationFrame(tick);
+            };
+            window.requestAnimationFrame(tick);
+        };
+        if (countTargets.length) {
+            if (!reduceMotion && 'IntersectionObserver' in window) {
+                const countObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            runCount(entry.target);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.4 });
+                countTargets.forEach((target) => countObserver.observe(target));
+            } else {
+                countTargets.forEach(runCount);
+            }
+        }
+
         const button = document.getElementById('copy-install');
         const code = document.getElementById('install-command');
+        const typed = document.getElementById('install-typed');
+        const cursor = document.getElementById('install-cursor');
+        const command = code ? code.dataset.command || '' : '';
+        if (typed && command) {
+            if (reduceMotion) {
+                typed.textContent = command;
+            } else {
+                typed.textContent = '';
+                let index = 0;
+                const typeNext = () => {
+                    index += 1;
+                    typed.textContent = command.slice(0, index);
+                    if (index < command.length) {
+                        window.setTimeout(typeNext, 16 + Math.random() * 24);
+                    } else if (cursor) {
+                        cursor.classList.add('cursor-done');
+                    }
+                };
+                window.setTimeout(typeNext, 360);
+            }
+        }
         if (button && code && navigator.clipboard) {
             button.addEventListener('click', async () => {
                 try {
-                    await navigator.clipboard.writeText(code.textContent || '');
+                    await navigator.clipboard.writeText(command || code.textContent || '');
                     button.classList.add('copied');
                     const label = button.querySelector('.copy-label');
                     if (label) label.textContent = 'Copied';
@@ -565,23 +660,6 @@ def _landing_page_html(state: StudioState) -> str:
                 }
             });
         }
-
-        const revealables = document.querySelectorAll('.reveal');
-        if ('IntersectionObserver' in window) {
-            const observer = new IntersectionObserver((entries) => {
-                for (const entry of entries) {
-                    if (!entry.isIntersecting) continue;
-                    entry.target.classList.add('reveal-visible');
-                    observer.unobserve(entry.target);
-                }
-            }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-            revealables.forEach((node, index) => {
-                node.style.transitionDelay = `${Math.min(index * 45, 240)}ms`;
-                observer.observe(node);
-            });
-        } else {
-            revealables.forEach((node) => node.classList.add('reveal-visible'));
-        }
     })();
     """
 
@@ -595,25 +673,21 @@ def _landing_page_html(state: StudioState) -> str:
   <link rel='icon' href='/favicon.ico' type='image/svg+xml'>
   <link rel='preconnect' href='https://fonts.googleapis.com'>
   <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-  <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap'>
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@400;500;600&display=swap'>
+  <script>document.documentElement.classList.add('js');</script>
   <style>{style}</style>
 </head>
 <body>
+  <div class='scroll-progress' id='scroll-progress' aria-hidden='true'></div>
   <header class='nav'>
     <div class='container nav-inner'>
       <a class='brand' href='/'>
         <span class='brand-mark' aria-hidden='true'>
           <svg viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
-            <defs>
-              <linearGradient id='landing-machine-mark' x1='6' y1='6' x2='42' y2='42' gradientUnits='userSpaceOnUse'>
-                <stop stop-color='#7DD3C7'/>
-                <stop offset='1' stop-color='#67E8F9'/>
-              </linearGradient>
-            </defs>
-            <path d='M9 38V10L24 27L39 10V38' stroke='url(#landing-machine-mark)' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/>
-            <circle cx='9' cy='10' r='3.2' fill='#060d16' stroke='url(#landing-machine-mark)' stroke-width='2'/>
-            <circle cx='24' cy='27' r='3.2' fill='#060d16' stroke='url(#landing-machine-mark)' stroke-width='2'/>
-            <circle cx='39' cy='10' r='3.2' fill='#060d16' stroke='url(#landing-machine-mark)' stroke-width='2'/>
+            <path d='M9 38V10L24 27L39 10V38' stroke='currentColor' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+            <circle cx='9' cy='10' r='3' fill='currentColor'/>
+            <circle cx='24' cy='27' r='3' fill='currentColor'/>
+            <circle cx='39' cy='10' r='3' fill='currentColor'/>
           </svg>
         </span>
         <span class='brand-copy'>
@@ -622,34 +696,24 @@ def _landing_page_html(state: StudioState) -> str:
         </span>
       </a>
       <nav class='nav-links' aria-label='Primary'>
-        <a href='#features'>Features</a>
-        <a href='#build'>What you can build</a>
+        <a href='#capabilities'>Capabilities</a>
         <a href='#install-machine'>Install</a>
         <a href='/_studio/'>Studio</a>
+        <a href='/_studio/docs'>Docs</a>
       </nav>
-      <a class='nav-cta' href='/_studio/'>Open Studio &rarr;</a>
+      <a class='nav-cta' href='/_studio/'>Open Studio</a>
     </div>
   </header>
 
   <main>
     <section class='hero'>
       <div class='container'>
-        <span class='badge'><span class='dot'></span> Open-source control plane for AI projects</span>
-        <h1>Build, run, and manage AI projects on <span class='grad'>one system</span>.</h1>
-        <p class='hero-sub'>Start with a single project and keep shipping. Machine Core keeps the way you began working even when the project grows into many runtimes, contexts, and operators.</p>
-        <div class='hero-actions'>
+        <span class='badge reveal' style='--reveal-delay:0ms'><span class='dot'></span> Open-source control plane for AI projects</span>
+        <h1>{headline_html}</h1>
+        <p class='hero-sub reveal' style='--reveal-delay:{len(headline_words) * 40 + 60}ms'>One runtime for agents, tools, RAG, memory, workflows, and evals — with a control plane that keeps every project in view.</p>
+        <div class='hero-actions reveal' style='--reveal-delay:{len(headline_words) * 40 + 120}ms'>
           <a class='btn btn-primary' href='#install-machine'>Install Machine</a>
           <a class='btn btn-ghost' href='/_studio/'>Open Studio</a>
-        </div>
-        <div class='hero-chips'>
-          <span class='chip'>Agents</span>
-          <span class='chip'>Tools</span>
-          <span class='chip'>RAG</span>
-          <span class='chip'>Memory</span>
-          <span class='chip'>Workflows</span>
-          <span class='chip'>Evals</span>
-          <span class='chip'>MCP</span>
-          <span class='chip'>Studio</span>
         </div>
       </div>
     </section>
@@ -658,114 +722,114 @@ def _landing_page_html(state: StudioState) -> str:
       <div class='container'>
         <div class='terminal'>
           <div class='terminal-bar'>
-            <span class='dot dot-red'></span>
-            <span class='dot dot-amber'></span>
-            <span class='dot dot-green'></span>
             <span class='terminal-title'>install.sh</span>
-          </div>
-          <div class='terminal-body'>
-            <code id='install-command'><span class='prompt'>$</span>{escape(install_command)}</code>
             <button type='button' class='copy-button' id='copy-install' aria-label='Copy install command' title='Copy install command'>
               <span class='copy-label'>Copy</span>
-              <span aria-hidden='true'>&#10697;</span>
             </button>
           </div>
-          <p class='terminal-caption'>Paste this once. Machine Core wires up the runtime, the plugin system, and Studio.</p>
+          <div class='terminal-body'>
+            <code id='install-command' data-command='{escape(install_command)}'><span class='prompt'>$</span><span class='typed' id='install-typed'>{escape(install_command)}</span><span class='cursor' id='install-cursor' aria-hidden='true'></span></code>
+          </div>
+          <p class='terminal-caption'>Paste once. Machine Core wires up the runtime, the plugin system, and Studio.</p>
         </div>
       </div>
     </section>
 
-    <section class='block' id='features'>
+    <section class='block' id='capabilities'>
       <div class='container'>
-        <div class='section-head'>
-          <span class='eyebrow'>Why Machine Core</span>
-          <h2>Start simple, then grow without starting over.</h2>
-          <p>Every capability is a plugin with a stable contract, so the system you learn on day one is the system you run in production.</p>
-        </div>
-        <div class='feature-grid'>
-          {feature_cards}
-        </div>
-      </div>
-    </section>
-
-    <section class='block' id='build'>
-      <div class='container'>
-        <div class='section-head'>
-          <span class='eyebrow'>What you can build</span>
+        <div class='section-head reveal' style='--reveal-delay:0ms'>
+          <span class='eyebrow'>Capabilities</span>
           <h2>Add capabilities instead of changing systems.</h2>
-          <p>Compose the parts you need today, and attach the rest when the project asks for them.</p>
         </div>
-        <div class='build-grid'>
-          {build_cards}
+        <div class='cell-grid'>
+          {capability_cells}
         </div>
+      </div>
+    </section>
+
+    <div class='marquee' aria-hidden='true'>
+      <div class='marquee-track'>
+        {marquee_sets}
+      </div>
+    </div>
+
+    <section class='block' id='how-it-works'>
+      <div class='container'>
+        <div class='section-head reveal' style='--reveal-delay:0ms'>
+          <span class='eyebrow'>How it works</span>
+          <h2>Install, declare, run.</h2>
+        </div>
+        <ol class='steps'>
+          <li class='step reveal' style='--reveal-delay:0ms'>
+            <span class='step-num'>01</span>
+            <h3>Install</h3>
+            <p>Run the installer once. Machine Core wires up the runtime, the plugin system, and Studio on your machine.</p>
+          </li>
+          <li class='step reveal' style='--reveal-delay:60ms'>
+            <span class='step-num'>02</span>
+            <h3>Declare</h3>
+            <p>Describe agents, tools, RAG, memory, and workflows as plugins in your project configuration.</p>
+          </li>
+          <li class='step reveal' style='--reveal-delay:120ms'>
+            <span class='step-num'>03</span>
+            <h3>Run</h3>
+            <p>Start the machine and operate every project from one control plane. Switch contexts without leaving the page.</p>
+          </li>
+        </ol>
       </div>
     </section>
 
     <section class='block'>
       <div class='container'>
-        <div class='stats-band'>
+        <div class='stats-band reveal' style='--reveal-delay:0ms'>
           {stat_cells}
         </div>
         <div class='context-strip'>
           <span class='tag'>Live context</span>
-          <span>Currently inspecting <strong>{active_target}</strong></span>
-          <span>Studio &middot; /_studio/</span>
-        </div>
-      </div>
-    </section>
-
-    <section class='block'>
-      <div class='container'>
-        <div class='cta-band'>
-          <span class='eyebrow'>Ready when you are</span>
-          <h2>Install once. Keep building.</h2>
-          <p>Bring your own models, add your own tools, and operate everything from one control plane.</p>
-          <div class='hero-actions'>
-            <a class='btn btn-primary' href='#install-machine'>Install Machine</a>
-            <a class='btn btn-ghost' href='/_studio/'>Open Studio</a>
-          </div>
+          <span>Inspecting <strong>{active_target}</strong></span>
         </div>
       </div>
     </section>
   </main>
 
   <footer class='footer'>
-    <div class='container'>
-      <div class='footer-grid'>
-        <div class='footer-brand'>
-          <div class='brand'>
-            <span class='brand-mark' aria-hidden='true'>
-              <svg viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                <path d='M9 38V10L24 27L39 10V38' stroke='#7dd3c7' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/>
-              </svg>
-            </span>
-            <span class='brand-copy'><strong>Machine Core</strong><small>One system for AI projects</small></span>
-          </div>
-          <p>The open control plane for agents, tools, RAG, memory, workflows, and evals.</p>
+    <div class='container footer-inner'>
+      <div class='footer-brand'>
+        <div class='brand'>
+          <span class='brand-mark' aria-hidden='true'>
+            <svg viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+              <path d='M9 38V10L24 27L39 10V38' stroke='currentColor' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+              <circle cx='9' cy='10' r='3' fill='currentColor'/>
+              <circle cx='24' cy='27' r='3' fill='currentColor'/>
+              <circle cx='39' cy='10' r='3' fill='currentColor'/>
+            </svg>
+          </span>
+          <span class='brand-copy'><strong>Machine Core</strong><small>One system for AI projects</small></span>
         </div>
-        <div class='footer-col'>
-          <h4>Product</h4>
-          <a href='#features'>Features</a>
-          <a href='#build'>What you can build</a>
-          <a href='#install-machine'>Install</a>
-        </div>
-        <div class='footer-col'>
-          <h4>Runtime</h4>
-          <a href='/_studio/agents'>Agents</a>
-          <a href='/_studio/tools'>Tools</a>
-          <a href='/_studio/sections/rag'>RAG</a>
-        </div>
-        <div class='footer-col'>
-          <h4>Operate</h4>
-          <a href='/_studio/'>Studio</a>
-          <a href='/_studio/docs'>Docs</a>
-          <a href='/health'>Health</a>
-        </div>
+        <p>The open control plane for agents, tools, RAG, memory, workflows, and evals.</p>
       </div>
-      <div class='footer-bottom'>
-        <span>Machine Core &middot; Studio is the control plane when you need a wider view.</span>
-        <span>Built to run one project or many.</span>
+      <div class='footer-col'>
+        <h4>Product</h4>
+        <a href='#capabilities'>Capabilities</a>
+        <a href='#install-machine'>Install</a>
+        <a href='/_studio/'>Studio</a>
       </div>
+      <div class='footer-col'>
+        <h4>Runtime</h4>
+        <a href='/_studio/agents'>Agents</a>
+        <a href='/_studio/tools'>Tools</a>
+        <a href='/_studio/sections/rag'>RAG</a>
+      </div>
+      <div class='footer-col'>
+        <h4>Operate</h4>
+        <a href='/_studio/'>Studio</a>
+        <a href='/_studio/docs'>Docs</a>
+        <a href='/health'>Health</a>
+      </div>
+    </div>
+    <div class='container footer-bottom'>
+      <span>Machine Core · Studio is the control plane when you need a wider view.</span>
+      <span>Built to run one project or many.</span>
     </div>
   </footer>
 
@@ -773,6 +837,7 @@ def _landing_page_html(state: StudioState) -> str:
 </body>
 </html>
 """
+
 
 def create_studio_host_app(machine: Any) -> FastAPI:
     """Create the top-level Studio host app with a landing page at /."""
@@ -828,6 +893,7 @@ def create_studio_app(
         chat,
         config,
         dashboard,
+        docs,
         registry,
         resources,
         services,
@@ -853,6 +919,7 @@ def create_studio_app(
     app.include_router(dashboard.router)
     app.include_router(registry.router)
     app.include_router(config.router)
+    app.include_router(docs.router)
     app.include_router(services.router)
     app.include_router(resources.router)
     app.include_router(chat.router)

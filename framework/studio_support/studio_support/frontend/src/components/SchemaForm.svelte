@@ -366,7 +366,7 @@
         <div class="result-head">
           <span class="eyebrow">Result</span>
           {#if hasExecuted && !resultError}
-            <button type="button" class="result-copy" onclick={copyResult}>
+            <button type="button" class="result-copy" class:copied={copied} onclick={copyResult}>
               <span class="icon">{@html copied ? checkIcon : copyIcon}</span>
               <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
@@ -384,59 +384,78 @@
 
 <style>
   .schema-panel {
+    --hair: color-mix(in oklab, var(--border) 100%, transparent);
+    --r: var(--radius);
+    --mono: var(--font-mono, ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, Consolas, monospace);
     display: grid;
     gap: 1rem;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .schema-panel > :not(.schema-header) {
+    margin-inline: 18px;
+  }
+
+  .schema-panel > :last-child {
+    margin-bottom: 18px;
   }
 
   .schema-header {
     align-items: flex-start;
     margin-bottom: 0;
-    padding-bottom: 0.9rem;
-    border-bottom: 1px solid color-mix(in oklab, var(--border) 82%, transparent);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--hair);
   }
 
   .schema-heading {
     display: grid;
-    gap: 0.2rem;
+    gap: 0.25rem;
     min-width: 0;
   }
 
   .schema-heading h3 {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   .schema-subtitle {
     margin: 0;
     max-width: 46rem;
-    font-size: 0.86rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
     color: var(--muted-foreground);
   }
 
   .schema-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.5rem;
     justify-content: flex-end;
   }
 
   .meta-tag {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.3rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: color-mix(in oklab, var(--accent) 70%, transparent);
-    font-size: 0.75rem;
+    gap: 0.35rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    background: transparent;
+    font-family: var(--mono);
+    font-size: 11px;
     color: var(--foreground);
   }
 
   .meta-label {
-    font-size: 0.62rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.08em;
     color: var(--muted-foreground);
   }
 
@@ -447,70 +466,95 @@
 
   .schema-fields {
     display: grid;
-    gap: 0.85rem;
+    gap: 0.75rem;
   }
 
   .schema-field {
     display: grid;
-    gap: 0.35rem;
-    padding: 0.85rem 0.95rem;
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) + 0.15rem);
-    background: color-mix(in oklab, var(--card) 78%, transparent);
+    gap: 0.375rem;
+    padding: 0.75rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    transition: border-color 120ms ease;
   }
 
   .schema-field.invalid {
-    border-color: color-mix(in oklab, oklch(0.65 0.19 25) 52%, var(--border));
-    background: color-mix(in oklab, oklch(0.65 0.19 25) 7%, var(--card));
+    border-color: color-mix(in oklab, var(--danger) 55%, var(--border));
   }
 
   .field-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .field-head label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--foreground);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted-foreground);
   }
 
   .required-badge {
-    padding: 0.1rem 0.45rem;
-    border: 1px dashed var(--border);
+    padding: 0.1rem 0.4rem;
+    border: 1px solid color-mix(in oklab, var(--danger) 42%, var(--border));
     border-radius: 999px;
-    font-size: 0.62rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: var(--muted-foreground);
+    color: color-mix(in oklab, var(--danger) 88%, var(--foreground));
   }
 
   .field-hint {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--muted-foreground);
   }
 
   .field-error {
     margin: 0;
-    font-size: 0.8rem;
-    color: oklch(0.72 0.17 25);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: color-mix(in oklab, var(--danger) 88%, var(--foreground));
+  }
+
+  .control-input {
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    background: var(--input);
+    color: var(--foreground);
+    font-size: 0.875rem;
+    transition: border-color 120ms ease, box-shadow 160ms ease;
+  }
+
+  .control-input:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 28%, transparent);
+  }
+
+  .control-input[aria-invalid='true'] {
+    border-color: color-mix(in oklab, var(--danger) 55%, var(--border));
   }
 
   .schema-textarea {
     min-height: 6rem;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.85rem;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
     resize: vertical;
   }
 
   .switch {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     cursor: pointer;
   }
 
@@ -523,43 +567,44 @@
 
   .switch-track {
     position: relative;
-    width: 2.4rem;
-    height: 1.35rem;
-    border: 1px solid var(--border);
+    width: 2.25rem;
+    height: 1.25rem;
+    border: 1px solid var(--hair);
     border-radius: 999px;
     background: color-mix(in oklab, var(--muted) 82%, transparent);
-    transition: background-color 140ms ease, border-color 140ms ease;
+    transition: background-color 120ms ease, border-color 120ms ease;
   }
 
   .switch-thumb {
     position: absolute;
     top: 50%;
-    left: 0.16rem;
-    width: 1rem;
-    height: 1rem;
+    left: 0.15rem;
+    width: 0.9rem;
+    height: 0.9rem;
     border-radius: 50%;
-    background: var(--foreground);
+    background: var(--muted-foreground);
     transform: translateY(-50%);
-    transition: left 140ms ease, background-color 140ms ease;
+    transition: left 120ms ease, background-color 120ms ease;
   }
 
   .switch input:checked + .switch-track {
-    border-color: color-mix(in oklab, var(--primary) 52%, var(--border));
-    background: color-mix(in oklab, var(--primary) 58%, var(--accent));
+    border-color: color-mix(in oklab, var(--primary) 55%, var(--border));
+    background: color-mix(in oklab, var(--primary) 55%, transparent);
   }
 
   .switch input:checked + .switch-track .switch-thumb {
-    left: calc(100% - 1.16rem);
+    left: calc(100% - 1.05rem);
     background: var(--primary-foreground);
   }
 
   .switch input:focus-visible + .switch-track {
-    outline: 2px solid color-mix(in oklab, var(--ring) 72%, transparent);
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent);
   }
 
   .switch-label {
-    font-size: 0.8rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
     color: var(--muted-foreground);
     font-variant-numeric: tabular-nums;
   }
@@ -568,13 +613,60 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.5rem;
   }
 
-  .schema-run {
+  .primary-button.schema-run,
+  .secondary-button.schema-reset {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: none;
+    transition: border-color 120ms ease, background-color 120ms ease, filter 120ms ease, opacity 120ms ease, transform 120ms ease;
+  }
+
+  .primary-button.schema-run:active:not(:disabled),
+  .secondary-button.schema-reset:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .primary-button.schema-run {
+    border-color: transparent;
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .primary-button.schema-run:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
+
+  .secondary-button.schema-reset {
+    background: transparent;
+    color: var(--foreground);
+  }
+
+  .secondary-button.schema-reset:hover:not(:disabled) {
+    border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+    background: color-mix(in oklab, var(--primary) 8%, transparent);
+  }
+
+  .primary-button.schema-run:disabled,
+  .secondary-button.schema-reset:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .primary-button.schema-run:focus-visible,
+  .secondary-button.schema-reset:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent);
   }
 
   .icon {
@@ -593,97 +685,135 @@
   }
 
   .schema-note {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .result-panel {
     display: grid;
     gap: 0.5rem;
+    animation: schema-result-in 220ms ease-out backwards;
   }
 
   .result-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .result-copy {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.3rem 0.65rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: color-mix(in oklab, var(--accent) 72%, transparent);
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    background: transparent;
     color: var(--foreground);
-    font-size: 0.76rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     cursor: pointer;
+    transition: border-color 120ms ease, background-color 120ms ease, transform 120ms ease;
   }
 
-  .result-copy:hover,
+  .result-copy:hover {
+    border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+    background: color-mix(in oklab, var(--primary) 8%, transparent);
+  }
+
+  .result-copy:active {
+    transform: scale(0.98);
+  }
+
+  .result-copy .icon {
+    transition: transform 160ms ease;
+  }
+
+  .result-copy.copied .icon {
+    animation: schema-check-pop 220ms ease-out;
+  }
+
   .result-copy:focus-visible {
-    border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent);
   }
 
   .result-body {
     margin: 0;
     max-height: 20rem;
     overflow: auto;
-    padding: 0.9rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) + 0.15rem);
-    background: color-mix(in oklab, var(--background) 68%, transparent);
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    background: color-mix(in oklab, var(--background) 78%, transparent);
     color: var(--foreground);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.84rem;
-    line-height: 1.5;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
     white-space: pre-wrap;
     word-break: break-word;
   }
 
   .result-body.result-error {
-    border-color: color-mix(in oklab, oklch(0.65 0.19 25) 50%, var(--border));
-    background: color-mix(in oklab, oklch(0.65 0.19 25) 10%, var(--card));
-    color: oklch(0.78 0.16 25);
+    border-color: color-mix(in oklab, var(--danger) 52%, var(--border));
+    background: color-mix(in oklab, var(--danger) 8%, transparent);
+    color: color-mix(in oklab, var(--danger) 88%, var(--foreground));
   }
 
   .schema-state {
     display: grid;
     gap: 0.5rem;
     justify-items: start;
-    padding: 1.4rem;
-    border: 1px dashed var(--border);
-    border-radius: calc(var(--radius) + 0.25rem);
-    background: color-mix(in oklab, var(--card) 60%, transparent);
+    padding: 1rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
   }
 
   .schema-state h4 {
     margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
   }
 
   .schema-state p {
     margin: 0;
     color: var(--muted-foreground);
+    line-height: 1.55;
   }
 
   .schema-state.error {
-    border-style: solid;
-    border-color: color-mix(in oklab, oklch(0.65 0.19 25) 46%, var(--border));
-    background: color-mix(in oklab, oklch(0.65 0.19 25) 9%, var(--card));
+    border-color: color-mix(in oklab, var(--danger) 52%, var(--border));
+    background: color-mix(in oklab, var(--danger) 8%, transparent);
   }
 
   .schema-retry {
-    margin-top: 0.3rem;
-    padding: 0.5rem 0.9rem;
-    border: 1px solid color-mix(in oklab, var(--primary) 34%, var(--border));
-    border-radius: calc(var(--radius) + 0.15rem);
-    background: color-mix(in oklab, var(--primary) 14%, var(--accent));
+    margin-top: 0.25rem;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid color-mix(in oklab, var(--primary) 48%, var(--border));
+    border-radius: var(--r);
+    background: transparent;
     color: var(--foreground);
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     cursor: pointer;
+    transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+  }
+
+  .schema-retry:hover {
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+  }
+
+  .schema-retry:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent);
   }
 
   .schema-skeleton {
@@ -692,28 +822,23 @@
   }
 
   .skeleton-field {
-    height: 3.6rem;
-    border-radius: calc(var(--radius) + 0.15rem);
-    background: linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--muted) 70%, transparent) 0%,
-      color-mix(in oklab, var(--foreground) 12%, var(--muted)) 50%,
-      color-mix(in oklab, var(--muted) 70%, transparent) 100%
-    );
-    background-size: 200% 100%;
-    animation: schema-shimmer 1.5s ease-in-out infinite;
+    height: 3.5rem;
+    border-radius: var(--r);
+    background: color-mix(in oklab, var(--muted) 82%, transparent);
+    animation: schema-pulse 1.4s ease-in-out infinite;
   }
 
   .skeleton-field.short {
     width: 60%;
   }
 
-  @keyframes schema-shimmer {
-    0% {
-      background-position: 200% 0;
-    }
+  @keyframes schema-pulse {
+    0%,
     100% {
-      background-position: -200% 0;
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
     }
   }
 
@@ -726,10 +851,56 @@
     }
   }
 
+  @keyframes schema-result-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes schema-check-pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.5) rotate(-12deg);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.12) rotate(3deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .skeleton-field,
-    .icon.spin {
+    .icon.spin,
+    .result-panel,
+    .result-copy.copied .icon {
       animation: none;
+    }
+
+    .schema-field,
+    .control-input,
+    .switch-track,
+    .switch-thumb,
+    .primary-button.schema-run,
+    .secondary-button.schema-reset,
+    .result-copy,
+    .result-copy .icon,
+    .schema-retry {
+      transition: none;
+    }
+
+    .primary-button.schema-run:active:not(:disabled),
+    .secondary-button.schema-reset:active:not(:disabled),
+    .result-copy:active {
+      transform: none;
     }
   }
 </style>

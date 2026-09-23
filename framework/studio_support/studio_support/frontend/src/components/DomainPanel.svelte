@@ -37,6 +37,48 @@
     return unique.size;
   });
 
+  let shownCategories = $state(0);
+  let shownResources = $state(0);
+  let shownOperations = $state(0);
+  let shownOwners = $state(0);
+
+  function prefersReducedMotion() {
+    return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
+  }
+
+  function countUp(target: number, apply: (value: number) => void) {
+    if (typeof window === 'undefined' || prefersReducedMotion()) {
+      apply(target);
+      return () => {};
+    }
+    const duration = 220;
+    const start = performance.now();
+    let frame = 0;
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      apply(Math.round(target * eased));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }
+
+  $effect(() => {
+    const stopCategories = countUp(categories.length, (value) => (shownCategories = value));
+    const stopResources = countUp(totalItems, (value) => (shownResources = value));
+    const stopOperations = countUp(totalOperations, (value) => (shownOperations = value));
+    const stopOwners = countUp(owners, (value) => (shownOwners = value));
+    return () => {
+      stopCategories();
+      stopResources();
+      stopOperations();
+      stopOwners();
+    };
+  });
+
   async function loadDomain() {
     loading = true;
     try {
@@ -141,26 +183,26 @@
     </div>
   {:else if payload}
     <div class="domain-stats">
-      <div class="domain-stat">
+      <div class="domain-stat" style="--enter-index: 0">
         <span class="stat-label">Categories</span>
-        <strong>{categories.length}</strong>
+        <strong>{shownCategories}</strong>
       </div>
-      <div class="domain-stat">
+      <div class="domain-stat" style="--enter-index: 1">
         <span class="stat-label">Resources</span>
-        <strong>{totalItems}</strong>
+        <strong>{shownResources}</strong>
       </div>
-      <div class="domain-stat">
+      <div class="domain-stat" style="--enter-index: 2">
         <span class="stat-label">Operations</span>
-        <strong>{totalOperations}</strong>
+        <strong>{shownOperations}</strong>
       </div>
-      <div class="domain-stat">
+      <div class="domain-stat" style="--enter-index: 3">
         <span class="stat-label">Owners</span>
-        <strong>{owners || '—'}</strong>
+        <strong>{owners ? shownOwners : '—'}</strong>
       </div>
     </div>
 
-    {#each categories as [category, items] (category)}
-      <section class="domain-category">
+    {#each categories as [category, items], categoryIndex (category)}
+      <section class="domain-category" style={`--enter-index:${categoryIndex}`}>
         <div class="domain-category-head">
           <h4>{category}</h4>
           <span class="count-badge">{items.length}</span>
@@ -177,8 +219,8 @@
               </tr>
             </thead>
             <tbody>
-              {#each items as item (item.name)}
-                <tr>
+              {#each items as item, rowIndex (item.name)}
+                <tr style={`--enter-index:${categoryIndex * 4 + rowIndex}`}>
                   <td data-label="Name"><span class="domain-name">{item.name}</span></td>
                   <td data-label="Owner">
                     {#if item.owner}
@@ -211,64 +253,82 @@
 
 <style>
   .domain-panel {
+    --hair: color-mix(in oklab, var(--border) 100%, transparent);
+    --r: var(--radius);
+    --mono: var(--font-mono, ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, Consolas, monospace);
     display: grid;
-    gap: 1.1rem;
+    gap: 1rem;
     position: relative;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .domain-panel > :not(.domain-header) {
+    margin-inline: 18px;
+  }
+
+  .domain-panel > :last-child {
+    margin-bottom: 18px;
   }
 
   .domain-header {
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-bottom: 0;
-    padding-bottom: 0.9rem;
-    border-bottom: 1px solid color-mix(in oklab, var(--border) 82%, transparent);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--hair);
   }
 
   .domain-heading {
     display: grid;
-    gap: 0.2rem;
+    gap: 0.25rem;
     min-width: 0;
   }
 
   .domain-heading h3 {
     margin: 0;
-    font-size: 1.15rem;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 600;
     letter-spacing: -0.01em;
   }
 
   .domain-subtitle {
     margin: 0;
-    font-size: 0.86rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
     color: var(--muted-foreground);
   }
 
   .domain-header-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.5rem;
     justify-content: flex-end;
   }
 
   .status-tag {
     display: inline-flex;
     align-items: center;
-    gap: 0.42rem;
-    padding: 0.32rem 0.68rem;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--accent) 70%, transparent);
+    gap: 0.375rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--r);
+    border: 1px solid var(--hair);
+    background: transparent;
     color: var(--muted-foreground);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    text-transform: lowercase;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     white-space: nowrap;
+    transition: border-color 120ms ease, color 120ms ease;
   }
 
   .status-tag.installed {
     color: var(--foreground);
-    border-color: color-mix(in oklab, var(--primary) 42%, var(--border));
-    background: color-mix(in oklab, var(--primary) 16%, var(--accent));
+    border-color: color-mix(in oklab, var(--primary) 48%, var(--border));
   }
 
   .status-tag.missing {
@@ -276,199 +336,242 @@
   }
 
   .status-dot {
-    width: 0.5rem;
-    height: 0.5rem;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: var(--muted-foreground);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--muted-foreground) 16%, transparent);
   }
 
   .status-tag.installed .status-dot {
     background: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 22%, transparent);
   }
 
   .domain-stats {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.7rem;
+    gap: 0;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
+    overflow: hidden;
   }
 
   .domain-stat {
     display: grid;
-    gap: 0.15rem;
-    padding: 0.7rem 0.8rem;
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) + 0.15rem);
-    background: color-mix(in oklab, var(--card) 82%, transparent);
+    gap: 0.125rem;
+    padding: 0.625rem 0.75rem;
+    border-left: 1px solid var(--hair);
+    animation: domain-enter 220ms ease-out backwards;
+    animation-delay: calc(var(--enter-index, 0) * 45ms);
+  }
+
+  .domain-stat:first-child {
+    border-left: 0;
   }
 
   .stat-label {
-    font-size: 0.67rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--muted-foreground);
   }
 
   .domain-stat strong {
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-family: var(--mono);
+    font-size: 1rem;
+    font-weight: 600;
     color: var(--foreground);
+    font-variant-numeric: tabular-nums;
   }
 
   .domain-category {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.5rem;
+    padding: 0;
+    animation: domain-enter 220ms ease-out backwards;
+    animation-delay: calc(var(--enter-index, 0) * 45ms);
   }
 
   .domain-category-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .domain-category-head h4 {
     margin: 0;
-    font-size: 0.92rem;
-    letter-spacing: 0.01em;
-    text-transform: capitalize;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted-foreground);
   }
 
   .count-badge {
-    min-width: 1.6rem;
-    padding: 0.15rem 0.5rem;
+    min-width: 1.5rem;
+    padding: 0.1rem 0.4rem;
     text-align: center;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--accent) 75%, transparent);
-    font-size: 0.75rem;
-    font-weight: 600;
+    border-radius: var(--r);
+    border: 1px solid var(--hair);
+    background: transparent;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
     color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
   }
 
   .domain-table-wrap {
     overflow-x: auto;
-    border: 1px solid var(--border);
-    border-radius: calc(var(--radius) + 0.2rem);
-    background: color-mix(in oklab, var(--card) 72%, transparent);
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
   }
 
   .domain-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.88rem;
+    border: 0;
+    border-radius: 0;
+    font-size: 0.8125rem;
   }
 
   .domain-table th {
-    padding: 0.6rem 0.8rem;
+    padding: 0.5rem 0.75rem;
     text-align: left;
-    font-size: 0.67rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.08em;
     color: var(--muted-foreground);
-    background: color-mix(in oklab, var(--accent) 45%, transparent);
-    border-bottom: 1px solid var(--border);
+    background: transparent;
+    border-bottom: 1px solid var(--hair);
     white-space: nowrap;
   }
 
   .domain-table td {
-    padding: 0.65rem 0.8rem;
-    vertical-align: top;
+    height: 44px;
+    padding: 0 0.75rem;
+    vertical-align: middle;
     color: var(--muted-foreground);
-    border-bottom: 1px solid color-mix(in oklab, var(--border) 58%, transparent);
+    border-bottom: 1px solid var(--hair);
   }
 
   .domain-table tbody tr:last-child td {
     border-bottom: 0;
   }
 
+  .domain-table tbody tr {
+    transition: background-color 120ms ease;
+    animation: domain-row-enter 200ms ease-out backwards;
+    animation-delay: calc(var(--enter-index, 0) * 30ms);
+  }
+
   .domain-table tbody tr:hover {
-    background: color-mix(in oklab, var(--accent) 42%, transparent);
+    background: color-mix(in oklab, var(--muted) 55%, transparent);
+  }
+
+  .domain-table tbody td:first-child {
+    border-left: 2px solid transparent;
+    transition: border-color 140ms ease;
+  }
+
+  .domain-table tbody tr:hover td:first-child {
+    border-left-color: var(--primary);
   }
 
   .domain-name {
-    font-weight: 600;
+    font-family: var(--mono);
+    font-weight: 500;
     color: var(--foreground);
   }
 
   .tag-list {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: 0.3rem;
+    gap: 0.25rem;
   }
 
   .tag {
     display: inline-flex;
     align-items: center;
-    padding: 0.18rem 0.5rem;
+    padding: 0.15rem 0.45rem;
     border-radius: 999px;
-    border: 1px solid var(--border);
-    background: color-mix(in oklab, var(--accent) 70%, transparent);
+    border: 1px solid var(--hair);
+    background: transparent;
     color: var(--muted-foreground);
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     white-space: nowrap;
   }
 
   .tag.owner {
     color: var(--foreground);
-    border-color: color-mix(in oklab, var(--ring) 36%, var(--border));
-    background: color-mix(in oklab, var(--ring) 12%, var(--accent));
+    border-color: color-mix(in oklab, var(--ring) 42%, var(--border));
   }
 
   .tag.operation {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.7rem;
-    color: color-mix(in oklab, var(--foreground) 86%, var(--muted-foreground));
+    color: var(--foreground);
+    border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
+    transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease;
+  }
+
+  .tag.operation:hover {
+    transform: translateY(-1px);
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
   }
 
   .tag.muted {
-    opacity: 0.72;
+    opacity: 0.6;
   }
 
   .domain-state {
     display: grid;
     gap: 0.5rem;
     justify-items: start;
-    padding: 1.4rem;
-    border: 1px dashed var(--border);
-    border-radius: calc(var(--radius) + 0.25rem);
-    background: color-mix(in oklab, var(--card) 60%, transparent);
+    padding: 1rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r);
   }
 
   .domain-state h4 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
   }
 
   .domain-state p {
     margin: 0;
     max-width: 42rem;
+    line-height: 1.55;
   }
 
   .domain-state .state-copy {
+    font-size: 0.8125rem;
     color: var(--muted-foreground);
   }
 
   .domain-state .muted-hint {
-    font-size: 0.85rem;
-    opacity: 0.86;
+    font-size: 0.75rem;
+    opacity: 0.82;
   }
 
   .domain-state.error {
-    border-style: solid;
-    border-color: color-mix(in oklab, oklch(0.65 0.19 25) 46%, var(--border));
-    background: color-mix(in oklab, oklch(0.65 0.19 25) 9%, var(--card));
+    border-color: color-mix(in oklab, var(--danger) 52%, var(--border));
+    background: color-mix(in oklab, var(--danger) 8%, transparent);
   }
 
   .state-icon {
     display: inline-flex;
-    width: 2rem;
-    height: 2rem;
-    color: var(--primary);
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--muted-foreground);
   }
 
   .state-icon svg {
@@ -477,55 +580,56 @@
   }
 
   .domain-state.error .state-icon {
-    color: oklch(0.72 0.17 25);
+    color: var(--danger);
   }
 
   .domain-retry {
-    margin-top: 0.3rem;
-    padding: 0.5rem 0.9rem;
-    border: 1px solid color-mix(in oklab, var(--primary) 34%, var(--border));
-    border-radius: calc(var(--radius) + 0.15rem);
-    background: color-mix(in oklab, var(--primary) 14%, var(--accent));
+    margin-top: 0.25rem;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid color-mix(in oklab, var(--primary) 48%, var(--border));
+    border-radius: var(--r);
+    background: transparent;
     color: var(--foreground);
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+    transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
   }
 
-  .domain-retry:hover,
+  .domain-retry:hover {
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 10%, transparent);
+  }
+
   .domain-retry:focus-visible {
-    background: color-mix(in oklab, var(--primary) 24%, var(--accent));
-    border-color: color-mix(in oklab, var(--primary) 44%, var(--border));
-    transform: translateY(-1px);
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent);
   }
 
   .domain-skeleton {
     display: grid;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
   .skeleton-category {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.5rem;
   }
 
   .skeleton-line {
-    height: 0.8rem;
-    border-radius: 999px;
-    background: linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--muted) 70%, transparent) 0%,
-      color-mix(in oklab, var(--foreground) 12%, var(--muted)) 50%,
-      color-mix(in oklab, var(--muted) 70%, transparent) 100%
-    );
-    background-size: 200% 100%;
-    animation: domain-shimmer 1.5s ease-in-out infinite;
+    height: 0.75rem;
+    border-radius: var(--r);
+    background: color-mix(in oklab, var(--muted) 82%, transparent);
+    animation: domain-pulse 1.4s ease-in-out infinite;
   }
 
   .skeleton-stat {
     width: 12rem;
-    height: 1.1rem;
+    height: 1rem;
   }
 
   .skeleton-head {
@@ -544,22 +648,56 @@
     border: 0;
   }
 
-  @keyframes domain-shimmer {
-    0% {
-      background-position: 200% 0;
-    }
+  @keyframes domain-pulse {
+    0%,
     100% {
-      background-position: -200% 0;
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes domain-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes domain-row-enter {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .skeleton-line {
+    .skeleton-line,
+    .domain-stat,
+    .domain-category,
+    .domain-table tbody tr {
       animation: none;
     }
 
-    .domain-retry {
+    .domain-retry,
+    .status-tag,
+    .domain-table tbody tr,
+    .domain-table tbody td:first-child,
+    .tag.operation {
       transition: none;
+    }
+
+    .tag.operation:hover {
+      transform: none;
     }
   }
 
@@ -567,12 +705,19 @@
     .domain-stats {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .domain-stat:nth-child(3) {
+      border-left: 0;
+    }
+
+    .domain-stat:nth-child(n + 3) {
+      border-top: 1px solid var(--hair);
+    }
   }
 
   @media (max-width: 640px) {
     .domain-table-wrap {
       border: 0;
-      background: transparent;
       overflow: visible;
     }
 
@@ -589,30 +734,32 @@
     }
 
     .domain-table tr {
-      margin-bottom: 0.65rem;
-      padding: 0.55rem 0.7rem;
-      border: 1px solid var(--border);
-      border-radius: calc(var(--radius) + 0.2rem);
-      background: color-mix(in oklab, var(--card) 82%, transparent);
+      margin-bottom: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--hair);
+      border-radius: var(--r);
     }
 
     .domain-table tbody tr:hover {
-      background: color-mix(in oklab, var(--card) 82%, transparent);
+      background: transparent;
     }
 
     .domain-table td {
       display: grid;
-      grid-template-columns: 6.5rem minmax(0, 1fr);
-      gap: 0.6rem;
+      grid-template-columns: 6rem minmax(0, 1fr);
+      gap: 0.5rem;
       align-items: start;
-      padding: 0.35rem 0;
+      height: auto;
+      padding: 0.375rem 0;
       border: 0;
+      border-left: 0;
     }
 
     .domain-table td::before {
       content: attr(data-label);
-      font-size: 0.67rem;
-      font-weight: 600;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.07em;
       color: var(--muted-foreground);

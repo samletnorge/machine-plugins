@@ -1,1 +1,1 @@
-import{z as t}from"./assets/api-DgXn3BUQ.js";import{D as e}from"./assets/DomainPanel-CCYZqe6z.js";const o=document.getElementById("browser-island");o&&t(e,{target:o,props:{domain:"browser",title:"Browser",endpoint:o.dataset.endpoint??"/_studio/api/browser/sessions"}});
+import{z as t}from"./assets/api-DgXn3BUQ.js";import{D as e}from"./assets/DomainPanel-CwhoHTUB.js";import"./assets/style-4minRsux.js";const o=document.getElementById("browser-island");o&&t(e,{target:o,props:{domain:"browser",title:"Browser",endpoint:o.dataset.endpoint??"/_studio/api/browser/sessions"}});

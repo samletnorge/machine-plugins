@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="mission-grid">
-    <article class="mission-hero panel">
+    <article class="panel mission-hero">
         <div class="mission-hero-copy">
             <span class="eyebrow">Machine Studio</span>
             <h2>{{ tenant_name }} / {{ project_name }} / {{ environment }}</h2>
-            <p>Studio is the control plane for this runtime. Inspect what is loaded right now, then widen out to the rest of the fleet to compare environments, move into tools, or trace a workflow.</p>
+            <p>Studio is the control plane for this runtime. Inspect what is loaded right now, switch contexts without leaving the page, and widen out to the rest of the fleet when you need to compare environments.</p>
             <div class="hero-actions mission-actions">
                 <a href="{{ request.scope.root_path }}/chat" class="panel-link block">Open runtime console</a>
                 <a href="{{ request.scope.root_path }}/registry" class="panel-link block subtle">Inspect registry</a>
@@ -21,17 +21,17 @@
                 <div class="hero-stat-row">
                     <article class="hero-stat-card compact">
                         <span class="status-label">Fleet</span>
-                        <strong>{{ project_count }}</strong>
+                        <strong data-count="{{ project_count }}">{{ project_count }}</strong>
                         <p>projects</p>
                     </article>
                     <article class="hero-stat-card compact">
                         <span class="status-label">Targets</span>
-                        <strong>{{ target_count }}</strong>
+                        <strong data-count="{{ target_count }}">{{ target_count }}</strong>
                         <p>environments</p>
                     </article>
                     <article class="hero-stat-card compact">
                         <span class="status-label">Plugins</span>
-                        <strong>{{ plugins_declared|length }}</strong>
+                        <strong data-count="{{ plugins_declared|length }}">{{ plugins_declared|length }}</strong>
                         <p>declared</p>
                     </article>
                 </div>
@@ -39,7 +39,7 @@
         </div>
     </article>
 
-    <article class="mission-focus panel">
+    <article class="panel mission-focus">
         <div class="panel-header compact">
             <div>
                 <span class="eyebrow">Current focus</span>
@@ -49,17 +49,17 @@
         <div class="focus-link-grid">
             <a href="{{ request.scope.root_path }}/agents" class="focus-link-card">
                 <span class="eyebrow">Agents</span>
-                <strong>{{ runtime_agents|length }}</strong>
+                <strong data-count="{{ runtime_agents|length }}">{{ runtime_agents|length }}</strong>
                 <p>Inspect registered agents and ownership.</p>
             </a>
             <a href="{{ request.scope.root_path }}/tools" class="focus-link-card">
                 <span class="eyebrow">Tools</span>
-                <strong>{{ runtime_tools|length }}</strong>
+                <strong data-count="{{ runtime_tools|length }}">{{ runtime_tools|length }}</strong>
                 <p>Open the tool surface and test handlers.</p>
             </a>
             <a href="{{ request.scope.root_path }}/workflows" class="focus-link-card">
                 <span class="eyebrow">Workflows</span>
-                <strong>{{ runtime_workflows|length }}</strong>
+                <strong data-count="{{ runtime_workflows|length }}">{{ runtime_workflows|length }}</strong>
                 <p>Review workflow inventory for this target.</p>
             </a>
         </div>
@@ -106,7 +106,7 @@
                 {% for category in categories %}
                 <div class="inventory-cell">
                     <span>{{ category }}</span>
-                    <strong>{{ category_counts.get(category, 0) }}</strong>
+                    <strong data-count="{{ category_counts.get(category, 0) }}">{{ category_counts.get(category, 0) }}</strong>
                 </div>
                 {% endfor %}
                 {% if not categories %}
@@ -124,8 +124,8 @@
                     <h3>Control plane model</h3>
                 </div>
             </div>
-            <p>Studio is where one Machine project grows into a set of runtimes, contexts, and operator views. The active selection decides what you are inspecting right now.</p>
-            <div class="detail-list stacked">
+            <p class="section-lede">Studio is where one Machine project grows into a set of runtimes, contexts, and operator views. The active selection decides what you are inspecting right now.</p>
+            <div class="detail-list">
                 <div><span>Project root</span><strong>{{ entry }}</strong></div>
                 <div><span>Machine</span><strong>{{ machine_name }}</strong></div>
                 <div><span>Manifest catalog</span><strong>{{ manifests|length }}</strong></div>

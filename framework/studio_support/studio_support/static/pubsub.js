@@ -1,1 +1,1 @@
-import{z as n}from"./assets/api-DgXn3BUQ.js";import{D as o}from"./assets/DomainPanel-CCYZqe6z.js";const t=document.getElementById("pubsub-island");t&&n(o,{target:t,props:{domain:"pubsub",title:"Pub/Sub",endpoint:t.dataset.endpoint??"/_studio/api/pubsub/events"}});
+import{z as o}from"./assets/api-DgXn3BUQ.js";import{D as n}from"./assets/DomainPanel-CwhoHTUB.js";import"./assets/style-4minRsux.js";const t=document.getElementById("pubsub-island");t&&o(n,{target:t,props:{domain:"pubsub",title:"Pub/Sub",endpoint:t.dataset.endpoint??"/_studio/api/pubsub/events"}});

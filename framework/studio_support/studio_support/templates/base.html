@@ -23,21 +23,15 @@
                     <a class="brand-link" href="{{ request.scope.root_path }}/">
                         <span class="brand-mark" aria-hidden="true">
                             <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <linearGradient id="studio-machine-mark-gradient" x1="6" y1="6" x2="42" y2="42" gradientUnits="userSpaceOnUse">
-                                        <stop stop-color="#7DD3C7"/>
-                                        <stop offset="1" stop-color="#67E8F9"/>
-                                    </linearGradient>
-                                </defs>
-                                <path d="M9 38V10L24 27L39 10V38" stroke="url(#studio-machine-mark-gradient)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-                                <circle cx="9" cy="10" r="3.2" fill="currentColor" stroke="url(#studio-machine-mark-gradient)" stroke-width="2"/>
-                                <circle cx="24" cy="27" r="3.2" fill="currentColor" stroke="url(#studio-machine-mark-gradient)" stroke-width="2"/>
-                                <circle cx="39" cy="10" r="3.2" fill="currentColor" stroke="url(#studio-machine-mark-gradient)" stroke-width="2"/>
+                                <path d="M9 38V10L24 27L39 10V38" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="9" cy="10" r="3" fill="currentColor"/>
+                                <circle cx="24" cy="27" r="3" fill="currentColor"/>
+                                <circle cx="39" cy="10" r="3" fill="currentColor"/>
                             </svg>
                         </span>
                         <span>
                             <strong>Machine Studio</strong>
-                            <small>Mission Control</small>
+                            <small>Control plane</small>
                         </span>
                     </a>
                     <button type="button" class="mode-toggle icon-only brand-mode-toggle" id="mode-toggle" aria-label="Toggle color mode">
@@ -94,17 +88,24 @@
 
             <nav class="nav-groups" aria-label="Studio Navigation">
                 {% for section in nav_sections %}
-                <section class="nav-group">
-                    <header>{{ section["section"] }}</header>
-                    {% for item in section["items"] %}
-                    <a href="{{ item.href }}" class="nav-item {% if active_nav == item.key %}active{% endif %}" {% if active_nav == item.key %}aria-current="page"{% endif %}>
-                        <span class="nav-icon">{{ icon(item.icon) }}</span>
-                        <span class="nav-label">{{ item.label }}</span>
-                        {% if item.status %}
-                        <span class="nav-status">{{ item.status }}</span>
-                        {% endif %}
-                    </a>
-                    {% endfor %}
+                <section class="nav-group" data-nav-group>
+                    <button type="button" class="nav-group-header" aria-expanded="true">
+                        <span>{{ section["section"] }}</span>
+                        <span class="nav-group-chevron">{{ icon('chevron') }}</span>
+                    </button>
+                    <div class="nav-group-items">
+                        <div class="nav-group-items-inner">
+                            {% for item in section["items"] %}
+                            <a href="{{ item.href }}" class="nav-item {% if active_nav == item.key %}active{% endif %}" {% if active_nav == item.key %}aria-current="page"{% endif %}>
+                                <span class="nav-icon">{{ icon(item.icon) }}</span>
+                                <span class="nav-label">{{ item.label }}</span>
+                                {% if item.status %}
+                                <span class="nav-status">{{ item.status }}</span>
+                                {% endif %}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </section>
                 {% endfor %}
             </nav>
@@ -118,52 +119,21 @@
 
         <div class="studio-main">
             <header class="studio-topbar">
-                <div class="topbar-intro">
-                    <button type="button" class="sidebar-toggle" id="sidebar-toggle">
+                <div class="topbar-inner">
+                    <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation">
                         <span class="nav-icon">{{ icon('blocks') }}</span>
-                        <span>Navigation</span>
                     </button>
-                    <h1>{{ page_title }}</h1>
-                    {% if active_nav == 'dashboard' %}
-                    <div class="topbar-kicker">Live control surface</div>
-                    <div class="topbar-context-line">
-                        <span>{{ tenant_name }}</span>
-                        <span>{{ project_name }}</span>
-                        <span>{{ environment }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-
-                {% if active_nav == 'dashboard' %}
-                <div class="topbar-actions">
-                    <div class="topbar-chip-stack">
+                    <nav class="topbar-breadcrumb" aria-label="Breadcrumb">
+                        <a class="crumb-root" href="{{ request.scope.root_path }}/">Studio</a>
+                        <span class="crumb-sep" aria-hidden="true">/</span>
+                        <h1>{{ page_title }}</h1>
+                    </nav>
+                    <div class="topbar-actions">
+                        <span class="topbar-context">{{ tenant_name }} / {{ project_name }} / {{ environment }}</span>
                         <span class="status-chip {% if attachment_status == 'attached' %}status-attached{% endif %}">{{ attachment_status }}</span>
-                        <span class="topbar-chip">{{ categories|length }} categories</span>
                     </div>
                 </div>
-                {% endif %}
             </header>
-
-            {% if active_nav == 'dashboard' %}
-            <section class="status-strip">
-                <article class="status-card">
-                    <span class="status-label">Categories</span>
-                    <strong>{{ categories|length }}</strong>
-                </article>
-                <article class="status-card">
-                    <span class="status-label">Loaded plugins</span>
-                    <strong>{{ loaded_plugins|length }}</strong>
-                </article>
-                <article class="status-card">
-                    <span class="status-label">Project plugins</span>
-                    <strong>{{ plugins_declared|length }}</strong>
-                </article>
-                <article class="status-card wide">
-                    <span class="status-label">Attachment</span>
-                    <strong>{{ attachment_status }}{% if attachment_error %} · {{ attachment_error }}{% endif %}</strong>
-                </article>
-            </section>
-            {% endif %}
 
             <main class="page-frame" id="page-frame">
                 {% block content %}{% endblock %}
@@ -331,6 +301,53 @@
                     restoreCurrentState();
                 }
             });
+        }
+
+        document.querySelectorAll('[data-nav-group]').forEach((group) => {
+            const header = group.querySelector('.nav-group-header');
+            if (!header) return;
+            header.addEventListener('click', () => {
+                const collapsed = group.dataset.collapsed === 'true';
+                group.dataset.collapsed = collapsed ? 'false' : 'true';
+                header.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+            });
+        });
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function countUp(element) {
+            const target = Number(element.dataset.count);
+            if (!Number.isFinite(target)) return;
+            if (reduceMotion) {
+                element.textContent = String(target);
+                return;
+            }
+            const duration = 720;
+            const start = performance.now();
+            function tick(now) {
+                const ratio = Math.min(1, (now - start) / duration);
+                const eased = 1 - Math.pow(1 - ratio, 3);
+                element.textContent = String(Math.round(target * eased));
+                if (ratio < 1) window.requestAnimationFrame(tick);
+            }
+            window.requestAnimationFrame(tick);
+        }
+
+        const countTargets = document.querySelectorAll('[data-count]');
+        if (countTargets.length) {
+            if (!reduceMotion && 'IntersectionObserver' in window) {
+                const countObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            countUp(entry.target);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.4 });
+                countTargets.forEach((element) => countObserver.observe(element));
+            } else {
+                countTargets.forEach(countUp);
+            }
         }
 
         applyTheme(storageTheme, storageMode);

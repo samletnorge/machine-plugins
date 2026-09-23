@@ -1,1 +1,1 @@
-import{z as a}from"./assets/api-DgXn3BUQ.js";import{D as o}from"./assets/DomainPanel-CCYZqe6z.js";const t=document.getElementById("auth-island");t&&a(o,{target:t,props:{domain:"auth",title:"Auth",endpoint:t.dataset.endpoint??"/_studio/api/auth/keys"}});
+import{z as o}from"./assets/api-DgXn3BUQ.js";import{D as a}from"./assets/DomainPanel-CwhoHTUB.js";import"./assets/style-4minRsux.js";const t=document.getElementById("auth-island");t&&o(a,{target:t,props:{domain:"auth",title:"Auth",endpoint:t.dataset.endpoint??"/_studio/api/auth/keys"}});
