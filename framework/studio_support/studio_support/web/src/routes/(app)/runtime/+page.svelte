@@ -8,6 +8,7 @@
 	import Metric from "$lib/components/studio/metric.svelte";
 	import PageHeader from "$lib/components/studio/page-header.svelte";
 	import ToolRunner from "$lib/components/studio/tool-runner.svelte";
+	import WorkflowViewer from "$lib/components/studio/workflow-viewer.svelte";
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { Button } from "$lib/components/ui/button/index.js";
 	import * as Card from "$lib/components/ui/card/index.js";
@@ -106,6 +107,10 @@
 												{#if tab.value === "tools"}
 													<div class="mt-2">
 														<ToolRunner toolName={item.name} />
+													</div>
+												{:else if tab.value === "workflows"}
+													<div class="mt-2">
+														<WorkflowViewer workflowName={item.name} />
 													</div>
 												{/if}
 											</div>
