@@ -5,7 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 from types import SimpleNamespace
 
+from studio_support import security
 from studio_support.control import store as store_module
+from studio_support.session import SESSION_COOKIE, new_session
 
 
 class FakeStore:
@@ -94,3 +96,39 @@ def test_store_surfaces_registry_errors(studio_client, tmp_path, monkeypatch):
     response = studio_client.get("/api/store")
 
     assert response.status_code == 502
+
+
+def _login_as(studio_client, roles: list[str]) -> None:
+    studio_client.cookies.set(
+        SESSION_COOKIE, new_session({"sub": "user-1", "email": "a@b", "roles": roles})
+    )
+
+
+def test_install_requires_auth_when_configured(studio_client, tmp_path, monkeypatch):
+    monkeypatch.setattr(store_module, "_store", lambda: FakeStore(tmp_path))
+    monkeypatch.setattr(security, "auth_configured", lambda: True)
+
+    response = studio_client.post("/api/store/install", json={"name": "auth_support"})
+
+    assert response.status_code == 401
+
+
+def test_install_rejects_non_admin(studio_client, tmp_path, monkeypatch):
+    monkeypatch.setattr(store_module, "_store", lambda: FakeStore(tmp_path))
+    monkeypatch.setattr(security, "auth_configured", lambda: True)
+    _login_as(studio_client, ["editor"])
+
+    response = studio_client.post("/api/store/install", json={"name": "auth_support"})
+
+    assert response.status_code == 403
+
+
+def test_install_allows_admin(studio_client, tmp_path, monkeypatch):
+    monkeypatch.setattr(store_module, "_store", lambda: FakeStore(tmp_path))
+    monkeypatch.setattr(security, "auth_configured", lambda: True)
+    _login_as(studio_client, ["admin"])
+
+    response = studio_client.post("/api/store/install", json={"name": "auth_support"})
+
+    assert response.status_code == 200
+    assert response.json()["declared"] is True

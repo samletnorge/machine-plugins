@@ -9,9 +9,12 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+
+from studio_support.security import require_role
 
 router = APIRouter(prefix="/api/store", tags=["studio-store"])
 
@@ -54,7 +57,10 @@ async def store_catalog() -> dict[str, object]:
 
 
 @router.post("/install")
-async def store_install(payload: StoreInstallRequest) -> dict[str, object]:
+async def store_install(
+    payload: StoreInstallRequest,
+    _user: dict[str, Any] | None = Depends(require_role("admin")),
+) -> dict[str, object]:
     store = _store()
     try:
         result = await store.install(payload.name, dev=payload.dev)
@@ -72,7 +78,10 @@ async def store_install(payload: StoreInstallRequest) -> dict[str, object]:
 
 
 @router.post("/uninstall")
-async def store_uninstall(payload: StoreInstallRequest) -> dict[str, object]:
+async def store_uninstall(
+    payload: StoreInstallRequest,
+    _user: dict[str, Any] | None = Depends(require_role("admin")),
+) -> dict[str, object]:
     store = _store()
     try:
         result = await store.uninstall(payload.name)

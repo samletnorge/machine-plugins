@@ -12,8 +12,10 @@
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { Button } from "$lib/components/ui/button/index.js";
 	import * as Card from "$lib/components/ui/card/index.js";
+	import * as Dialog from "$lib/components/ui/dialog/index.js";
 	import { Input } from "$lib/components/ui/input/index.js";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
+	import { studio } from "$lib/store.svelte";
 	import {
 		getStore,
 		installPlugin,
@@ -30,6 +32,9 @@
 	let tier = $state("all");
 	let busy = $state<string | null>(null);
 	let lastResult = $state<StoreActionResult | null>(null);
+	let pending = $state<{ name: string; action: "install" | "uninstall" } | null>(null);
+
+	const isAdmin = $derived(!studio.user || (studio.user.roles ?? []).includes("admin"));
 
 	onMount(load);
 
@@ -70,6 +75,12 @@
 		} finally {
 			busy = null;
 		}
+	}
+
+	function confirmPending() {
+		const request = pending;
+		pending = null;
+		if (request) run(request.name, request.action);
 	}
 </script>
 
@@ -149,13 +160,13 @@
 									<Badge variant="secondary">declared</Badge>
 								{/if}
 							</div>
-							<div class="mt-auto flex gap-2 pt-2">
+							<div class="mt-auto flex items-center gap-2 pt-2">
 								{#if plugin.declared || plugin.installed}
 									<Button
 										variant="outline"
 										size="sm"
-										disabled={busy !== null}
-										onclick={() => run(plugin.name, "uninstall")}
+										disabled={busy !== null || !isAdmin}
+										onclick={() => (pending = { name: plugin.name, action: "uninstall" })}
 									>
 										<Trash2Icon data-icon="inline-start" />
 										Remove
@@ -163,12 +174,15 @@
 								{:else}
 									<Button
 										size="sm"
-										disabled={busy !== null || !catalog.has_pyproject}
-										onclick={() => run(plugin.name, "install")}
+										disabled={busy !== null || !catalog.has_pyproject || !isAdmin}
+										onclick={() => (pending = { name: plugin.name, action: "install" })}
 									>
 										<DownloadIcon data-icon="inline-start" />
 										{busy === plugin.name ? "Installing…" : "Install"}
 									</Button>
+								{/if}
+								{#if !isAdmin}
+									<Badge variant="outline" class="text-xs">admin required</Badge>
 								{/if}
 							</div>
 						</Card.Content>
@@ -195,4 +209,30 @@
 			{/if}
 		{/if}
 	</DataState>
+
+	<Dialog.Root open={pending !== null} onOpenChange={(open) => !open && (pending = null)}>
+		<Dialog.Content class="sm:max-w-md">
+			<Dialog.Header>
+				<Dialog.Title>
+					{pending?.action === "install" ? "Install" : "Remove"} {pending?.name}?
+				</Dialog.Title>
+				<Dialog.Description>
+					{#if pending?.action === "install"}
+						This runs <code>uv add</code> in the project, declares the plugin in
+						<code>[tool.machine-core].plugins</code>, and syncs its manifest. Restart the
+						runtime afterwards.
+					{:else}
+						This runs <code>uv remove</code>, undeclares the plugin, and removes its synced
+						manifest.
+					{/if}
+				</Dialog.Description>
+			</Dialog.Header>
+			<Dialog.Footer>
+				<Button variant="outline" onclick={() => (pending = null)}>Cancel</Button>
+				<Button onclick={confirmPending}>
+					{pending?.action === "install" ? "Install" : "Remove"}
+				</Button>
+			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
 </div>
