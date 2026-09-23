@@ -1,1 +1,0 @@
-import{z as o}from"./assets/api-DgXn3BUQ.js";import{D as e}from"./assets/DomainPanel-CwhoHTUB.js";import"./assets/style-4minRsux.js";const t=document.getElementById("deploy-island");t&&o(e,{target:t,props:{domain:"deploy",title:"Deploy",endpoint:t.dataset.endpoint??"/_studio/api/deploy/targets"}});

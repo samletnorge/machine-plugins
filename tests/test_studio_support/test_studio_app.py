@@ -1,7 +1,8 @@
-"""Task 9 — Studio app creation and index route tests."""
+"""Task 9 — Studio app creation and legacy-redirect tests."""
 
 import json
 
+import pytest
 from studio_support import StudioSupportPlugin
 from studio_support.app import create_studio_app
 from studio_support.dependencies import (
@@ -40,150 +41,36 @@ def test_create_studio_app_returns_fastapi(fake_machine):
     assert isinstance(app, FastAPI)
 
 
-def test_index_returns_200(studio_client):
-    resp = studio_client.get("/")
-    assert resp.status_code == 200
-    assert "TestMachine" in resp.text
+@pytest.mark.parametrize(
+    ("legacy", "target"),
+    [
+        ("/", "/app/"),
+        ("/dashboard", "/app/"),
+        ("/registry", "/app/registry"),
+        ("/config", "/app/config"),
+        ("/services", "/app/services"),
+        ("/account", "/app/context"),
+        ("/agents", "/app/runtime"),
+        ("/tools", "/app/runtime"),
+        ("/workflows", "/app/runtime"),
+        ("/chat", "/app/runtime"),
+        ("/sections/deploy", "/app/domain/deploy"),
+        ("/islands/memory", "/app/domain/memory"),
+        ("/docs", "/app/"),
+    ],
+)
+def test_legacy_pages_redirect_into_spa(studio_client, legacy: str, target: str):
+    response = studio_client.get(legacy, follow_redirects=False)
+
+    assert response.status_code == 307
+    assert response.headers["location"] == target
 
 
-def test_index_exposes_agents_surface(studio_client):
-    resp = studio_client.get("/")
-    assert '<span class="eyebrow">Agents</span>' in resp.text
-
-
-def test_index_exposes_tools_surface(studio_client):
-    resp = studio_client.get("/")
-    assert '<span class="eyebrow">Tools</span>' in resp.text
-
-
-def test_index_shows_active_tenant_project_and_environment(studio_client):
-    response = studio_client.get("/")
-
-    assert response.status_code == 200
-    assert 'data-active-context="Northwind / Fuel Ops / dev"' in response.text
-    assert "Northwind" in response.text
-    assert "Fuel Ops / dev" in response.text
-    assert "Northwind / Fuel Ops / dev" in response.text
-
-
-def test_index_shows_attachment_state(studio_client):
-    response = studio_client.get("/")
-
-    assert response.status_code == 200
-    assert 'data-attachment="attached"' in response.text
-    assert '<span class="context-label">Attachment</span>' in response.text
-    assert "<strong>attached</strong>" in response.text
-
-
-def test_dashboard_frames_studio_as_control_plane(studio_client):
-    response = studio_client.get("/")
+def test_spa_index_served(studio_client):
+    response = studio_client.get("/app")
 
     assert response.status_code == 200
-    assert "Machine Studio" in response.text
-    assert "control plane" in response.text
-    for nav_item in ("Dashboard", "Registry", "Config", "Services"):
-        assert nav_item in response.text
-
-
-def test_dashboard_moves_context_switching_to_sidebar_and_removes_topbar_switcher(
-    studio_client,
-):
-    response = studio_client.get("/")
-
-    assert response.status_code == 200
-    assert 'class="sidebar-context-switcher"' in response.text
-    assert 'aria-label="Tenant"' in response.text
-    assert 'aria-label="Project"' in response.text
-    assert 'aria-label="Environment"' in response.text
-    assert 'data-context-switcher-endpoint="' in response.text
-    assert '/api/context"' in response.text
-    assert 'name="tenant_slug"' in response.text
-    assert 'name="project_slug"' in response.text
-    assert 'name="environment_name"' in response.text
-    assert "Samletnorge" in response.text
-    assert "Mythrantic" in response.text
-    assert "Car Expert" in response.text
-    assert "News Finder" in response.text
-    assert "AI Playground" in response.text
-    assert 'class="context-switcher-shell"' not in response.text
-    assert (
-        '<button type="submit" class="primary-button">Switch</button>'
-        not in response.text
-    )
-    assert "Active runtime" not in response.text
-
-
-def test_topbar_only_keeps_mode_toggle_and_moves_theme_picker_to_account_page(
-    studio_client,
-):
-    response = studio_client.get("/")
-
-    assert response.status_code == 200
-    assert 'id="mode-toggle"' in response.text
-    assert 'aria-label="Toggle color mode"' in response.text
-    assert 'id="theme-picker"' not in response.text
-    assert ">Theme</span>" not in response.text
-
-    account_response = studio_client.get("/account")
-
-    assert account_response.status_code == 200
-    assert 'id="theme-picker"' in account_response.text
-    assert ">Theme</span>" in account_response.text
-
-
-def test_sidebar_switcher_seeds_multi_tenant_catalog(studio_client):
-    response = studio_client.get("/")
-
-    assert response.status_code == 200
-    assert 'value="northwind"' in response.text
-    assert 'value="northwind"' in response.text and "selected" in response.text
-    assert 'value="samletnorge"' in response.text
-    assert 'value="mythrantic"' in response.text
-    assert 'value="fuel-ops"' in response.text
-    assert 'value="dev"' in response.text
-    assert 'value="staging"' in response.text
-    assert 'value="prod"' in response.text
-    assert "Car Expert" in response.text
-    assert "News Finder" in response.text
-    assert "AI Playground" in response.text
-
-
-def test_dashboard_shows_requested_failed_context_without_stale_runtime(
-    context_aware_studio_client,
-):
-    state = context_aware_studio_client.app.state.studio_state
-    original_resolver = state.attachment_manager._resolver
-
-    def fail_resolver(context):
-        if context.environment_id == "env-staging":
-            raise RuntimeError("attach failed")
-        return original_resolver(context)
-
-    state.attachment_manager._resolver = fail_resolver
-
-    switch_response = context_aware_studio_client.put(
-        "/api/context",
-        json={
-            "tenant_slug": "northwind",
-            "project_slug": "fuel-ops",
-            "environment_name": "staging",
-        },
-    )
-
-    assert switch_response.status_code == 200
-
-    response = context_aware_studio_client.get("/")
-
-    assert response.status_code == 200
-    assert "Northwind / Fuel Ops / staging" in response.text
-    assert "failed" in response.text
-    assert "attach failed" in response.text
-    assert "StagingMachine" not in response.text
-    assert "designer-agent" not in response.text
-    assert "staging-echo" not in response.text
-    assert "No runtime attached" in response.text
-    assert 'data-active-context="Northwind / Fuel Ops / staging"' in response.text
-    assert 'data-attachment="failed' in response.text
+    assert "text/html" in response.headers["content-type"]
 
 
 def test_machine_snapshot_uses_honest_unknown_context_placeholders_when_state_missing(

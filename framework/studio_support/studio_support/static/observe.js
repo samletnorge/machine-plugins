@@ -1,1 +1,0 @@
-import{z as e}from"./assets/api-DgXn3BUQ.js";import{D as o}from"./assets/DomainPanel-CwhoHTUB.js";import"./assets/style-4minRsux.js";const t=document.getElementById("observe-island");t&&e(o,{target:t,props:{domain:"observe",title:"Observability",endpoint:t.dataset.endpoint??"/_studio/api/observe/traces"}});

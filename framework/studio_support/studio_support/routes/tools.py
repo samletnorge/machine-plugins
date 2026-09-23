@@ -1,4 +1,4 @@
-"""Tool tester routes for Studio."""
+"""Tool execution route (JSON API used by the Studio SPA)."""
 
 from __future__ import annotations
 
@@ -7,24 +7,8 @@ import inspect
 from fastapi import APIRouter, HTTPException, Request
 
 from studio_support.runtime_access import machine_item
-from studio_support.ui import render_template
 
 router = APIRouter(prefix="/tools", tags=["tools"])
-
-
-@router.get("/{tool_name}")
-async def tool_page(request: Request, tool_name: str):
-    tool = machine_item("tool", tool_name)
-    if tool is None:
-        raise HTTPException(status_code=404, detail=f"Tool '{tool_name}' not found")
-    return render_template(
-        request,
-        "tool_tester.html",
-        page_title=f"Tool: {tool_name}",
-        active_nav="tools",
-        tool=tool,
-        tool_name=tool_name,
-    )
 
 
 @router.post("/{tool_name}/execute")

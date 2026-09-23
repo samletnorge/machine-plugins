@@ -1,21 +1,8 @@
-"""Studio domain slice and hub seam tests."""
+"""Studio domain slice and control-plane seam tests."""
 
 from __future__ import annotations
 
 import pytest
-
-from studio_support.ui import studio_layout
-
-
-def test_studio_layout_exposes_hub_context_seams():
-    layout = studio_layout(page_title="Dashboard", active_nav="dashboard")
-
-    assert "project_name" in layout
-    assert "environment" in layout
-    assert "nav_sections" in layout
-    assert "workspace_name" in layout
-    assert "organization_name" in layout
-    assert "project_targets" in layout
 
 
 @pytest.mark.parametrize(
@@ -45,16 +32,9 @@ def test_domain_endpoints_return_domain_payloads(studio_client, path: str, domai
     assert "items" in payload
 
 
-def test_domain_section_renders_control_plane_page(studio_client):
-    response = studio_client.get("/sections/deploy")
+@pytest.mark.parametrize("section", ["deploy", "memory", "observe", "not-a-domain"])
+def test_legacy_sections_redirect_to_spa(studio_client, section: str):
+    response = studio_client.get(f"/sections/{section}", follow_redirects=False)
 
-    assert response.status_code == 200
-    assert "Control plane" in response.text
-    assert "Deploy" in response.text
-
-
-def test_unknown_section_still_renders_placeholder(studio_client):
-    response = studio_client.get("/sections/not-a-domain")
-
-    assert response.status_code == 200
-    assert '"next": "not-a-domain"' in response.text
+    assert response.status_code == 307
+    assert response.headers["location"].startswith("/app")

@@ -1,1 +1,0 @@
-import{z as t}from"./assets/api-DgXn3BUQ.js";import{D as e}from"./assets/DomainPanel-CwhoHTUB.js";import"./assets/style-4minRsux.js";const o=document.getElementById("workspace-island");o&&t(e,{target:o,props:{domain:"workspace",title:"Workspace",endpoint:o.dataset.endpoint??"/_studio/api/workspace/files"}});

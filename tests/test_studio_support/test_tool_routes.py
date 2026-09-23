@@ -1,15 +1,4 @@
-"""Task 10 — Tool tester route tests."""
-
-
-def test_tool_page_returns_200(studio_client):
-    resp = studio_client.get("/tools/echo")
-    assert resp.status_code == 200
-    assert "echo" in resp.text
-
-
-def test_tool_page_unknown_404(studio_client):
-    resp = studio_client.get("/tools/nonexistent")
-    assert resp.status_code == 404
+"""Tool execution API tests."""
 
 
 def test_tool_execute_returns_result(studio_client):

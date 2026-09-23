@@ -1,1 +1,0 @@
-import{z as t}from"./assets/api-DgXn3BUQ.js";import{D as m}from"./assets/DomainPanel-CwhoHTUB.js";import"./assets/style-4minRsux.js";const o=document.getElementById("memory-island");o&&t(m,{target:o,props:{domain:"memory",title:"Memory",endpoint:o.dataset.endpoint??"/_studio/api/memory/threads"}});

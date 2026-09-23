@@ -698,10 +698,10 @@ def _landing_page_html(state: StudioState) -> str:
       <nav class='nav-links' aria-label='Primary'>
         <a href='#capabilities'>Capabilities</a>
         <a href='#install-machine'>Install</a>
-        <a href='/_studio/'>Studio</a>
-        <a href='/_studio/docs'>Docs</a>
+        <a href='/_studio/app/'>Studio</a>
+        <a href='/_studio/app/'>Docs</a>
       </nav>
-      <a class='nav-cta' href='/_studio/'>Open Studio</a>
+      <a class='nav-cta' href='/_studio/app/'>Open Studio</a>
     </div>
   </header>
 
@@ -713,7 +713,7 @@ def _landing_page_html(state: StudioState) -> str:
         <p class='hero-sub reveal' style='--reveal-delay:{len(headline_words) * 40 + 60}ms'>One runtime for agents, tools, RAG, memory, workflows, and evals — with a control plane that keeps every project in view.</p>
         <div class='hero-actions reveal' style='--reveal-delay:{len(headline_words) * 40 + 120}ms'>
           <a class='btn btn-primary' href='#install-machine'>Install Machine</a>
-          <a class='btn btn-ghost' href='/_studio/'>Open Studio</a>
+          <a class='btn btn-ghost' href='/_studio/app/'>Open Studio</a>
         </div>
       </div>
     </section>
@@ -812,18 +812,18 @@ def _landing_page_html(state: StudioState) -> str:
         <h4>Product</h4>
         <a href='#capabilities'>Capabilities</a>
         <a href='#install-machine'>Install</a>
-        <a href='/_studio/'>Studio</a>
+        <a href='/_studio/app/'>Studio</a>
       </div>
       <div class='footer-col'>
         <h4>Runtime</h4>
-        <a href='/_studio/agents'>Agents</a>
-        <a href='/_studio/tools'>Tools</a>
-        <a href='/_studio/sections/rag'>RAG</a>
+        <a href='/_studio/app/runtime'>Agents</a>
+        <a href='/_studio/app/runtime'>Tools</a>
+        <a href='/_studio/app/domain/rag'>RAG</a>
       </div>
       <div class='footer-col'>
         <h4>Operate</h4>
-        <a href='/_studio/'>Studio</a>
-        <a href='/_studio/docs'>Docs</a>
+        <a href='/_studio/app/'>Studio</a>
+        <a href='/_studio/app/'>Docs</a>
         <a href='/health'>Health</a>
       </div>
     </div>
@@ -886,18 +886,9 @@ def create_studio_app(
         finally:
             reset_bound_studio_state(token)
 
-    static_dir = Path(__file__).parent / "static"
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
-
     from studio_support.routes import (
         auth as auth_routes,
-        chat,
-        config,
-        dashboard,
-        docs,
-        registry,
-        resources,
-        services,
+        legacy as legacy_routes,
         tools as tool_routes,
     )
     from studio_support.control import auth as control_auth
@@ -919,13 +910,6 @@ def create_studio_app(
     from studio_support.control import workspace as control_workspace
 
     app.include_router(auth_routes.router)
-    app.include_router(dashboard.router)
-    app.include_router(registry.router)
-    app.include_router(config.router)
-    app.include_router(docs.router)
-    app.include_router(services.router)
-    app.include_router(resources.router)
-    app.include_router(chat.router)
     app.include_router(tool_routes.router)
     app.include_router(control_services.router)
     app.include_router(control_registry.router)
@@ -944,6 +928,9 @@ def create_studio_app(
     app.include_router(control_workspace.router)
     app.include_router(control_browser.router)
     app.include_router(control_voice.router)
+
+    # Legacy server-rendered pages now redirect into the SPA.
+    app.include_router(legacy_routes.router)
 
     # New SvelteKit Studio build (static SPA) served under /_studio/app.
     studio_build = Path(__file__).parent / "web" / "build"
