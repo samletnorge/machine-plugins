@@ -1,14 +1,18 @@
 # Studio
 
 Studio is the control plane for a machine-core runtime: a web UI for browsing the registry,
-chatting with agents, testing tools, switching between projects and environments, and
+inspecting agents, tools and workflows, switching between projects and environments, and
 inspecting domain data (memory, RAG, evals, storage, deploy, observe, auth, workspace,
 browser, voice, pubsub).
+
+The UI is a **SvelteKit single-page app** (Svelte 5 + Tailwind v4 + shadcn-svelte) served at
+`/_studio/app`. The FastAPI sub-application serves the SPA build and the JSON API, and owns
+the Zitadel OIDC login flow.
 
 ## Launch it
 
 ```bash
-machine studio                              # http://127.0.0.1:3177/_studio/
+machine studio                              # http://127.0.0.1:3177/_studio/app/
 machine studio --port 4000 --host 0.0.0.0
 ```
 
@@ -29,54 +33,47 @@ interpreter and warns.
 | Path | What it is |
 |------|------------|
 | `/` | Studio landing page. |
-| `/_studio/` | The Studio sub-application. |
+| `/_studio/app/...` | The Studio SPA (all UI routes). |
+| `/_studio/api/...` | Control-plane JSON endpoints. |
+| `/_studio/auth/...` | Zitadel OIDC login, callback, session and logout. |
 | `/health` | `{"status": "healthy", "studio_mount": "/_studio"}` |
-| `/favicon.ico` | The Machine mark. |
 
 The host app starts the machine in its lifespan (if it has not been started), so plugins and
 `when_ready` callbacks run before any request is served.
 
 ## Studio routes
 
-All Studio routes are mounted under `/_studio`:
-
 | Path | Purpose |
 |------|---------|
-| `/_studio/` | Dashboard ("Mission Control"). |
-| `/_studio/dashboard` | Dashboard alias. |
-| `/_studio/account` | Account preferences (theme). |
-| `/_studio/sections/{key}` | A domain page (`memory`, `rag`, `evals`, `storage`, `deploy`, `observe`, `auth`, `workspace`, `browser`, `voice`, `pubsub`). |
-| `/_studio/islands/{domain}` | The Svelte island for a domain. |
-| `/_studio/registry` | Registry browser. |
-| `/_studio/config` | Configuration view. |
-| `/_studio/services` | Services view. |
-| `/_studio/resources` | Resources view. |
-| `/_studio/chat` | Chat UI. |
-| `/_studio/chat/send` | Form POST that runs an agent and returns chat HTML. |
-| `/_studio/tools/{tool_name}` | Tool tester. |
+| `/_studio/app/` | Overview dashboard. |
+| `/_studio/app/registry` | Registry browser. |
+| `/_studio/app/services` | Control-plane endpoints and service actions. |
+| `/_studio/app/runtime` | Agents, tools and workflows. |
+| `/_studio/app/domain/{key}` | A domain page (`memory`, `rag`, `evals`, `storage`, `deploy`, `observe`, `auth`, `workspace`, `browser`, `voice`, `pubsub`). |
+| `/_studio/app/context` | Tenant / project / environment switcher. |
+| `/_studio/app/config` | Configuration view. |
 | `/_studio/tools/{tool_name}/execute` | Execute a tool (handler-aware). |
-| `/_studio/api/...` | Control-plane JSON endpoints. |
 
-## Chat
+The legacy server-rendered URLs (`/_studio/`, `/_studio/registry`, `/_studio/chat`, ...)
+permanently redirect to their SPA equivalents, so old links keep working.
 
-Open <http://127.0.0.1:3177/_studio/chat>. The page lists agents from
-`machine.list_category("agent")` and lets you pick one. Sending a message posts to
-`/_studio/chat/send` with form fields `agent` and `message`; Studio calls
-`agent_instance.run(message)` and renders the reply.
+## Authentication
 
-The control-plane chat API (used by rich surfaces) exposes:
+Studio delegates sign-in to **Zitadel** (OIDC authorization-code flow, confidential client).
+The backend performs the token exchange and stores an HttpOnly session cookie; the SPA never
+sees tokens. Configure via environment:
 
-| Method | Path |
-|--------|------|
-| `GET` | `/_studio/api/chat/threads` |
-| `POST` | `/_studio/api/chat/sessions` |
-| `POST` | `/_studio/api/chat/threads/{thread_id}/messages` |
+| Variable | Purpose |
+|----------|---------|
+| `ZITADEL_ISSUER` | Issuer URL (default `https://zitadel.samletnorge.no`). |
+| `ZITADEL_CLIENT_ID` / `ZITADEL_CLIENT_SECRET` | Web app credentials. |
+| `ZITADEL_REDIRECT_URI` | Must match the registered callback (`/_studio/auth/callback`). |
+| `ZITADEL_PROJECT_ID` | Optional; adds the audience scope so project roles resolve. |
+| `SESSION_SECRET` | HMAC key for the signed session cookie. |
 
-> **Tip:** For chat to work, the agent item's `run` method must accept a single message
-> argument (like the scaffold's `ExampleAgent.run(input, context=None)`). Studio's runtime
-> routes prefer agents whose `run` has at most one required parameter. Agent **runtimes**
-> registered as `agent/basic` and `agent/pydantic-ai` are intentionally skipped because
-> their `run` needs a definition and tool list.
+`GET /_studio/auth/login` starts the flow, `/_studio/auth/callback` completes it,
+`GET /_studio/auth/me` returns the signed-in user and roles, and `/_studio/auth/logout` ends
+the session.
 
 ## Context: tenants, projects, environments
 
@@ -112,6 +109,7 @@ status = "healthy"
 
 The catalog resolves to dataclasses: `StudioTenant`, `StudioProject`, `StudioEnvironment`,
 `StudioContext`, and `RuntimeAttachment` (`attached`, `attaching`, `failed`, `detached`).
+The sidebar tenant switcher and the Context page both use the endpoints below.
 
 ### Switching context
 
@@ -131,30 +129,35 @@ curl -s -X PUT http://127.0.0.1:3177/_studio/api/context \
 
 This is how Studio scales from one project to many without changing the underlying system.
 
+## Overview
+
+`GET /_studio/api/overview` returns the full machine/context snapshot the SPA dashboard uses:
+machine and context names, category counts, plugin manifests, project targets, and the
+registered agents, tools and workflows.
+
 ## Domains
 
 Each domain page renders live control-plane data from a JSON endpoint:
 
-| Domain | Categories | Endpoint |
-|--------|-----------|----------|
-| Memory | `memory` | `/_studio/api/memory/threads` |
-| RAG | `rag_pipeline`, `chunker`, `reranker`, `metadata_extractor` | `/_studio/api/rag/pipelines` |
-| Evals | `scorer`, `dataset` | `/_studio/api/evals/runs` |
-| Storage | `storage-backend` | `/_studio/api/storage/files` |
-| Deploy | `deployer` | `/_studio/api/deploy/targets` |
-| Observe | `observability_exporter` | `/_studio/api/observe/traces` |
-| Auth | `auth_provider` | `/_studio/api/auth/keys` |
-| Workspace | `sandbox`, `filesystem` | `/_studio/api/workspace/files` |
-| Browser | `browser` | `/_studio/api/browser/sessions` |
-| Voice | `voice_provider` | `/_studio/api/voice/voices` |
-| PubSub | `pubsub` | `/_studio/api/pubsub/events` |
+| Domain | Endpoint |
+|--------|----------|
+| Memory | `/_studio/api/memory/threads` |
+| RAG | `/_studio/api/rag/pipelines` |
+| Evals | `/_studio/api/evals/runs` |
+| Storage | `/_studio/api/storage/files` |
+| Deploy | `/_studio/api/deploy/targets` |
+| Observe | `/_studio/api/observe/traces` |
+| Auth | `/_studio/api/auth/keys` |
+| Workspace | `/_studio/api/workspace/files` |
+| Browser | `/_studio/api/browser/sessions` |
+| Voice | `/_studio/api/voice/voices` |
+| PubSub | `/_studio/api/pubsub/events` |
 
 A domain page with no registered categories renders an empty state rather than an error.
 
-## Tool tester
+## Tool execution
 
-`/_studio/tools/{tool_name}` tests a registered tool. `/_studio/tools/{tool_name}/execute`
-prefers, in order:
+`POST /_studio/tools/{tool_name}/execute` runs a registered tool, preferring, in order:
 
 1. `tool.execute(body)` (if callable),
 2. `tool.handler(**body)` (for `@tool`-defined `ToolDefinition`s),
@@ -165,14 +168,23 @@ This is why Studio can execute `@tool` tools even though the generic
 
 ## Registry browser
 
-`/_studio/api/registry` and the `/_studio/registry` page browse the current machine's
-categories and items, showing owners and serialized metadata (sensitive keys redacted).
+`/_studio/api/registry/plugins` returns the installed plugin manifests, and
+`/_studio/api/registry/plugins/{name}` returns one. The SPA's Registry page groups them by
+name prefix and supports search and filtering.
+
+## Developing the SPA
+
+```bash
+cd framework/studio_support/studio_support/web
+pnpm install
+pnpm run dev      # SvelteKit dev server
+pnpm run check    # svelte-check
+pnpm run build    # writes ./build, committed so git installs can serve it
+```
 
 ## Next steps
 
 - [HTTP API](http-api.md) — the runtime's own `/api` and `/gateway`.
-- [Deployers](deployers.md) — the Deploy domain.
-- [Cloud deployment](../deployment/cloud.md) — run Studio in the cloud.
 
 ---
 
