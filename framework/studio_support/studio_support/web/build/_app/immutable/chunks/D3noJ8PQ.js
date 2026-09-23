@@ -1,1 +1,0 @@
-var e=`/_studio`;async function t(){try{let t=await fetch(`${e}/auth/me`,{credentials:`include`});return t.ok?(await t.json()).user:null}catch{return null}}function n(t){let n=t??`${e}/app/`;window.location.href=`${e}/auth/login?next=${encodeURIComponent(n)}`}export{n,t};

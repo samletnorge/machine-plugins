@@ -908,6 +908,7 @@ def create_studio_app(
     from studio_support.control import evals as control_evals
     from studio_support.control import memory as control_memory
     from studio_support.control import observe as control_observe
+    from studio_support.control import overview as control_overview
     from studio_support.control import pubsub as control_pubsub
     from studio_support.control import rag as control_rag
     from studio_support.control import registry as control_registry
@@ -934,6 +935,7 @@ def create_studio_app(
     app.include_router(control_deploy.router)
     app.include_router(control_auth.router)
     app.include_router(control_observe.router)
+    app.include_router(control_overview.router)
     app.include_router(control_memory.router)
     app.include_router(control_rag.router)
     app.include_router(control_evals.router)

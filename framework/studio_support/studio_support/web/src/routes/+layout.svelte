@@ -2,7 +2,8 @@
 	import './layout.css';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-	import { getUser, login } from '$lib/auth';
+	import { login } from '$lib/auth';
+	import { loadStudio, studio } from '$lib/store.svelte';
 
 	let { children } = $props();
 
@@ -11,8 +12,8 @@
 	onMount(async () => {
 		const path = page.url.pathname;
 		if (PUBLIC_ROUTES.some((route) => path.endsWith(route))) return;
-		const user = await getUser();
-		if (!user) login();
+		await loadStudio();
+		if (!studio.user) login();
 	});
 </script>
 

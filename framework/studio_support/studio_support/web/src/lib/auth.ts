@@ -1,7 +1,7 @@
 // Studio auth helpers. The SvelteKit app is served at /_studio/app while the
 // FastAPI backend owns the Zitadel OIDC flow under /_studio/auth/*.
 
-const API_ROOT = '/_studio';
+export const API_ROOT = '/_studio';
 
 export interface StudioUser {
 	sub: string;
