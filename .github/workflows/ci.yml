@@ -29,3 +29,25 @@ jobs:
         run: uvx ruff check framework community tests
       - name: Tests
         run: uv run pytest tests -q
+
+  studio-web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: framework/studio_support/studio_support/web
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: framework/studio_support/studio_support/web/pnpm-lock.yaml
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Type-check
+        run: pnpm run check
+      - name: Build SPA
+        run: pnpm run build
