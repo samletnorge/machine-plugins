@@ -4,11 +4,79 @@
   "description": "Voice abstraction layer with TTS, STT, and realtime voice providers",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["categories:define"],
+  "capabilities": ["categories:define", "voice_provider:register"],
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
     "entry_point": "voice_support:VoiceSupportPlugin"
+  },
+  "config_schema": {
+    "openai_api_key": {
+      "type": "string",
+      "secret": true,
+      "env": "OPENAI_API_KEY",
+      "required": false,
+      "description": "OpenAI API key for the openai provider"
+    },
+    "azure_speech_key": {
+      "type": "string",
+      "secret": true,
+      "env": "AZURE_SPEECH_KEY",
+      "required": false,
+      "description": "Azure Speech subscription key for the azure provider"
+    },
+    "azure_speech_region": {
+      "type": "string",
+      "env": "AZURE_SPEECH_REGION",
+      "required": false,
+      "description": "Azure Speech region for the azure provider"
+    },
+    "google_application_credentials": {
+      "type": "string",
+      "secret": true,
+      "env": "GOOGLE_APPLICATION_CREDENTIALS",
+      "required": false,
+      "description": "Path to Google service account JSON for the google_cloud provider"
+    },
+    "fish_audio_api_key": {
+      "type": "string",
+      "secret": true,
+      "env": "FISH_AUDIO_API_KEY",
+      "required": false,
+      "description": "Fish Audio API key for the fish_audio provider"
+    },
+    "deepgram_api_key": {
+      "type": "string",
+      "secret": true,
+      "env": "DEEPGRAM_API_KEY",
+      "required": false,
+      "description": "Deepgram API key for the deepgram provider"
+    },
+    "elevenlabs_api_key": {
+      "type": "string",
+      "secret": true,
+      "env": "ELEVENLABS_API_KEY",
+      "required": false,
+      "description": "ElevenLabs API key for the elevenlabs provider"
+    },
+    "edge_tts_voice": {
+      "type": "string",
+      "default": "en-US-GuyNeural",
+      "required": false,
+      "description": "Default voice for the edge_tts provider"
+    },
+    "gtts_language": {
+      "type": "string",
+      "default": "en",
+      "required": false,
+      "description": "Default language for the gtts provider"
+    },
+    "whisper_model": {
+      "type": "string",
+      "default": "base",
+      "required": false,
+      "description": "Model size for the whisper_local provider"
+    }
   }
 }

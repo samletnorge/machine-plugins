@@ -4,11 +4,26 @@
   "description": "Deployment target category and built-in deployers (Docker, Dokploy, Vercel, Cloudflare)",
   "schema_version": "1.0.0",
   "language": "python",
-  "capabilities": ["categories:define"],
+  "capabilities": ["categories:define", "deployer:register"],
   "hooks_subscribed": {},
   "events_subscribed": [],
   "transport": {
     "type": "in-process",
     "entry_point": "deployer_support:DeployerSupportPlugin"
+  },
+  "config_schema": {
+    "api_url": {
+      "type": "string",
+      "env": "DOKPLOY_API_URL",
+      "required": false,
+      "description": "Dokploy API base URL (enables the dokploy deployer)"
+    },
+    "api_token": {
+      "type": "string",
+      "secret": true,
+      "env": "DOKPLOY_API_TOKEN",
+      "required": false,
+      "description": "Dokploy API token (enables the dokploy deployer)"
+    }
   }
 }

@@ -13,6 +13,7 @@ from .base import (
     ScreenshotResult,
     ElementResult,
 )
+from .playwright_browser import PlaywrightBrowser
 
 __all__ = [
     "BrowserSupportPlugin",
@@ -21,6 +22,7 @@ __all__ = [
     "NavigateResult",
     "ScreenshotResult",
     "ElementResult",
+    "PlaywrightBrowser",
 ]
 
 
@@ -39,6 +41,10 @@ class BrowserSupportPlugin:
                 "list": {"method": "GET", "on": "collection"},
             },
         )
+        # Construction is cheap and lazy — no browser is launched here.
+        # PlaywrightBrowser.create() starts Playwright on first use and
+        # raises a clear ImportError when the playwright package is absent.
+        ctx.register("browser", "playwright", PlaywrightBrowser())
 
     async def shutdown(self, **kwargs):
         """No-op — no resources to release."""
