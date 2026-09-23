@@ -86,10 +86,17 @@ export interface Environment {
 	connection_ref?: string | null;
 }
 
+export interface ContextOption {
+	slug: string;
+	name: string;
+	active: boolean;
+}
+
 export interface Overview {
 	machine_name: string;
 	tenant_slug: string | null;
 	tenant_name: string;
+	tenant_options: ContextOption[];
 	project_slug: string | null;
 	project_name: string;
 	environment: string;

@@ -1,16 +1,20 @@
 <script lang="ts">
-	import CreditCardIcon from "@tabler/icons-svelte/icons/credit-card";
-	import DotsVerticalIcon from "@tabler/icons-svelte/icons/dots-vertical";
-	import LogoutIcon from "@tabler/icons-svelte/icons/logout";
-	import NotificationIcon from "@tabler/icons-svelte/icons/notification";
-	import UserCircleIcon from "@tabler/icons-svelte/icons/user-circle";
+	import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
+	import LogOutIcon from "@lucide/svelte/icons/log-out";
+	import ShieldCheckIcon from "@lucide/svelte/icons/shield-check";
+	import UserIcon from "@lucide/svelte/icons/user";
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
+	import { Badge } from "$lib/components/ui/badge/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-
-	let { user }: { user: { name: string; email: string; avatar: string } } = $props();
+	import { logout } from "$lib/auth";
+	import { initials, studio } from "$lib/store.svelte";
 
 	const sidebar = Sidebar.useSidebar();
+	const user = $derived(studio.user);
+	const name = $derived(user?.name || user?.email || "Signed in");
+	const email = $derived(user?.email ?? "");
+	const roles = $derived(user?.roles ?? []);
 </script>
 
 <Sidebar.Menu>
@@ -19,21 +23,18 @@
 			<DropdownMenu.Trigger>
 				{#snippet child({ props })}
 					<Sidebar.MenuButton
-						{...props}
 						size="lg"
 						class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+						{...props}
 					>
-						<Avatar.Root class="size-8 rounded-lg grayscale">
-							<Avatar.Image src={user.avatar} alt={user.name} />
-							<Avatar.Fallback class="rounded-lg">CN</Avatar.Fallback>
+						<Avatar.Root class="size-8 rounded-lg">
+							<Avatar.Fallback class="rounded-lg">{initials(user?.name, user?.email)}</Avatar.Fallback>
 						</Avatar.Root>
 						<div class="grid flex-1 text-start text-sm leading-tight">
-							<span class="truncate font-medium">{user.name}</span>
-							<span class="truncate text-xs text-muted-foreground">
-								{user.email}
-							</span>
+							<span class="truncate font-medium">{name}</span>
+							<span class="truncate text-xs">{email}</span>
 						</div>
-						<DotsVerticalIcon class="ms-auto size-4" />
+						<ChevronsUpDownIcon class="ms-auto size-4" />
 					</Sidebar.MenuButton>
 				{/snippet}
 			</DropdownMenu.Trigger>
@@ -46,35 +47,33 @@
 				<DropdownMenu.Label class="p-0 font-normal">
 					<div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
 						<Avatar.Root class="size-8 rounded-lg">
-							<Avatar.Image src={user.avatar} alt={user.name} />
-							<Avatar.Fallback class="rounded-lg">CN</Avatar.Fallback>
+							<Avatar.Fallback class="rounded-lg">{initials(user?.name, user?.email)}</Avatar.Fallback>
 						</Avatar.Root>
 						<div class="grid flex-1 text-start text-sm leading-tight">
-							<span class="truncate font-medium">{user.name}</span>
-							<span class="truncate text-xs text-muted-foreground">
-								{user.email}
-							</span>
+							<span class="truncate font-medium">{name}</span>
+							<span class="truncate text-xs">{email}</span>
 						</div>
 					</div>
 				</DropdownMenu.Label>
+				{#if roles.length}
+					<DropdownMenu.Separator />
+					<DropdownMenu.Label class="flex flex-wrap items-center gap-1">
+						<ShieldCheckIcon class="size-3.5 text-muted-foreground" />
+						{#each roles as role (role)}
+							<Badge variant="secondary" class="capitalize">{role}</Badge>
+						{/each}
+					</DropdownMenu.Label>
+				{/if}
 				<DropdownMenu.Separator />
 				<DropdownMenu.Group>
-					<DropdownMenu.Item>
-						<UserCircleIcon />
-						Account
-					</DropdownMenu.Item>
-					<DropdownMenu.Item>
-						<CreditCardIcon />
-						Billing
-					</DropdownMenu.Item>
-					<DropdownMenu.Item>
-						<NotificationIcon />
-						Notifications
+					<DropdownMenu.Item disabled>
+						<UserIcon />
+						{email || "No email"}
 					</DropdownMenu.Item>
 				</DropdownMenu.Group>
 				<DropdownMenu.Separator />
-				<DropdownMenu.Item>
-					<LogoutIcon />
+				<DropdownMenu.Item onSelect={() => logout()}>
+					<LogOutIcon />
 					Log out
 				</DropdownMenu.Item>
 			</DropdownMenu.Content>

@@ -1,167 +1,150 @@
 <script lang="ts">
-	import CameraIcon from "@tabler/icons-svelte/icons/camera";
-	import ChartBarIcon from "@tabler/icons-svelte/icons/chart-bar";
-	import DashboardIcon from "@tabler/icons-svelte/icons/dashboard";
-	import DatabaseIcon from "@tabler/icons-svelte/icons/database";
-	import FileAiIcon from "@tabler/icons-svelte/icons/file-ai";
-	import FileDescriptionIcon from "@tabler/icons-svelte/icons/file-description";
-	import FileWordIcon from "@tabler/icons-svelte/icons/file-word";
-	import FolderIcon from "@tabler/icons-svelte/icons/folder";
-	import HelpIcon from "@tabler/icons-svelte/icons/help";
-	import InnerShadowTopIcon from "@tabler/icons-svelte/icons/inner-shadow-top";
-	import ListDetailsIcon from "@tabler/icons-svelte/icons/list-details";
-	import ReportIcon from "@tabler/icons-svelte/icons/report";
-	import SearchIcon from "@tabler/icons-svelte/icons/search";
-	import SettingsIcon from "@tabler/icons-svelte/icons/settings";
-	import UsersIcon from "@tabler/icons-svelte/icons/users";
+	import { base } from "$app/paths";
+	import { goto } from "$app/navigation";
+	import { page } from "$app/state";
+	import CheckIcon from "@lucide/svelte/icons/check";
+	import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
+	import Settings2Icon from "@lucide/svelte/icons/settings-2";
+	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import NavDocuments from "./nav-documents.svelte";
-	import NavMain from "./nav-main.svelte";
-	import NavSecondary from "./nav-secondary.svelte";
+	import { getEnvironments, getProjects, switchContext } from "$lib/api";
+	import { NAV_SECTIONS } from "$lib/nav";
+	import { loadStudio, studio } from "$lib/store.svelte";
 	import NavUser from "./nav-user.svelte";
 	import type { ComponentProps } from "svelte";
 
-	const data = {
-		user: {
-			name: "shadcn",
-			email: "m@example.com",
-			avatar: "/avatars/shadcn.jpg",
-		},
-		navMain: [
-			{
-				title: "Dashboard",
-				url: "#",
-				icon: DashboardIcon,
-			},
-			{
-				title: "Lifecycle",
-				url: "#",
-				icon: ListDetailsIcon,
-			},
-			{
-				title: "Analytics",
-				url: "#",
-				icon: ChartBarIcon,
-			},
-			{
-				title: "Projects",
-				url: "#",
-				icon: FolderIcon,
-			},
-			{
-				title: "Team",
-				url: "#",
-				icon: UsersIcon,
-			},
-		],
-		navClouds: [
-			{
-				title: "Capture",
-				icon: CameraIcon,
-				isActive: true,
-				url: "#",
-				items: [
-					{
-						title: "Active Proposals",
-						url: "#",
-					},
-					{
-						title: "Archived",
-						url: "#",
-					},
-				],
-			},
-			{
-				title: "Proposal",
-				icon: FileDescriptionIcon,
-				url: "#",
-				items: [
-					{
-						title: "Active Proposals",
-						url: "#",
-					},
-					{
-						title: "Archived",
-						url: "#",
-					},
-				],
-			},
-			{
-				title: "Prompts",
-				icon: FileAiIcon,
-				url: "#",
-				items: [
-					{
-						title: "Active Proposals",
-						url: "#",
-					},
-					{
-						title: "Archived",
-						url: "#",
-					},
-				],
-			},
-		],
-		navSecondary: [
-			{
-				title: "Settings",
-				url: "#",
-				icon: SettingsIcon,
-			},
-			{
-				title: "Get Help",
-				url: "#",
-				icon: HelpIcon,
-			},
-			{
-				title: "Search",
-				url: "#",
-				icon: SearchIcon,
-			},
-		],
-		documents: [
-			{
-				name: "Data Library",
-				url: "#",
-				icon: DatabaseIcon,
-			},
-			{
-				name: "Reports",
-				url: "#",
-				icon: ReportIcon,
-			},
-			{
-				name: "Word Assistant",
-				url: "#",
-				icon: FileWordIcon,
-			},
-		],
-	};
-
 	let { ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
+
+	const pathname = $derived(page.url.pathname);
+	const overview = $derived(studio.overview);
+	const tenants = $derived(overview?.tenant_options ?? []);
+
+	function isActive(href: string): boolean {
+		const target = `${base}${href}`;
+		if (href === "/") return pathname === target || pathname === base;
+		return pathname === target || pathname.startsWith(`${target}/`);
+	}
+
+	function initial(name: string): string {
+		return name.trim().slice(0, 2).toUpperCase();
+	}
+
+	async function quickSwitch(slug: string) {
+		const projects = await getProjects(slug);
+		const project = projects[0];
+		if (!project) return;
+		const environments = await getEnvironments(project.slug);
+		const environment = environments[0];
+		if (!environment) return;
+		await switchContext({
+			tenant_slug: slug,
+			project_slug: project.slug,
+			environment_name: environment.name,
+		});
+		await loadStudio(true);
+	}
 </script>
 
-<Sidebar.Root collapsible="offcanvas" {...restProps}>
+<Sidebar.Root
+	class="top-(--header-height) h-[calc(100svh_-_var(--header-height))]!"
+	{...restProps}
+>
 	<Sidebar.Header>
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
-				<Sidebar.MenuButton class="data-[slot=sidebar-menu-button]:!p-1.5">
-					{#snippet child({ props })}
-						<a href="##" {...props}>
-							<InnerShadowTopIcon class="!size-5" />
-							<span class="text-base font-semibold">Acme Inc.</span>
-						</a>
-					{/snippet}
-				</Sidebar.MenuButton>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger>
+						{#snippet child({ props })}
+							<Sidebar.MenuButton
+								size="lg"
+								class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+								{...props}
+							>
+								<div
+									class="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+								>
+									<svg viewBox="0 0 48 48" fill="none" class="size-5">
+										<path
+											d="M11 36V12L24 27L37 12V36"
+											stroke="currentColor"
+											stroke-width="5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</div>
+								<div class="grid flex-1 text-start text-sm leading-tight">
+									<span class="truncate font-medium">{overview?.tenant_name ?? "Machine Core"}</span>
+									<span class="truncate text-xs">
+										{overview?.project_name ?? "No project"}{#if overview?.environment}· {overview.environment}{/if}
+									</span>
+								</div>
+								<ChevronsUpDownIcon class="ms-auto size-4" />
+							</Sidebar.MenuButton>
+						{/snippet}
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content
+						class="w-(--bits-dropdown-menu-anchor-width) min-w-56 rounded-lg"
+						align="start"
+						side="bottom"
+						sideOffset={4}
+					>
+						<DropdownMenu.Label class="text-muted-foreground text-xs">Tenants</DropdownMenu.Label>
+						<DropdownMenu.Group>
+							{#each tenants as tenant (tenant.slug)}
+								<DropdownMenu.Item
+									class="gap-2"
+									disabled={tenant.active}
+									onSelect={() => tenant.slug && !tenant.active && quickSwitch(tenant.slug)}
+								>
+									<div
+										class="flex size-6 items-center justify-center rounded-md border text-[10px] font-medium"
+									>
+										{initial(tenant.name)}
+									</div>
+									<span class="truncate">{tenant.name}</span>
+									{#if tenant.active}
+										<CheckIcon class="ms-auto" />
+									{/if}
+								</DropdownMenu.Item>
+							{/each}
+							{#if tenants.length === 0}
+								<DropdownMenu.Item disabled>No tenants configured</DropdownMenu.Item>
+							{/if}
+						</DropdownMenu.Group>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item onSelect={() => goto(`${base}/context`)}>
+							<Settings2Icon />
+							Manage context
+						</DropdownMenu.Item>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 	</Sidebar.Header>
 	<Sidebar.Content>
-		<NavMain items={data.navMain} />
-		<NavDocuments items={data.documents} />
-		<NavSecondary items={data.navSecondary} class="mt-auto" />
+		{#each NAV_SECTIONS as section (section.section)}
+			<Sidebar.Group>
+				<Sidebar.GroupLabel>{section.section}</Sidebar.GroupLabel>
+				<Sidebar.Menu>
+					{#each section.items as item (item.key)}
+						{@const Icon = item.icon}
+						<Sidebar.MenuItem>
+							<Sidebar.MenuButton isActive={isActive(item.href)} tooltipContent={item.label}>
+								{#snippet child({ props })}
+									<a href="{base}{item.href}" {...props}>
+										<Icon />
+										<span>{item.label}</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+					{/each}
+				</Sidebar.Menu>
+			</Sidebar.Group>
+		{/each}
 	</Sidebar.Content>
 	<Sidebar.Footer>
-		<NavUser user={data.user} />
+		<NavUser />
 	</Sidebar.Footer>
 </Sidebar.Root>
